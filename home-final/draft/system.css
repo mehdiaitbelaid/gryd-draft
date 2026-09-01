@@ -38,6 +38,7 @@
 .sys.is-title-compact .sys-title .sec-head {
   padding: 0 0 16px;
   font-size: 17px; line-height: 22px; letter-spacing: .005em;
+  max-width: none; white-space: nowrap;
 }
 .sys.is-title-measuring .sys-title .eyebrow,
 .sys.is-title-measuring .sys-title .sec-head { transition: none; }
@@ -326,6 +327,7 @@
   .sys.is-title-compact .sys-title .sec-head {
     padding: 0; font-size: clamp(30px, 3.6vw, 50px);
     line-height: .98; letter-spacing: -.025em;
+    max-width: 20ch; white-space: normal;
   }
   .sys-track { height: auto; }
   .sys-pin { position: static; height: auto; overflow: visible; padding: 8px 0 64px; }
