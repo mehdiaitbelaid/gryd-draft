@@ -311,3 +311,178 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   .map-beads .map-bead { display: none; }
   .map-beads .map-curve { opacity: .5; }
 }
+
+/* The trust band keeps its quiet language: no cards, no boxes, text and marks
+   on the paper, hairlines between ideas, slow passes, and masked ends. */
+.a-quotes .q-rail {
+  margin-top: 44px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.a-quotes .q-track { animation: quote-drift 78s linear infinite; }
+.a-quotes .q-rail:hover .q-track,
+.a-quotes .q-rail:focus-within .q-track { animation-play-state: paused; }
+@keyframes quote-drift { to { transform: translateX(-50%); } }
+
+.a-quotes .q-set { gap: 0; padding-right: 0; align-items: flex-start; }
+.a-quotes .qc {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin: 0;
+  width: clamp(360px, 30vw, 460px);
+  padding: 0 clamp(24px, 3vw, 44px);
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-left: 1px solid var(--stone-mid);
+}
+.a-quotes .qc blockquote {
+  margin: 0;
+  font-style: normal;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--red110);
+}
+.a-quotes .qc figcaption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 0;
+  flex-wrap: wrap;
+}
+.a-quotes .qc figcaption strong { font-weight: 500; font-size: 14.5px; }
+/* One step darker than --warm-grey, which reads at 3.55:1 on the stone ground
+   and misses AA on 14px text. Same hue, 5.07:1, and only the role line moves:
+   the press wordmarks stay in the grey because a brand mark is a logo. */
+.a-quotes .qc figcaption > span { color: #705F57; font-size: 14px; }
+.a-quotes .qlogo { margin-left: 0; }
+.a-quotes .qlogo img { height: 20px; }
+.a-quotes .qlogo.word {
+  font-size: 14px;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--warm-grey);
+}
+
+/* Seen in stays over the middle of the band rather than off to the left, which
+   is where the row was centred before this redesign and where Scott read it. */
+.a-quotes .press {
+  max-width: var(--measure);
+  margin: 64px auto 0;
+  padding-top: 30px;
+  border-top: 1px solid var(--stone-mid);
+}
+.a-quotes .press .hint {
+  display: block;
+  text-align: center;
+}
+.a-quotes .p-rail {
+  margin-top: 26px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.a-quotes .p-track {
+  display: flex;
+  width: max-content;
+  animation: press-drift 46s linear infinite;
+}
+.a-quotes .p-rail:hover .p-track,
+.a-quotes .p-rail:focus-within .p-track { animation-play-state: paused; }
+@keyframes press-drift { to { transform: translateX(-50%); } }
+.a-quotes .p-set {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 4vw, 54px);
+  padding-right: clamp(24px, 4vw, 54px);
+}
+/* Other people's brands, so they stay in their own faces at one optical weight,
+   greyed back and brought up on hover. */
+.a-quotes .pmark img {
+  height: 26px;
+  width: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: .62;
+  transition: opacity .3s ease, filter .3s ease;
+}
+.a-quotes .pmark:hover img { filter: grayscale(0); opacity: 1; }
+.a-quotes .pmark.word {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: -0.01em;
+  color: var(--warm-grey);
+}
+
+/* Without motion the rail is the wrapping row one.css already makes of it, and
+   that row is centred so it does not stack against the left edge. */
+@media (prefers-reduced-motion: reduce) {
+  .a-quotes .q-track { animation: none; }
+  .a-quotes .q-set { justify-content: center; row-gap: 34px; }
+  .a-quotes .qc { flex: 0 1 420px; }
+  .a-quotes .p-rail { -webkit-mask-image: none; mask-image: none; }
+  .a-quotes .p-track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+    transform: none;
+  }
+  .a-quotes .p-set {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 24px;
+    padding-right: 0;
+  }
+  .a-quotes .p-track .p-set + .p-set { display: none; }
+}
+
+/* ----------------------------------------- developers and homeowners paths */
+/* The split path chooser from proto-audience/1, approved 1 September. Two
+   halves of one band, a photograph each on the panel radius, the audience name
+   at section head size, and a flare keyline that grows to 84px as the path
+   arrives and to the full column under the pointer. Entry runs on the page's
+   own [data-reveal] hook, so without motion home-ui lands the .in state at once
+   and only the transitions are switched off below. */
+.a-ben .aud-head { max-width: 60ch; }
+/* the band's own lede sits at the standing readability bar rather than at
+   the 18px the shared .lede carries */
+.a-ben .aud-head .lede { font-size: 20px; line-height: 1.6; }
+.a-ben .aud-paths {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 58px;
+}
+.a-ben .aud-path { display: flex; flex-direction: column; }
+.a-ben .aud-shot {
+  border-radius: var(--radius-panel); overflow: hidden;
+  aspect-ratio: 4 / 3; background: var(--stonelight);
+}
+.a-ben .aud-shot img {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  transform: scale(1.06);
+  transition: transform 1.2s cubic-bezier(.22,.61,.36,1);
+}
+.a-ben .aud-path.in .aud-shot img { transform: scale(1); }
+.a-ben .aud-path:hover .aud-shot img { transform: scale(1.03); }
+.a-ben .aud-path h3 { font-size: clamp(30px, 3.2vw, 44px); margin: 30px 0 0; }
+.a-ben .aud-keyline {
+  height: 2px; width: 0; margin-top: 18px; background: var(--flare);
+  transition: width .8s cubic-bezier(.22,.61,.36,1) .15s;
+}
+.a-ben .aud-path.in .aud-keyline { width: 84px; }
+.a-ben .aud-path:hover .aud-keyline { width: 100%; }
+.a-ben .aud-path .ticks { margin-top: 24px; }
+/* the standing readability bar rather than the prototype's inherited 15.5px */
+.a-ben .aud-path .ticks li { font-size: 20px; line-height: 1.55; padding: 16px 0; }
+
+@media (max-width: 900px) {
+  .a-ben .aud-paths { grid-template-columns: 1fr; gap: 52px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .a-ben .aud-shot img, .a-ben .aud-keyline { transition: none; }
+  .a-ben .aud-path:hover .aud-shot img { transform: scale(1); }
+}

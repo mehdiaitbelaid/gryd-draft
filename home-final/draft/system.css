@@ -9,12 +9,43 @@
    else: --sys-scale on the pin, the film's currentTime, and (only when there is
    no film) an opacity per plate. */
 
-.sys { padding-bottom: 0; }
+.sys {
+  --sys-title-reserve: 132px;
+  --sys-title-band: 76px;
+  --sys-track-height: 550vh;
+  --sys-pin-height: 100vh;
+  padding-bottom: 0;
+}
+.sys-stage { position: relative; }
+.sys-title-layer {
+  position: absolute; inset: 0 0 auto; z-index: 9;
+  height: calc(var(--sys-title-reserve) + var(--sys-title-reserve)
+               + var(--sys-track-height) - var(--sys-pin-height));
+  pointer-events: none;
+}
+.sys-title {
+  position: sticky; top: 0; height: var(--sys-title-reserve);
+  overflow: hidden;
+}
+.sys-title-reserve { height: var(--sys-title-reserve); }
+.sys-title .eyebrow { transition: opacity .24s; }
+.sys-title .sec-head {
+  transition: font-size .24s, line-height .24s, padding .24s,
+              letter-spacing .24s;
+}
+.sys.is-title-compact .sys-title { background: var(--paper); }
+.sys.is-title-compact .sys-title .eyebrow { opacity: 0; }
+.sys.is-title-compact .sys-title .sec-head {
+  padding: 0 0 16px;
+  font-size: 17px; line-height: 22px; letter-spacing: .005em;
+}
+.sys.is-title-measuring .sys-title .eyebrow,
+.sys.is-title-measuring .sys-title .sec-head { transition: none; }
 /* 5.5 viewports, not 7. The curve already puts nearly all the scroll on
    moving frames; a shorter track raises the motion density again, so a
    hand's worth of scrolling is always worth a visible change. */
-.sys-track { position: relative; height: 550vh; }
-.sys-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.sys-track { position: relative; height: var(--sys-track-height); }
+.sys-pin { position: sticky; top: 0; height: var(--sys-pin-height); overflow: hidden; }
 
 /* one row, five times over, plus the line's own.
 
@@ -38,7 +69,7 @@
    text against a window edge reads as an accident, while the film's own frame
    has generous margin baked into the render. */
 .sys-row {
-  position: absolute; inset: 0;
+  position: absolute; inset: var(--sys-title-band) 0 0;
   display: grid; grid-template-columns: minmax(0, var(--sys-copy, 580px)) 1fr;
   align-items: center; gap: 52px;
   padding: 0 30px 0 64px;
@@ -286,6 +317,16 @@
    and becomes what it is describing: five blocks, each with its own plate and
    its own words, in order. No pin, no line, nothing to scrub. */
 @media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  .sys-title-layer { position: static; height: auto; pointer-events: auto; }
+  .sys-title { position: static; height: auto; overflow: visible; }
+  .sys-title-reserve { display: none; }
+  .sys-title .eyebrow, .sys-title .sec-head { transition: none; }
+  .sys.is-title-compact .sys-title { background: transparent; }
+  .sys.is-title-compact .sys-title .eyebrow { opacity: 1; }
+  .sys.is-title-compact .sys-title .sec-head {
+    padding: 0; font-size: clamp(30px, 3.6vw, 50px);
+    line-height: .98; letter-spacing: -.025em;
+  }
   .sys-track { height: auto; }
   .sys-pin { position: static; height: auto; overflow: visible; padding: 8px 0 64px; }
   .sys-steps { display: grid; gap: 56px; padding: 0 max(20px, calc((100% - var(--measure)) / 2)); }

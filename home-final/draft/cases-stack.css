@@ -280,6 +280,11 @@
   margin-top: calc(-1 * var(--pstack-handover, 0px));
   position: relative;
   z-index: 1;
+  /* opaque, and only on the band that does the handover. It is riding over the
+     finished stack, so it has to cover it rather than blend into it: left
+     transparent, its heading renders straight through the pinned rows and the
+     wiped panel and the two sets of type collide. */
+  background: var(--paper);
 }
 
 /* --------------------------------------------------------------- mobile */

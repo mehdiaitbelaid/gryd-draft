@@ -57,9 +57,27 @@
       var secBox = sec.getBoundingClientRect();
       var stackTop = stack.getBoundingClientRect().top - secBox.top;
       var pin = stackTop + natural[last] - (h + row * last);
-      // their collapse reaches 1 at (progress - .52) / .26, so at .78
+      /* Their collapse reaches 1 at (progress - .52) / .26, so at .78. The
+         next band has to be one screen further down than that, not level with
+         it: a band is already climbing through the viewport a whole screen
+         before its top reaches the top of it, and anchoring it to the wipe
+         point buried the last project before it could be read. Landing its top
+         at the foot of the screen as the wipe finishes means it arrives just
+         as there stops being anything to look at. */
+      /* The seam. As the wipe finishes, the next band's top should be sitting
+         directly under the pinned rows, which is the first line of the screen
+         that has nothing left on it. Level with the top of the screen and the
+         band buries the last project before it can be read; a whole screen
+         lower and it leaves the blank the wipe just made. The index's own
+         height is the measure of it. */
+      /* The index's depth, plus a little of the card's own travel. The wipe
+         empties 650px of panel over about 170px of scroll, so the band cannot
+         both track the wiping edge exactly and stay off the panel while it is
+         still readable. This lands between the two: nothing readable is
+         covered, and the band is in frame before the wipe is done. */
+      var rows = h + row * cards.length;
       var wiped = pin + 0.78 * lastH;
-      handover = Math.max(0, Math.round(secBox.height - wiped));
+      handover = Math.max(0, Math.round(secBox.height - wiped - rows - 0.19 * lastH));
       var host = sec.parentElement || sec;
       host.style.setProperty('--pstack-handover', handover + 'px');
     }
