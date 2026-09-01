@@ -1,0 +1,187 @@
+/* Gryd hub directions, shared brand tokens.
+   Locked palette. Nothing outside this file may introduce a new hue. */
+
+@font-face {
+  font-family: "Borna";
+  src: url("fonts/borna-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Borna";
+  src: url("fonts/borna-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-var.woff2") format("woff2-variations");
+  font-weight: 100 1000;
+  font-display: swap;
+}
+
+:root {
+  --paper: #F8F6F2;
+  --red110: #4E251B;
+  --ember: #872823;
+  --flare: #FF5532;
+  --blush: #F0E4DC;
+  --stonelight: #EFEAE3;
+  --stone-mid: #D8CFC5;
+  --warm-grey: #8A776E;
+  --dark-card: #5C2E22;
+  --dark-secondary: #C9B6AD;
+  --ink-soft: #6B4A3E;
+  --radius-panel: 28px;
+  --radius-chip: 10px;
+  --measure: 1200px;
+
+  /* names the ported intro and scrub scene read, mapped onto the direction palette */
+  --ember-deep: #4E251B;
+  --text: #4E251B;
+  --flare-dark: #CC3E22;
+  /* Orange 90 from the brand guide; the previous #FF8A63 was not a guide tint. */
+  --flare-trail: #FF6E46;
+  --font-display: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --panel-shadow: 0 24px 60px rgba(78,37,27,.22);
+
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--red110);
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  font-feature-settings: "kern" 1;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+h1, h2, h3, h4, .display {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
+  margin: 0;
+}
+
+.flare { color: var(--flare); }
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--warm-grey);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  background: var(--flare);
+  display: inline-block;
+}
+
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 28px; }
+
+/* Floating pill nav, shared skeleton. Directions restyle the surface only.
+
+   The lockup is placed at its artwork height, so --logo-h is the height of the
+   mark itself. The guide's safezone is the counter of the "G" in the emblem: in
+   the brand pack vector that counter is 88 units against a 187.9 unit lockup,
+   0.469 of the height, so a 19px mark asks for 8.9px of clearance on all four
+   sides. --logo-safezone rounds that up, and the left inset takes double, since
+   the guide says use more where there is room. */
+.nav {
+  --logo-h: 19px;
+  --logo-safezone: 10px;
+  /* Centred by an auto margin between a left and a right inset rather than by
+     left:50% and a translate. With only a left inset a fixed box is offered
+     half the window to fit in, so below about 1400px the pill collapsed to its
+     minimum width and clipped the call to action off its own right edge. */
+  position: fixed;
+  top: 18px;
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin: 0 auto;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--logo-safezone) 8px var(--logo-safezone) calc(var(--logo-safezone) * 2);
+  border-radius: 999px;
+  background: var(--red110);
+  color: var(--paper);
+  max-width: calc(100% - 32px);
+}
+/* The placed lockup. Height only: the asset carries its own proportions and the
+   guide forbids stretching them. The gap to the first link is the safezone. */
+.nav .logo-lockup {
+  display: block;
+  height: var(--logo-h, 19px);
+  width: auto;
+  flex: none;
+  margin-right: var(--logo-safezone);
+}
+.nav a.link {
+  text-decoration: none;
+  font-size: 14px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: var(--dark-secondary);
+  white-space: nowrap;
+}
+.nav a.link:hover, .nav a.link[aria-current="page"] { color: var(--paper); background: var(--dark-card); }
+.nav .cta {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--flare);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: var(--flare);
+  color: #ffffff;
+}
+.btn.ghost { background: transparent; color: var(--red110); box-shadow: inset 0 0 0 1px var(--stone-mid); }
+
+.foot {
+  padding: 64px 0 72px;
+  border-top: 1px solid var(--stone-mid);
+  margin-top: 96px;
+  font-size: 14px;
+  color: var(--warm-grey);
+}
+.foot .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+
+@media (max-width: 820px) {
+  body { font-size: 16px; }
+  /* Smaller mark on a phone, so the safezone comes down with it: 17px of mark
+     against the same 0.469 counter ratio is 8px of clearance. */
+  .nav { --logo-h: 17px; --logo-safezone: 8px; gap: 2px; overflow-x: auto; }
+  .nav a.link { padding: 8px 10px; font-size: 13px; }
+  .nav .cta { padding: 10px 14px; font-size: 13px; }
+  .wrap { padding: 0 20px; }
+}

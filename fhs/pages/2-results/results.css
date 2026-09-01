@@ -1,0 +1,186 @@
+/* Results treatments for design 2. The checker, the model and the copy are the
+   same in all three; only where the Results step lands and how it is laid out
+   differs. Eight breakdown cards need width, so every treatment gives the
+   summary the full measure instead of the hero column. */
+
+/* ---- the summary as a wide layout ------------------------------------- */
+.sum.is-on.wide { display: grid; }
+.sum.wide {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 30px 26px;
+  align-items: start;
+}
+.sum.wide > * { margin-top: 0; }
+.sum.wide .sum-head { grid-column: 1 / -1; margin-bottom: 0; }
+.sum.wide .flag { grid-column: 1 / -1; margin: 0; }
+.sum.wide .sum-block { grid-column: 1 / -1; }
+.sum.wide .sum-acts { grid-column: 1 / -1; margin-top: 4px; }
+.sum.wide .scores { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.sum.wide .score { background: var(--paper); padding: 22px 24px 24px; }
+.sum.wide .sum-head { padding: 32px 36px 34px; }
+.sum.wide .sum-head .h-md { font-size: clamp(26px, 2.6vw, 34px); }
+.sum.wide .tbl { min-width: 520px; }
+.sum.wide .b-zero { grid-column: 1 / 7; }
+.sum.wide .b-comp { grid-column: 7 / -1; }
+
+/* Variant b stacks: banner, a grid of picture cards that flip to their note,
+   then one combined section holding the zero cost prose and the comparison table. */
+.sum.wide.flipgrid .b-break { grid-column: 1 / -1; }
+.sum.wide.flipgrid .combo { grid-column: 1 / -1; }
+
+.flips {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px; align-items: stretch; perspective: 1400px;
+}
+.flip {
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+  background: none; border: 0; padding: 0; width: 100%;
+  height: 264px; border-radius: var(--radius-panel);
+}
+.flip-in {
+  position: relative; display: block; width: 100%; height: 100%;
+  transform-style: preserve-3d; transition: transform 450ms ease;
+}
+.flip-face {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  overflow: hidden; border-radius: var(--radius-panel);
+  border: 1px solid var(--stone-mid); background: var(--paper);
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+}
+.flip-front { justify-content: flex-end; padding: 0; }
+/* The icon sits on a circular plate in a calm well, so the eight fronts read as
+   one set whatever the component. */
+.flip-ico {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  background: var(--stonelight);
+}
+.flip-disc {
+  display: flex; align-items: center; justify-content: center;
+  width: 82px; height: 82px; border-radius: 999px;
+  background: var(--blush); color: var(--ember);
+}
+.flip-disc svg {
+  width: 36px; height: 36px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+/* The plate carries the name and the pill under the icon well. */
+.flip-plate {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start;
+  gap: 10px; padding: 14px 16px 15px; background: var(--paper);
+  border-top: 1px solid var(--stone-mid);
+}
+.flip h4 { font-family: "Borna", sans-serif; font-weight: 500; font-size: 15px; margin: 0; }
+.flip .pill { white-space: normal; }
+.flip-back {
+  transform: rotateY(180deg); padding: 18px 20px 20px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.flip-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.flip-back p { margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: #6B4A3E; }
+.flip-green .pill { background: #2F7A55; }
+.flip-amber .pill { background: #B7761F; }
+.flip-red .pill { background: var(--flare); }
+.flip:hover .flip-face, .flip:focus-visible .flip-face { border-color: var(--ember); }
+.flip:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+
+@media (hover: hover) {
+  .flip:hover .flip-in { transform: rotateY(180deg); }
+}
+.flip[aria-expanded="true"] .flip-in { transform: rotateY(180deg); }
+
+/* Reduced motion swaps the faces instead of turning the card. */
+@media (prefers-reduced-motion: reduce) {
+  .flip-in { transition: none; transform: none !important; }
+  .flip-face { -webkit-backface-visibility: visible; backface-visibility: visible; }
+  .flip-back { transform: none; visibility: hidden; }
+  .flip[aria-expanded="true"] .flip-back { visibility: visible; }
+  .flip[aria-expanded="true"] .flip-front { visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) and (hover: hover) {
+  .flip:hover .flip-back { visibility: visible; }
+  .flip:hover .flip-front { visibility: hidden; }
+}
+
+.combo {
+  background: var(--paper); border-radius: var(--radius-panel); padding: 30px 32px;
+  display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+  gap: 30px 34px; align-items: start;
+}
+/* The wide summary places its blocks on the 12 column grid; inside the combined
+   section they are ordinary two column children again. */
+.sum.wide .combo > .sum-block { grid-column: auto; margin-top: 0; }
+.combo .sum-block + .sum-block { margin-top: 0; }
+.combo .tbl { min-width: 0; font-size: 13px; }
+.combo .tbl th, .combo .tbl td { padding-right: 10px; }
+.combo .ph { font-size: 10px; padding: 2px 7px; }
+/* The zero cost heading opens the combined section, so it carries the weight of
+   a section heading rather than a block label. */
+.combo .b-zero > h4 {
+  font-family: "Borna", sans-serif; font-weight: 500;
+  font-size: clamp(28px, 2.6vw, 38px); line-height: 1.08;
+  letter-spacing: -0.02em; margin-bottom: 16px; max-width: 20ch;
+}
+
+@media (max-width: 1180px) {
+  .flips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .combo { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  .combo { padding: 22px 20px; }
+  .flips { gap: 12px; }
+  .flip { height: 372px; }
+  .flip-back { padding: 15px 15px 17px; }
+  .flip-back p { font-size: 12.5px; line-height: 1.45; }
+}
+
+@media (max-width: 1180px) {
+  .sum.wide .scores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sum.wide .b-zero, .sum.wide .b-comp { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .sum.wide .scores { grid-template-columns: 1fr; }
+  .sum.wide .sum-head { padding: 24px 22px 26px; }
+}
+
+/* ---- variant a: the page takes over ------------------------------------ */
+.res-full { background: var(--stonelight); padding: 60px 0 76px; }
+.res-full[hidden] { display: none; }
+.res-lead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 20px; margin-bottom: 26px;
+}
+.res-lead .count {
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--warm-grey);
+}
+.recap[hidden] { display: none; }
+.recap {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 18px; flex-wrap: wrap;
+}
+.recap-line { font-family: "Borna", sans-serif; font-weight: 500; font-size: 17px; }
+.answered[hidden] { display: none; }
+
+/* ---- variant b: the panel becomes the band ----------------------------- */
+.p2-hero.is-results .p2-hero-in { grid-template-columns: 1fr; gap: 34px; padding-bottom: 0; }
+.p2-hero.is-results .p2-say .h-xl { max-width: 22ch; }
+.p2-hero.is-results .p2-say .lede,
+.p2-hero.is-results .p2-say > p { max-width: 92ch; }
+.p2-hero.is-results .p2-ask {
+  position: static;
+  width: var(--vwpx, 100%);
+  margin-left: calc(50% - var(--vwpx, 100%) / 2);
+  border-radius: 0;
+  background: var(--stonelight);
+  padding: 48px max(28px, calc((var(--vwpx, 100%) - 1200px) / 2 + 28px)) 64px;
+}
+.p2-hero.is-results .stepline, .p2-hero.is-results .progress { max-width: 1144px; margin-inline: auto; }
+.p2-hero.is-results .stepline { margin-bottom: 12px; }
+.p2-hero.is-results .progress { margin-bottom: 30px; }
+.p2-hero.is-results .answered { display: none; }
+
+/* ---- variant c: the dedicated results page ----------------------------- */
+.res-page { padding-top: 132px; }
+.res-page .res-top { padding: 34px 0 30px; }
+.res-back { font-size: 15px; color: var(--ember); display: inline-block; }
+.res-page .res-body { background: var(--stonelight); padding: 44px 0 76px; }

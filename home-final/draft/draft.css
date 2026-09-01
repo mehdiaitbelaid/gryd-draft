@@ -1,0 +1,313 @@
+/* Draft page glue. Everything above this file in the cascade is either the
+   shared prototype 1 stylesheet or the 11n intro sheet inlined by
+   _build_draft.py, so this file only does three jobs: pin the ported hero
+   inside its own section instead of the viewport, style the fixed pill nav
+   Scott asked for, and give the two sections prototype 1 never carried
+   (case studies, seen in) enough shape to read at draft level. */
+
+/* 11n sets overflow-x hidden on the root, which is harmless on a page that is
+   one screen tall and fatal here: it makes the root a scroll container, and the
+   pinned process scene stops sticking. The field it was there to clip is now
+   clipped by the hero section itself, so the root goes back to visible and the
+   validator gates the overflow instead. */
+html, body { overflow-x: visible; }
+
+/* ---------------------------------------------------------------- hero box */
+/* 11n paints its field and scrim on the viewport, because 11n is a hero and
+   nothing else. Here the same markup has a whole page under it, so the field
+   is confined to the opening section. At scroll zero the section fills the
+   screen, which is the only moment the intro cares about, and past it the
+   paper page is not looking through a red wash. */
+.d-hero { position: relative; overflow: hidden; min-height: 100svh; isolation: isolate; }
+.d-hero .field { position: absolute; }
+.d-hero .hero-scrim { position: absolute; }
+.d-hero .stub { min-height: 100svh; }
+.d-hero .eyebrow { display: block; color: #fff; opacity: .82; font-size: 13px;
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: 20px; }
+.d-hero .sub { color: #fff; opacity: .88; font-size: clamp(17px, 1.7vw, 21px);
+  max-width: 46ch; margin: 22px 0 0; }
+.d-hero .hint { position: absolute; right: 28px; bottom: 30px; z-index: 3;
+  color: rgba(255,255,255,.7); font-size: 13px; letter-spacing: .06em; }
+@media (max-width: 820px) { .d-hero .hint { display: none; } }
+
+/* --------------------------------------------------------------- pill nav */
+/* Always on screen, pill shaped, lockup at its left. It is hidden only while
+   the opening owns the screen, and comes back on the same beat the opening
+   used to hand the corner lockup over, so nothing has to be scheduled twice. */
+.dnav {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 60;
+  display: flex; align-items: center; gap: 8px;
+  max-width: calc(100% - 24px);
+  padding: 7px 7px 7px 16px; border-radius: 999px;
+  background: rgba(78,37,27,.82); backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(46,12,8,.22);
+  /* opacity keeps the opening's own .4s; transform and visibility are the
+     retraction's, and neither is touched by the opening */
+  transition: opacity .4s cubic-bezier(.4,0,.6,1),
+              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+}
+.dnav .lockup { display: flex; align-items: center; gap: 8px; margin-right: 10px; flex: none; }
+.dnav .lockup svg { display: block; color: #fff; }
+.dnav .lockup .mk { width: 22px; height: 22px; }
+.dnav .lockup .wd { width: 40px; height: 17px; }
+.dnav .links { display: flex; align-items: center; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.dnav .links > li { position: relative; }
+.dnav .link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: rgba(255,255,255,.86); text-decoration: none;
+  font-family: var(--font-display); font-weight: 500; font-size: 14px; line-height: 1;
+  padding: 9px 12px; border-radius: 999px; white-space: nowrap;
+  background: none; border: 0; cursor: pointer;
+  transition: background-color .18s ease, color .18s ease;
+}
+.dnav .link:hover, .dnav .link:focus-visible { background: rgba(255,255,255,.14); color: #fff; }
+.dnav .has-menu.open > .link { background: rgba(255,255,255,.14); color: #fff; }
+.dnav .caret {
+  width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg); transition: transform .2s ease;
+}
+.dnav .has-menu.open .caret { transform: translateY(1px) rotate(225deg); }
+
+/* ------------------------------------------------------------- dropdowns */
+/* Out of flow and clipped to nothing when shut, so opening one moves no part
+   of the page and adds no width to it. The 10px gap between the pill and the
+   panel is padding on the panel rather than a margin, so the pointer crosses
+   it without leaving the item and the panel does not flicker shut. */
+/* The open and close motion is not here. It is a choice Mehdi is making from
+   menu-lab.html, so all four candidates live in menu-motion.css and a page
+   picks one with data-menu-motion on the nav. This file only says where the
+   panel sits and that it is hidden until its parent is open. */
+.dnav .submenu {
+  position: absolute; top: 100%; left: 0; padding-top: 12px;
+  min-width: 190px; opacity: 0; visibility: hidden;
+}
+.dnav .has-menu.open > .submenu { opacity: 1; visibility: visible; }
+.dnav .submenu ul {
+  list-style: none; margin: 0; padding: 8px;
+  background: rgba(78,37,27,.94); backdrop-filter: blur(14px);
+  border-radius: 20px; box-shadow: 0 16px 40px rgba(46,12,8,.28);
+}
+.dnav .submenu a {
+  display: block; padding: 9px 14px; border-radius: 999px;
+  color: rgba(255,255,255,.86); text-decoration: none;
+  font-family: var(--font-display); font-weight: 500; font-size: 14px; white-space: nowrap;
+  transition: background-color .18s ease, color .18s ease;
+}
+.dnav .submenu a:hover, .dnav .submenu a:focus-visible { background: rgba(255,255,255,.14); color: #fff; }
+/* the burger only exists on the narrow layout */
+.dnav-burger { display: none; }
+
+.dnav .cta {
+  flex: none; margin-left: 6px; text-decoration: none; white-space: nowrap;
+  background: var(--flare); color: #fff; font-size: 14px; font-weight: 500;
+  padding: 10px 18px; border-radius: 999px;
+}
+.dnav .cta:hover, .dnav .cta:focus-visible { background: #fff; color: var(--ember); }
+.dnav .cta .sm { display: none; }
+/* the opening owns the screen until the corner lockup would have landed */
+body.vid-playing .dnav, body.vid-fade:not(.nav-landed) .dnav { opacity: 0; pointer-events: none; }
+
+/* --------------------------------------------------------- the retraction */
+/* At the top of a page the bar is the bar. Once the reader is into the page a
+   full width bar lying across the content is in the way, so it hands over to a
+   capsule: the mark and the same three lines the narrow burger uses, on the
+   bar's own centre line and on the bar's own horizontal anchor.
+
+   The anchor is the whole design choice. The capsule sits where the middle of
+   the bar sits and is centred on the same line, so expanding puts the bar under
+   the pointer that was on the capsule and the gesture is one object growing
+   rather than two objects swapping. It also means the pointer never crosses a
+   gap on the way in, which is what would otherwise make the bar flicker shut
+   the moment it arrived.
+
+   Two elements, cross faded, rather than one element that shrinks. The pill is
+   a flex row whose width is its content, so collapsing it in place would be a
+   layout animation of exactly the kind menu-spotlight.js exists to avoid. Here
+   nothing animates but opacity and transform, and neither element is ever in
+   flow, so no part of the page underneath moves at any point.
+
+   Whichever is retired goes to visibility hidden as well as to opacity nought:
+   a bar faded out is still a row of focusable links, and a keyboard must not be
+   able to tab into something the reader cannot see. That is also what keeps the
+   backdrop blur off the content, since an element at opacity nought paints no
+   backdrop filter at all.
+*/
+.dnav-tab {
+  /* 22px, not the bar's 16px: the capsule is shorter than the bar, and this is
+     what puts the two on one centre line rather than on one top edge */
+  position: fixed; top: 22px; left: 50%; z-index: 61;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 14px 9px 12px; border: 0; border-radius: 999px; cursor: pointer;
+  background: rgba(78,37,27,.82); backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(46,12,8,.22);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateX(-50%) scale(.86);
+  transition: opacity .32s cubic-bezier(.4,0,.6,1),
+              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+}
+.dnav-tab .mk { display: block; width: 22px; height: 22px; color: #fff; }
+/* the narrow bar's own burger glyph, so the affordance is a word the site has
+   already used rather than a new one */
+.dnav-tab .bars, .dnav-tab .bars::before, .dnav-tab .bars::after {
+  display: block; width: 15px; height: 1.6px; border-radius: 2px;
+  background: rgba(255,255,255,.86);
+}
+.dnav-tab .bars { position: relative; }
+.dnav-tab .bars::before, .dnav-tab .bars::after { content: ""; position: absolute; left: 0; }
+.dnav-tab .bars::before { top: -5px; }
+.dnav-tab .bars::after { top: 5px; }
+.dnav-tab:hover, .dnav-tab:focus-visible { background: var(--red110); }
+.dnav-tab:focus-visible { outline: 2px solid rgba(255,255,255,.7); outline-offset: 2px; }
+
+/* retracted: the capsule has it */
+html.nav-tuck .dnav {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateX(-50%) scale(.97);
+  transition: opacity .32s cubic-bezier(.4,0,.6,1),
+              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+}
+html.nav-tuck .dnav-tab {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: translateX(-50%) scale(1);
+  transition: opacity .32s cubic-bezier(.4,0,.6,1),
+              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+}
+/* peeking: hovered, focused or tapped, so the bar comes back for as long as
+   the reader is on it */
+html.nav-tuck.nav-peek .dnav {
+  opacity: 1; visibility: visible;
+  /* not clickable yet, deliberately: see nav-peek-on below */
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity .32s cubic-bezier(.4,0,.6,1),
+              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+}
+/* The bar becomes clickable once it is actually there, and not before.
+   The capsule stands on the bar's own centre, which is what makes the
+   expansion read as one object growing, and it also means the bar's links
+   arrive underneath the very pointer that opened it. A reader who moves to the
+   capsule and clicks straight through would otherwise follow a link they never
+   aimed at. So the links are inert for the length of the fade, and the second
+   class the script adds when that fade is done is what arms them. */
+html.nav-tuck.nav-peek-on .dnav { pointer-events: auto; }
+html.nav-tuck.nav-peek .dnav-tab {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateX(-50%) scale(.86);
+  transition: opacity .32s cubic-bezier(.4,0,.6,1),
+              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+}
+/* The opening outranks all of it, and has to: a first visit is at the top of
+   the page, where nothing is retracted, and the handover still lands on the
+   full bar exactly as it did. This is the belt to that brace. */
+body.vid-playing .dnav-tab,
+body.vid-fade:not(.nav-landed) .dnav-tab { opacity: 0; visibility: hidden; pointer-events: none; }
+/* The first state is set before the reader has done anything, and on an arrival
+   that restores a position it is set to retracted. That must be the state the
+   page opens in, not a state it animates into, so nothing transitions until the
+   script says the page is live. */
+html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !important; }
+
+/* ------------------------------------------------------------ narrow pill */
+/* The same tree, opened by the burger instead of by hovering, and drawn as one
+   panel under the pill rather than as a panel per parent. It is positioned off
+   the pill, so the page under it never moves, and every parent's children are
+   simply indented under it: on a phone a second level of tapping to reach four
+   links is friction for nothing. */
+@media (max-width: 900px) {
+  .dnav {
+    left: 12px; right: 12px; transform: none; max-width: none;
+    justify-content: space-between; padding-right: 6px;
+  }
+  .dnav-burger {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; margin-left: auto; flex: none;
+    background: rgba(255,255,255,.12); border: 0; border-radius: 999px; cursor: pointer;
+  }
+  .dnav-burger span, .dnav-burger span::before, .dnav-burger span::after {
+    content: ""; display: block; width: 16px; height: 1.6px; border-radius: 2px; background: #fff;
+  }
+  .dnav-burger span { position: relative; }
+  .dnav-burger span::before { position: absolute; top: -5px; }
+  .dnav-burger span::after { position: absolute; top: 5px; }
+  .dnav.menu-open .dnav-burger { background: var(--flare); }
+  /* the pill goes solid with its panel, so the two read as one surface */
+  .dnav.menu-open { background: var(--red110); }
+
+  .dnav .links {
+    position: absolute; top: 100%; left: 0; right: 0; margin-top: 10px;
+    display: block; padding: 10px;
+    /* solid, not translucent: this panel covers the hero headline, and any
+       amount of the type reading through it made both unreadable */
+    background: var(--red110);
+    border-radius: 22px; box-shadow: 0 18px 44px rgba(46,12,8,.34);
+    max-height: min(70vh, 520px); overflow-y: auto;
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  }
+  .dnav.menu-open .links { opacity: 1; visibility: visible; transform: none; }
+  .dnav .link { width: 100%; justify-content: space-between; padding: 11px 14px; font-size: 15px; }
+  .dnav .caret { display: none; }
+  /* the children are always shown, so there is no second tap and no panel that
+     can push the pill's own panel taller mid gesture */
+  .dnav .submenu {
+    position: static; opacity: 1; visibility: visible; transform: none;
+    padding-top: 0; min-width: 0;
+  }
+  .dnav .submenu ul { background: none; box-shadow: none; padding: 0 0 6px 14px; border-radius: 0; }
+  .dnav .submenu a { font-size: 14px; color: rgba(255,255,255,.7); padding: 8px 14px; }
+
+  .dnav .cta .lg { display: none; }
+  .dnav .cta .sm { display: inline; }
+
+  /* The narrow bar spans the window and is not centred by a translate, so the
+     retraction's own transforms are restated without one. The capsule stays on
+     the centre line at both widths: there is no bar anchor to match down here,
+     and centred is the calmer of the two. */
+  html.nav-tuck .dnav { transform: scale(.97); transform-origin: 50% 0; }
+  html.nav-tuck.nav-peek .dnav { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dnav, .dnav-tab { transition: none; }
+  /* the end states, arrived at instantly, so the retraction is a state change
+     and not a movement */
+  html.nav-tuck .dnav, html.nav-tuck .dnav-tab,
+  html.nav-tuck.nav-peek .dnav, html.nav-tuck.nav-peek .dnav-tab {
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------- case study rail */
+.d-cases .sec-head { margin-bottom: 6px; }
+.d-cases .sc-rail { padding-top: 26px; }
+.d-cases .case { display: block; }
+.d-cases .case img { width: 100%; height: 210px; object-fit: cover; display: block; }
+.d-cases .case h3 { margin: 18px 0 2px; font-size: 22px; }
+.d-cases .case .place { color: var(--warm-grey); font-size: 14px; margin: 0 0 12px; }
+.d-cases .case p { font-size: 15px; line-height: 1.55; }
+.d-cases .case .stats { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; padding: 0 8px; }
+.d-cases .case .stats span { display: flex; flex-direction: column; font-size: 12px; color: var(--warm-grey); }
+.d-cases .case .stats strong { font-family: var(--font-display); font-size: 22px; color: var(--red110); }
+
+/* a placeholder band is still a band, so it is marked where Scott will see it
+   rather than only in the source */
+.is-placeholder { position: relative; }
+
+/* ------------------------------------------------------------- CTA map */
+/* One's sheet hides the arcs behind a dash offset and waits for the reveal
+   class to run them on. The closing map here does not draw on, it runs: the
+   arcs stay put at a low weight and a bead travels each one, so the dash is
+   cleared rather than left waiting for a class that never arrives. */
+.map-beads .map-curve {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  opacity: .3;
+  transition: none;
+}
+.map-beads .map-bead { fill: var(--flare); }
+
+/* The beads are decoration on a route that is already drawn, so without motion
+   they are simply not there rather than parked mid arc. */
+@media (prefers-reduced-motion: reduce) {
+  .map-beads .map-bead { display: none; }
+  .map-beads .map-curve { opacity: .5; }
+}

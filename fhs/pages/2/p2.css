@@ -1,0 +1,48 @@
+/* Design 2, hero starts it. Question one is in the hero, so there is nothing to
+   click before answering. Answers fold into a list above the question and the hero
+   grows a row at a time. Everything the site already said sits underneath, so a
+   visitor who is not ready to answer still has a page to read. */
+
+.p2-hero { padding-bottom: 20px; }
+.p2-hero-in { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; padding-bottom: 52px; }
+.p2-say .h-xl { max-width: 15ch; }
+.p2-say .note { margin-top: 22px; max-width: 46ch; }
+
+.p2-ask {
+  background: var(--blush);
+  border-radius: var(--radius-panel);
+  padding: 30px 32px;
+  position: sticky;
+  top: 104px;
+}
+.p2-ask .answered { margin-bottom: 20px; }
+.p2-ask .answered li:first-child { border-top: 0; }
+.p2-ask .answered:empty { display: none; }
+
+.p2-strip { aspect-ratio: 24 / 7; }
+
+.p2-band { background: var(--blush); padding: 76px 0; margin: 8px 0; }
+.case { display: grid; grid-template-columns: 1.1fr 1fr; gap: 36px; margin-top: 34px; align-items: start; }
+.case .figure { aspect-ratio: 5 / 4; }
+
+.p2-pressrow { display: flex; gap: 34px; align-items: center; flex-wrap: wrap; }
+.p2-pressrow .pressband { flex: 1 1 520px; }
+.p2-close .h-lg { max-width: 20ch; }
+
+.sec + .sec { border-top: 1px solid var(--stone-mid); }
+.p2-band + .sec { border-top: 0; }
+
+@media (max-width: 1000px) {
+  .p2-hero-in { grid-template-columns: 1fr; gap: 30px; }
+  .p2-ask { position: static; }
+  .case { grid-template-columns: 1fr; }
+  .p2-strip { aspect-ratio: 3 / 2; }
+}
+@media (max-width: 560px) {
+  .p2-ask { padding: 22px 20px; }
+}
+
+/* once the summary is on screen the panel is far too tall to pin */
+.p2-ask:has(.sum.is-on) { position: static; }
+
+.p2-ask { min-width: 0; }

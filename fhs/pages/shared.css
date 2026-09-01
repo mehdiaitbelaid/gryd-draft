@@ -1,0 +1,318 @@
+/* Shared across the five FHS page designs: the assessment furniture, the summary,
+   and the small editorial primitives the page layouts build on. Daylight tokens only. */
+
+.js-opt.is-on { border-color: var(--flare); background: var(--flare); color: #fff; }
+.choice.is-done { border-color: var(--stone-mid); color: var(--warm-grey); }
+
+.ph {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+  border: 1px solid var(--stone-mid);
+  border-radius: 999px;
+  padding: 3px 9px;
+  vertical-align: middle;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.progress { height: 3px; background: var(--stone-mid); border-radius: 999px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--flare); transition: width 0.25s ease; }
+.stepline { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+.stepline .chrome { font-family: "Borna", sans-serif; font-weight: 500; font-size: 16px; }
+.stepline .count { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--warm-grey); }
+
+.qwrap .q { font-family: "Borna", sans-serif; font-weight: 500; font-size: clamp(21px, 2.2vw, 28px); letter-spacing: -0.02em; line-height: 1.1; }
+.qwrap .hint { font-size: 14px; color: var(--warm-grey); margin-top: 8px; max-width: 60ch; }
+.acts { display: flex; gap: 10px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+.acts .btn { padding: 12px 22px; }
+
+/* answered questions folded to one line */
+.answered { list-style: none; margin: 0; padding: 0; }
+.answered li { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid var(--stone-mid); font-size: 15px; }
+.answered li span:first-child { color: var(--warm-grey); }
+.answered li span:last-child { font-weight: 500; text-align: right; }
+
+/* summary */
+.sum { display: none; }
+.sum.is-on { display: block; }
+.sum-head { margin-bottom: 22px; }
+.sum-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; margin-bottom: 32px; }
+.sum-block h4 { font-family: "Borna", sans-serif; font-weight: 500; font-size: 17px; margin: 0 0 12px; }
+.sum-dl { margin: 0; }
+.sum-dl > div { display: flex; justify-content: space-between; gap: 14px; border-top: 1px solid var(--stone-mid); padding: 9px 0; font-size: 15px; }
+.sum-dl dt { color: var(--warm-grey); margin: 0; }
+.sum-dl dd { margin: 0; text-align: right; font-weight: 500; }
+.sum-big { font-family: "Borna", sans-serif; font-weight: 500; font-size: clamp(30px, 3.4vw, 44px); letter-spacing: -0.03em; line-height: 1; margin: 0 0 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sum-ul { margin: 0; padding-left: 18px; font-size: 15px; color: #6B4A3E; }
+.sum-ul li { margin-bottom: 8px; }
+.tbl-wrap { overflow-x: auto; }
+.tbl { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+.tbl th, .tbl td { text-align: left; padding: 11px 14px 11px 0; border-top: 1px solid var(--stone-mid); }
+.tbl th { color: var(--warm-grey); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+.sum-acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+
+/* editorial primitives */
+.kicker { font-family: "Borna", sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ember); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 34px; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; }
+.trio .figure { aspect-ratio: 3 / 4; }
+.hi { list-style: none; margin: 16px 0 0; padding: 0; }
+.hi li { border-top: 1px solid var(--stone-mid); padding: 11px 0; font-size: 16px; }
+.subs { list-style: none; margin: 26px 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 26px; }
+.subs li strong { display: block; font-family: "Borna", sans-serif; font-weight: 500; font-size: 18px; margin-bottom: 6px; }
+.subs li span { color: #6B4A3E; font-size: 15px; }
+.steps4 { list-style: none; margin: 26px 0 0; padding: 0; }
+.steps4 li { display: grid; grid-template-columns: 62px 1fr; gap: 18px; border-top: 1px solid var(--stone-mid); padding: 22px 0; }
+.steps4 li > span { font-family: "Borna", sans-serif; color: var(--flare); font-size: 15px; }
+.steps4 p { margin: 8px 0 0; color: #6B4A3E; font-size: 15px; max-width: 62ch; }
+.zid { background: var(--red110); border-radius: var(--radius-chip); padding: 16px 20px; display: inline-block; margin-top: 22px; }
+.zid img { height: 26px; width: auto; }
+.pressband { background: var(--red110); border-radius: var(--radius-panel); padding: 30px 34px; margin-top: 8px; }
+.pressband .press img { height: 22px; filter: none; }
+.badge { height: 92px; width: auto; }
+
+@media (max-width: 900px) {
+  .sum-grid, .two, .subs { grid-template-columns: 1fr; }
+  .trio { grid-template-columns: 1fr; }
+  .trio .figure { aspect-ratio: 4 / 3; }
+}
+
+/* A grid or flex child sizes to its content by default, and the breakdown table
+   carries a min-width so its columns stay readable. Without this the table pushes
+   the whole page wider than the viewport instead of scrolling inside its wrapper. */
+.sum, .sum-block, .tbl-wrap { min-width: 0; }
+.tbl-wrap { max-width: 100%; }
+
+/* ---- FHS readiness pop up, ported into the five page mechanisms ---- */
+
+.field { align-items: flex-start; }
+.field .col { flex: 1 1 210px; }
+.field .col.wide { flex: 1 1 100%; }
+.field select, .field input[type="tel"] {
+  width: 100%; margin-top: 6px; padding: 11px 12px; font: inherit; font-size: 15px;
+  color: var(--red110); background: var(--paper); border: 1px solid var(--stone-mid);
+  border-radius: var(--radius-chip);
+}
+.field input { margin-top: 6px; }
+.toggle { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--red110); cursor: pointer; }
+.toggle input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--flare); }
+.toggle span { flex: 1; }
+
+.num { font-weight: 500; }
+.band { border-radius: var(--radius-panel); padding: 26px 28px; color: #fff; }
+.band p { margin-top: 10px; max-width: 70ch; }
+.band .note { color: rgba(255,255,255,0.78); }
+.band h3 { color: #fff; }
+.band-green { background: #2F7A55; }
+.band-amber { background: #B7761F; }
+.band-red { background: var(--flare); }
+.flag { border-left: 3px solid var(--flare); padding-left: 14px; margin: 18px 0 0; }
+
+.scores { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.score { background: var(--stonelight); border-radius: var(--radius-panel); padding: 18px 20px; min-width: 0; }
+.score-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.score h4 { margin: 0; font-family: "Borna", sans-serif; font-weight: 500; font-size: 17px; }
+.score p { margin: 10px 0 0; font-size: 14px; color: #6B4A3E; }
+.pill { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; color: #fff; white-space: nowrap; }
+.score-green .pill { background: #2F7A55; }
+.score-amber .pill { background: #B7761F; }
+.score-red .pill { background: var(--flare); }
+.sum-block + .sum-block { margin-top: 30px; }
+.sum-block > h4 { font-size: 19px; }
+.sum-block .btn { margin-top: 16px; }
+
+/* editorial primitives for the FHS copy */
+.bullets { list-style: none; margin: 20px 0 0; padding: 0; }
+.bullets li { border-top: 1px solid var(--stone-mid); padding: 14px 0; font-size: 16px; max-width: 74ch; }
+.bullets li strong { font-weight: 500; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 22px; margin-top: 28px; }
+.card { min-width: 0; }
+.card .figure { aspect-ratio: 4 / 3; }
+.card .tag { display: inline-block; margin-top: 14px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ember); }
+.card h3 { font-family: "Borna", sans-serif; font-weight: 500; font-size: 19px; margin: 8px 0 0; }
+.card .by { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--warm-grey); }
+.card .by img { width: 28px; height: 28px; border-radius: 999px; object-fit: cover; }
+.card .more { display: inline-block; margin-top: 12px; font-size: 14px; color: var(--ember); }
+
+@media (max-width: 900px) {
+  .scores, .cards { grid-template-columns: 1fr; }
+}
+
+/* Grid children default to min-content width, and the comparison table carries a
+   min-width so its columns stay readable. Without this the summary widens the
+   whole hero grid instead of scrolling inside its own wrapper. */
+.p4-counter > *, .p1-assess-in > *, .p2-hero-in > *, .p3-wiz > *, .p5-calc > * { min-width: 0; }
+
+/* ---- visual enrichment: icons, timeline, panels, plates ---- */
+
+/* Icon cards for the three FHS requirements. Line art inherits the text colour so
+   one rule covers both the paper and the dark surfaces. */
+.req-i svg, .panel-i svg {
+  width: 30px; height: 30px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.reqs { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; margin-top: 30px; }
+.req {
+  min-width: 0;
+  background: var(--paper);
+  border: 1px solid var(--stone-mid);
+  border-radius: var(--radius-panel);
+  padding: 26px 26px 28px;
+}
+.req .req-i { color: var(--flare); display: block; margin-bottom: 20px; }
+.req h3 { font-family: "Borna", sans-serif; font-weight: 500; font-size: 20px; line-height: 1.1; }
+.req p { margin: 12px 0 0; font-size: 15px; color: #6B4A3E; }
+
+/* Horizontal timeline. The rule runs behind the markers on wide viewports and
+   turns into a left spine once the columns stack. */
+.tl-band { padding: 56px 0; }
+.tl-wrap { position: relative; }
+.tl {
+  list-style: none; margin: 26px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 28px;
+}
+.tl li { position: relative; padding-top: 30px; min-width: 0; }
+.tl li::before {
+  content: ""; position: absolute; top: 7px; left: 0; right: -28px; height: 1px;
+  background: var(--stone-mid);
+}
+.tl li:last-child::before { right: 0; }
+.tl-dot {
+  position: absolute; top: 2px; left: 0; width: 11px; height: 11px; border-radius: 999px;
+  background: var(--flare); box-shadow: 0 0 0 4px var(--stonelight);
+}
+.tl-d {
+  display: block; font-family: "Borna", sans-serif; font-weight: 500; font-size: 21px;
+  letter-spacing: -0.02em; color: var(--ember);
+}
+.tl p { margin: 10px 0 0; font-size: 15px; color: #6B4A3E; max-width: 34ch; }
+.surf-stone { background: var(--stonelight); }
+.tl-inset .tl-wrap { background: var(--stonelight); border-radius: var(--radius-panel); padding: 30px 32px; }
+
+/* Two panels replacing the developer and homeowner lists. */
+.panels { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px; margin-top: 30px; }
+.panel { min-width: 0; border-radius: var(--radius-panel); padding: 30px 32px 34px; }
+.panel .panel-i { display: block; margin-bottom: 20px; }
+.panel-i svg { width: 34px; height: 34px; }
+.panel .bullets li { max-width: none; }
+.panel-dark { background: var(--red110); color: var(--paper); }
+.panel-dark .kicker { color: var(--flare); }
+.panel-dark .panel-i { color: var(--flare); }
+.panel-dark .bullets li { border-color: rgba(248, 246, 242, 0.22); }
+.panel-blush { background: var(--blush); }
+.panel-blush .panel-i { color: var(--ember); }
+
+/* Full width photography. Placed at page level so it spans without a viewport
+   width calculation, which would count the scrollbar and push the page sideways. */
+.bleed { margin: 0; width: 100%; position: relative; overflow: hidden; background: var(--stonelight); }
+.bleed img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 24 / 7; }
+.bleed-tall img { aspect-ratio: 21 / 8; }
+.bleed-wide img { aspect-ratio: 30 / 8; }
+.bleed-top img { object-position: center top; }
+
+/* Duotone plate, the hub treatment: one warm wash over the photograph. */
+.duo { position: relative; }
+.duo::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(78, 37, 27, 0.34), rgba(135, 40, 35, 0.30));
+  mix-blend-mode: multiply;
+}
+
+/* Closing band as a full width ember plate. */
+.closeplate { position: relative; overflow: hidden; margin-top: 20px; isolation: isolate; }
+.closeplate .closeplate-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;
+}
+.closeplate::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(to right, rgba(78, 37, 27, 0.94), rgba(135, 40, 35, 0.78));
+}
+.closeplate-in { padding: 92px 28px 96px; color: var(--paper); }
+.closeplate-in .h-lg { color: var(--paper); }
+.closeplate-in .lede { color: rgba(248, 246, 242, 0.86); }
+.closeplate-acts { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; margin-top: 30px; }
+
+/* FAQ card, hub accordion surface. */
+.faqbox {
+  margin-top: 26px; background: var(--stonelight);
+  border-radius: var(--radius-panel); padding: 12px 32px 20px;
+}
+.faqbox details.faq:first-of-type { border-top: 0; }
+.faqbox .g-pill {
+  display: inline-block; margin: 20px 0 4px; font-size: 12px; letter-spacing: 0.06em;
+  padding: 6px 13px; border-radius: 999px; background: var(--blush); color: var(--ember);
+  font-weight: 500;
+}
+
+/* Blog covers carry the plate framing the hub uses, and the tag reads as a pill. */
+.card .cover { aspect-ratio: 1.41; }
+.card .tag {
+  display: inline-block; margin-top: 16px; font-size: 12px; letter-spacing: 0.06em;
+  text-transform: none; padding: 6px 13px; border-radius: 999px;
+  background: var(--blush); color: var(--ember); font-weight: 500;
+}
+
+@media (max-width: 1000px) {
+  .reqs { grid-template-columns: 1fr; }
+  .panels { grid-template-columns: 1fr; }
+  .tl { grid-template-columns: 1fr; gap: 22px; }
+  .tl li { padding: 0 0 0 26px; }
+  .tl li::before { top: 6px; bottom: -22px; left: 5px; right: auto; width: 1px; height: auto; }
+  .tl li:last-child::before { bottom: 0; }
+  .tl-dot { top: 5px; left: 0; }
+  .closeplate-in { padding: 62px 20px 66px; }
+  .bleed img, .bleed-wide img, .bleed-tall img { aspect-ratio: 3 / 2; }
+}
+@media (max-width: 560px) {
+  .req, .panel { padding: 22px 20px 24px; }
+  .faqbox { padding: 6px 20px 16px; }
+  .tl-band { padding: 42px 0; }
+}
+
+/* ---------- plates for the low resolution photography ----------------------
+   The pictures are web captures between 475px and 1024px wide, so a full bleed
+   band would scale them two or three times over. A plate holds the picture near
+   its own width, centred over a blurred and darkened copy of itself, and the
+   band reads as a deliberate vignette rather than a stretched photograph.
+   --src is the same file as the <img>; --nat is its native pixel width.
+   The url() inside --src is substituted here, so it resolves against this
+   stylesheet at fhs/pages/, one directory above the page that declares it:
+   write ../img/x.png in --src where the <img> src reads ../../img/x.png. */
+.plate { position: relative; overflow: hidden; background: var(--red110); }
+.plate::before {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background-image: var(--src); background-size: cover; background-position: center;
+  filter: blur(22px) saturate(1.12) brightness(0.94);
+  transform: scale(1.18);
+}
+.plate img {
+  position: relative; z-index: 1; display: block; margin-inline: auto;
+  width: min(100%, calc(var(--nat) * 1.45)); height: 100%; object-fit: cover;
+  /* Fade the vertical edges so the picture dissolves into the blurred ground
+     instead of butting against it on a hard seam. */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+}
+/* The wash has to sit over the picture, which the plate lifts off the flow. */
+.duo::after { z-index: 2; }
+
+/* A plate needs its height from the container, since the image no longer sets it. */
+.bleed.plate { aspect-ratio: 24 / 7; }
+.bleed.bleed-tall.plate { aspect-ratio: 21 / 8; }
+.bleed.bleed-wide.plate { aspect-ratio: 30 / 8; }
+
+@media (max-width: 1000px) {
+  .bleed.plate, .bleed.bleed-tall.plate, .bleed.bleed-wide.plate { aspect-ratio: 3 / 2; }
+  .plate::before { filter: blur(16px) saturate(1.12) brightness(0.94); }
+  .plate img {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+  }
+}
+
+/* Panel counts sit under the capacity figure in the comparison table. */
+.tbl .sub { display: block; font-size: 12px; color: var(--warm-grey); margin-top: 2px; }

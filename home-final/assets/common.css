@@ -1,0 +1,48 @@
+/* Shared homepage scaffolding for directions A to D.
+   Palette, type and nav skeleton come from tokens.css; nothing here adds a hue. */
+
+.nav .cta .sm { display: none; }
+@media (max-width: 620px) {
+  /* Five destinations plus the button will not fit one row on a phone, and the
+     shared nav scrolls rather than wraps, so the button would ride off screen.
+     Wrap to two rows instead of hiding a link. */
+  /* Wrapped rows still owe the lockup its safezone, so the pill's own padding
+     stays on the safezone and the row gap never closes below it. */
+  .nav { gap: 4px; padding: var(--logo-safezone); flex-wrap: wrap; justify-content: flex-start; overflow: visible; row-gap: var(--logo-safezone); }
+  .nav a.link { padding: 8px 7px; font-size: 12.5px; }
+  .nav .cta { padding: 10px 12px; }
+  .nav .cta .lg { display: none; }
+  .nav .cta .sm { display: inline; }
+}
+
+.sec { padding: 96px 0; }
+.sec.tight { padding: 72px 0; }
+h2.sec-head { font-size: clamp(30px, 3.6vw, 50px); max-width: 20ch; margin-top: 20px; }
+.lede { font-size: 18px; line-height: 1.55; color: var(--ink-soft); max-width: 62ch; }
+.hint { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm-grey); }
+.rule { height: 1px; background: var(--stone-mid); border: 0; margin: 0; }
+
+.foot { margin-top: 0; }
+.f-cols { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; width: 100%; }
+.f-cols h3 { font-family: "DM Sans", sans-serif; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--warm-grey); font-weight: 500; margin-bottom: 14px; }
+.f-cols ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.f-cols a { text-decoration: none; }
+.f-strap { font-family: "Borna", sans-serif; font-size: 21px; line-height: 1.2; color: var(--red110); max-width: 24ch; letter-spacing: -0.02em; }
+.f-legal { width: 100%; margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--stone-mid); display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; }
+
+.seen { display: flex; flex-wrap: wrap; gap: 14px 34px; align-items: baseline; }
+/* Publication names, so DM Sans rather than Borna: the heading face is Gryd's
+   own voice and these titles are somebody else's. */
+.seen span { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: clamp(17px, 1.9vw, 24px); letter-spacing: -0.01em; color: var(--warm-grey); }
+
+.map-plate { background: transparent; }
+/* The placeholder is a drawing, not a photograph, so it is fitted whole rather than cropped. */
+.map-plate img { width: 100%; height: 100%; object-fit: contain; }
+
+@media (max-width: 900px) {
+  .sec { padding: 68px 0; }
+  .f-cols { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .f-cols { grid-template-columns: 1fr; }
+}

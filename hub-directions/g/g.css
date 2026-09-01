@@ -1,0 +1,535 @@
+/* Direction G, "Daylight".
+   Devices lifted from blog.godaylight.com: centred masthead on paper, an asymmetric
+   card grid with one featured card spanning two columns and two rows, cover artwork
+   carrying its own title, a category pill under the image, centred pagination, and on
+   the detail page an inset rounded cover card, a narrow reading measure, and figures
+   allowed to break out wider than the text. Palette and radii are Gryd only. */
+
+.g-page { padding-top: 138px; }
+
+/* Five nav items plus the call to action overrun a 390 viewport, and the shared
+   nav scrolls rather than wraps, so the button drops off the right edge. Shorten
+   the label instead of hiding a destination. */
+.nav .cta .sm { display: none; }
+@media (max-width: 560px) {
+  .nav { gap: 0; padding-left: 12px; }
+  .nav .mark { margin-right: 2px; }
+  .nav a.link { padding: 8px 7px; }
+  .nav .cta { padding: 10px 12px; }
+  .nav .cta .lg { display: none; }
+  .nav .cta .sm { display: inline; }
+}
+
+/* ---------- listing masthead ---------- */
+
+.g-mast {
+  text-align: center;
+  padding: 0 0 64px;
+}
+.g-mast .eyebrow { justify-content: center; }
+.g-mast h1 {
+  font-size: clamp(44px, 6.6vw, 82px);
+  max-width: 15ch;
+  margin: 26px auto 0;
+}
+.g-mast .stand {
+  max-width: 58ch;
+  margin: 24px auto 0;
+  font-size: 18px;
+  color: #6B4A3E;
+}
+
+/* ---------- asymmetric card grid ---------- */
+
+.g-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  align-items: start;
+}
+.g-card { text-decoration: none; display: block; min-width: 0; }
+.g-card .cover {
+  position: relative;
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  background: var(--stonelight);
+}
+/* Direct child only, so the photo rules never reach the logomark inside the plate. */
+.g-card .cover > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1.41;
+}
+.g-card.feat { grid-column: span 2; grid-row: span 2; }
+.g-card.feat .cover > img { aspect-ratio: 1.13; }
+
+/* Type set into the artwork, the one device that makes these covers read as a set. */
+.g-card .plate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 26px;
+  color: var(--paper);
+  background: linear-gradient(to bottom, rgba(30, 12, 8, 0.42), rgba(30, 12, 8, 0.58));
+}
+.g-card .plate .mark {
+  height: 28px;
+  width: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  align-self: center;
+  flex: none;
+  opacity: 0.92;
+  margin-bottom: 16px;
+}
+.g-card .plate .over {
+  font-family: "Borna", sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  font-size: 26px;
+  max-width: 16ch;
+}
+.g-card.feat .plate .over { font-size: clamp(32px, 4vw, 54px); }
+.g-card .plate .sub {
+  margin-top: 12px;
+  font-size: 13px;
+  max-width: 34ch;
+  color: rgba(248, 246, 242, 0.86);
+  line-height: 1.45;
+}
+.g-card.feat .plate .sub { font-size: 15px; margin-top: 16px; }
+
+.g-pill {
+  display: inline-block;
+  margin: 18px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: var(--blush);
+  color: var(--ember);
+  font-weight: 500;
+}
+.g-card h2 {
+  margin-top: 14px;
+  font-size: 25px;
+  line-height: 1.12;
+  max-width: 22ch;
+}
+.g-card.feat h2 { font-size: 32px; max-width: 30ch; }
+.g-card .facts {
+  margin: 14px 0 0;
+  font-size: 14px;
+  color: var(--warm-grey);
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/* ---------- category filter, the one thing Daylight's listing lacks ---------- */
+
+.g-filter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 22px;
+  max-width: 900px;
+}
+.f-pill {
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--stone-mid);
+  background: transparent;
+  color: var(--red110);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.f-pill .c { font-size: 12px; color: var(--warm-grey); }
+.f-pill:hover { background: var(--stonelight); }
+.f-pill[aria-pressed="true"] {
+  background: var(--red110);
+  border-color: var(--red110);
+  color: var(--paper);
+}
+.f-pill[aria-pressed="true"] .c { color: var(--dark-secondary); }
+
+.g-count {
+  text-align: center;
+  margin: 0 0 40px;
+  font-size: 14px;
+  color: var(--warm-grey);
+}
+.g-empty {
+  text-align: center;
+  margin: 60px 0 0;
+  font-size: 17px;
+  color: var(--warm-grey);
+}
+/* .g-card sets display:block, which would otherwise beat the hidden attribute. */
+.g-card[hidden] { display: none; }
+
+.g-card .dek {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #6B4A3E;
+  max-width: 44ch;
+}
+
+/* ---------- dated press list ---------- */
+
+.n-list { border-top: 1px solid var(--stone-mid); }
+.n-year {
+  font-size: 15px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--warm-grey);
+  padding: 26px 0 6px;
+}
+.n-row {
+  display: grid;
+  grid-template-columns: 150px 140px 176px minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: baseline;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--stone-mid);
+  text-decoration: none;
+}
+.n-row:hover { background: var(--stonelight); }
+/* Same cover treatment as the project and article cards, sized down to a row thumb.
+   Every press item carries the picture the live site gives it, so there is no
+   empty variant: three of these photographs are shared with another item, which
+   is how gryd.energy itself publishes them. */
+.n-row .cover {
+  align-self: start;
+  position: relative;
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  background: var(--stonelight);
+}
+.n-row .cover > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1.41;
+}
+.n-row .when { font-size: 14px; color: var(--warm-grey); }
+.n-row .outlet {
+  font-family: "Borna", sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.n-row .head {
+  display: block;
+  font-family: "Borna", sans-serif;
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: -0.025em;
+  line-height: 1.14;
+}
+.n-row .line {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #6B4A3E;
+  max-width: 58ch;
+}
+.n-row .ext {
+  font-size: 13px;
+  white-space: nowrap;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: var(--blush);
+  color: var(--ember);
+  justify-self: end;
+}
+.n-row .ext.own { background: var(--flare); color: #ffffff; }
+
+.g-close .alt { margin: 22px auto 0; font-size: 14px; color: var(--warm-grey); }
+.g-close .alt a { color: var(--ember); }
+
+/* ---------- centred pagination ---------- */
+
+.g-pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 72px;
+  color: var(--warm-grey);
+}
+.g-pager .step {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 15px;
+  opacity: 0.45;
+}
+/* A live arrow or number is a link and reads at full strength; the .off arrows at
+   the ends of the run keep the muted weight the single page pager already used. */
+.g-pager a.step, .g-pager .num {
+  opacity: 1;
+  color: var(--warm-grey);
+  text-decoration: none;
+}
+.g-pager .num {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 15px;
+}
+.g-pager a.step:hover, .g-pager .num:hover {
+  background: var(--stonelight);
+  color: var(--ember);
+}
+.g-pager .step.off { opacity: 0.45; }
+.g-pager .now {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--flare);
+  color: var(--ember);
+  font-size: 15px;
+}
+
+/* ---------- closing panel, shared by both pages ---------- */
+
+.g-close {
+  margin-top: 96px;
+  background: var(--blush);
+  border-radius: var(--radius-panel);
+  padding: 68px 48px;
+  text-align: center;
+}
+.g-close h2 { font-size: clamp(30px, 4vw, 48px); max-width: 20ch; margin: 0 auto; }
+.g-close p { max-width: 54ch; margin: 20px auto 30px; color: #6B4A3E; }
+
+/* ---------- detail page ---------- */
+
+.g-hero {
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  position: relative;
+  background: var(--stonelight);
+}
+.g-hero > img { width: 100%; aspect-ratio: 2.45; object-fit: cover; }
+.g-hero .plate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 clamp(28px, 7vw, 96px);
+  color: var(--paper);
+  background: linear-gradient(to right, rgba(30, 12, 8, 0.66), rgba(30, 12, 8, 0.24));
+}
+.g-hero .plate .mark {
+  height: 28px;
+  width: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  align-self: flex-start;
+  flex: none;
+  opacity: 0.92;
+  margin-bottom: 16px;
+}
+.g-hero .plate h1 {
+  font-size: clamp(30px, 4.4vw, 58px);
+  max-width: 16ch;
+  color: var(--paper);
+}
+.g-hero .plate .stand {
+  margin-top: 16px;
+  max-width: 40ch;
+  font-size: 15px;
+  color: rgba(248, 246, 242, 0.86);
+}
+
+/* One narrow measure carries the whole article. */
+.g-measure { max-width: 660px; margin: 0 auto; }
+
+.g-title { margin-top: 56px; }
+.g-title h2 { font-size: clamp(32px, 3.6vw, 46px); }
+.g-byline {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+  font-size: 15px;
+}
+.g-byline .face {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--ember);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  font-family: "Borna", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.g-byline .who { font-weight: 500; }
+.g-byline .when { color: var(--warm-grey); }
+
+.g-body { margin-top: 44px; font-size: 17px; }
+.g-body p { margin: 0 0 22px; }
+.g-body h3 { font-size: 28px; margin: 46px 0 16px; }
+.g-body h4 { font-size: 20px; margin: 32px 0 12px; }
+.g-body ul { margin: 0 0 22px; padding-left: 22px; }
+.g-body li { margin-bottom: 9px; }
+.g-body .lead-in { font-size: 21px; line-height: 1.45; color: var(--ember); }
+.g-body blockquote {
+  margin: 34px 0;
+  padding: 0 0 0 22px;
+  border-left: 2px solid var(--flare);
+  font-family: "Borna", sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.24;
+  letter-spacing: -0.02em;
+}
+.g-body blockquote cite {
+  display: block;
+  margin-top: 14px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--warm-grey);
+}
+
+/* Figures break the measure, the only element on the page allowed to. */
+.g-break {
+  width: min(920px, 100%);
+  margin-left: 50%;
+  transform: translateX(-50%);
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+.g-break figcaption {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--warm-grey);
+  text-align: center;
+}
+.g-break img { border-radius: var(--radius-panel); width: 100%; }
+
+.g-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.g-figures img { border-radius: var(--radius-chip); aspect-ratio: 1.2; object-fit: cover; }
+
+.g-numbers {
+  background: var(--stonelight);
+  border-radius: var(--radius-panel);
+  padding: 40px 34px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px;
+}
+.g-numbers .n {
+  font-family: "Borna", sans-serif;
+  font-weight: 500;
+  font-size: clamp(26px, 3vw, 40px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.g-numbers .n em { font-style: normal; color: var(--ember); }
+.g-numbers .l { margin-top: 12px; font-size: 13px; color: var(--warm-grey); line-height: 1.4; }
+
+.g-spec { margin: 0; }
+.g-spec div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--stone-mid);
+  font-size: 15px;
+}
+.g-spec dt { color: var(--warm-grey); }
+.g-spec dd { margin: 0; text-align: right; font-weight: 500; }
+
+.g-return { margin-top: 44px; }
+
+.g-share { text-align: center; margin-top: 84px; }
+.g-share h3 { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 17px; letter-spacing: 0; }
+.g-share .row { display: flex; justify-content: center; gap: 12px; margin-top: 18px; }
+.g-share .row a {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--red110);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.g-more { margin-top: 96px; }
+.g-more > h3 { text-align: center; font-size: clamp(30px, 4vw, 46px); }
+.g-more .pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 44px;
+}
+
+@media (max-width: 900px) {
+  .g-page { padding-top: 108px; }
+  .g-grid { grid-template-columns: 1fr; gap: 40px; }
+  .g-card.feat { grid-column: auto; grid-row: auto; }
+  .g-card .cover img, .g-card.feat .cover img { aspect-ratio: 1.3; }
+  .g-card.feat h2 { font-size: 27px; }
+  .g-numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 30px 24px; }
+  .g-figures { grid-template-columns: 1fr; }
+  .g-hero img { aspect-ratio: 1.25; }
+  .g-hero .plate { justify-content: flex-end; padding-bottom: 34px; }
+  .g-break { width: 100%; margin-left: 0; transform: none; }
+  .g-close { padding: 46px 24px; }
+  .g-more .pair { grid-template-columns: 1fr; gap: 40px; }
+
+  .g-filter { justify-content: flex-start; }
+  .f-pill { font-size: 13px; padding: 10px 13px; }
+  .g-count { text-align: left; }
+  /* The date and outlet become a single caption line above the headline. */
+  .n-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 24px 0;
+  }
+  .n-row .cover { order: 1; }
+  .n-row .when { order: 2; }
+  .n-row .outlet { order: 3; font-size: 15px; }
+  .n-row .body { order: 4; }
+  .n-row .head { font-size: 19px; }
+  .n-row .ext { order: 5; justify-self: start; }
+}

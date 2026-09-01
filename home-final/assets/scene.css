@@ -1,0 +1,115 @@
+/* ---------------------------------------------------------------
+   Opening animation and the reveal it hands the page over with, ported from
+   Scott's Website 3 draft. The field is paper, the emblem turns on its own
+   axis beside the drawn logotype, then the field fades and the page rises.
+   Hidden unless JS turns it on, so a JS failure leaves the page usable.
+   --------------------------------------------------------------- */
+.gryd-intro{position:fixed;inset:0;z-index:2000;display:none;background:var(--paper);opacity:1;transition:opacity .7s cubic-bezier(.22,.61,.36,1),visibility .7s}
+.gryd-intro.on{display:flex;align-items:center;justify-content:center}
+.gryd-intro.out{opacity:0;visibility:hidden;pointer-events:none;will-change:opacity}
+.gryd-intro-inner{display:flex;align-items:center;gap:14px}
+/* the emblem at its artwork proportions, turning the way Scott's draft turns it */
+.gryd-intro-mark{width:46px;height:46px;color:var(--flare);animation:gryd-intro-spin 2.4s linear infinite}
+.gryd-intro-word{height:34.8px;width:auto;aspect-ratio:411.6/173.3;color:var(--red110)}
+@keyframes gryd-intro-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.gryd-intro-mark{animation:none}}
+.gryd-intro-skip{position:absolute;right:24px;bottom:22px;z-index:1;appearance:none;border:0;background:rgba(28,14,10,.42);color:#fff;font:inherit;font-size:13px;letter-spacing:.02em;line-height:1;padding:10px 16px;border-radius:999px;cursor:pointer;transition:background-color .2s linear}
+.gryd-intro-skip:hover,.gryd-intro-skip:focus-visible{background:rgba(28,14,10,.68)}
+body.intro-playing{overflow:hidden}
+body.intro-playing #content{transform:translateY(24px);opacity:0}
+body.intro-rise #content{transform:none;opacity:1;transition:transform .6s cubic-bezier(.22,.61,.36,1),opacity .6s cubic-bezier(.22,.61,.36,1)}
+/* the header waits behind the field and fades in as the page is revealed */
+body.intro-playing .gryd-header{opacity:0}
+body.intro-nav .gryd-header{opacity:1;transition:opacity .4s cubic-bezier(.22,.61,.36,1)}
+
+
+/* the lockup is a placed asset; tokens.css sizes it and holds its safezone */
+
+/* step 2: one line art world. Gryd's own house drawing and the estate it
+   feeds share a single svg and a single coordinate space, so the camera can
+   travel from the close up out along the route without a cut. The camera is
+   the viewBox, driven from scroll progress. */
+.step-city{position:relative;width:100%;height:100%;min-height:280px;overflow:hidden}
+.gh-svg{display:block;width:100%;height:100%}
+.gh-cell{fill:var(--flare);fill-opacity:0;stroke:none}
+.gh-halo{fill:var(--flare);fill-opacity:.16}
+.gh-dot{fill:var(--flare)}
+.gh-exit-head{fill:var(--flare);opacity:0}
+
+/* the estate, drawn in the same hand as the house: single weight ember outlines
+   estate plots are the same drawing cloned smaller, so --rw and the per copy
+   stroke width are set from the zoom each frame, which is what holds one
+   apparent weight from the close up out to the wide street. */
+.est-glow{fill:url(#estGlow);opacity:0}
+/* a run is drawn flat: one weight, square ends, hard corners, the way the
+   drawing itself is drawn. The settled body is the cool tint and the hot head
+   rides over it in three steps, which is the ramp read off the reference. */
+.gh-exit-line,.est-route{fill:none;stroke:var(--flare-trail);stroke-width:var(--rw,15);stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:8}
+.est-head{fill:none;stroke:var(--flare);stroke-width:var(--rw,15);stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:8}
+
+
+/* ------------------------------------------------------------------
+   The five step scrub scene.
+   The track owns the scroll, the pin holds one viewport of it, and the
+   copy column swaps its step while the artwork runs one continuous
+   timeline underneath. Five labels, one scene, no cuts.
+   ------------------------------------------------------------------ */
+.scene { padding-bottom: 0; }
+.scene-track { position: relative; height: 520vh; }
+.scene-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+/* The artwork bleeds to the right edge the way the original step 2 did: the
+   copy keeps the measure's left margin, the scene takes everything else. */
+.scene-grid {
+  display: grid; grid-template-columns: minmax(0, 430px) 1fr; align-items: center;
+  height: 100%; max-width: none; gap: 40px;
+  padding: 0 0 0 max(28px, calc((100% - var(--measure)) / 2));
+}
+.scene-copy { position: relative; min-width: 0; }
+.scene-steps { position: relative; list-style: none; margin: 0; padding: 0; min-height: 340px; }
+.scene-step {
+  position: absolute; inset: 0; opacity: 0; transform: translate3d(0, 18px, 0);
+  transition: opacity .38s var(--ease-out, cubic-bezier(0,0,.2,1)), transform .38s var(--ease-out, cubic-bezier(0,0,.2,1));
+  pointer-events: none;
+}
+.scene-step.on { opacity: 1; transform: none; pointer-events: auto; }
+.scene-step .n { font-family: "Borna", sans-serif; font-size: 46px; line-height: 1; color: var(--flare); letter-spacing: -0.04em; display: block; }
+.scene-step h3 { font-size: clamp(28px, 3vw, 42px); margin-top: 14px; }
+.scene-step p { font-size: 16px; line-height: 1.55; color: var(--ink-soft); max-width: 42ch; margin: 16px 0 0; }
+.scene-step .labs { display: grid; gap: 0; margin-top: 24px; max-width: 40ch; }
+.scene-step .labs span { font-size: 13px; color: var(--warm-grey); border-top: 1px solid var(--stone-mid); padding: 11px 0; }
+.scene-step .labs em { display: block; font-style: normal; color: var(--red110); font-weight: 500; }
+
+.scene-rail { display: flex; align-items: center; gap: 14px; margin-top: 34px; }
+.scene-bar { flex: 1; height: 2px; background: var(--stone-mid); position: relative; }
+.scene-bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--flare); display: block; }
+.scene-ticks { display: flex; gap: 10px; font-size: 12px; letter-spacing: 0.12em; color: var(--warm-grey); }
+.scene-ticks span.on { color: var(--red110); }
+
+.scene-art { position: relative; height: min(76vh, 58vw); min-height: 360px; min-width: 0; }
+.scene-art .step-city { height: 100%; }
+/* the ported three.js development. It owns its own pixels, so the element just
+   has to be a real box: the renderer sizes itself off clientWidth/Height. */
+.scene-canvas { display: block; width: 100%; height: 100%; border-radius: var(--radius-panel); background: var(--paper); }
+
+@media (max-width: 900px) {
+  .scene-track { height: 460vh; }
+  /* stacked: the scene sits above the copy and clears the floating nav */
+  .scene-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; align-content: center; gap: 20px; padding: 96px 20px 24px; }
+  .scene-art { order: -1; height: 34vh; min-height: 210px; }
+  .scene-art .step-city { height: 32vh; min-height: 200px; }
+  .scene-steps { min-height: 300px; }
+  .scene-step .n { font-size: 34px; }
+  .scene-step p { font-size: 15px; }
+  .scene-step .labs { max-width: none; }
+}
+
+/* Nav lockup: the placed brand pack asset, sized and spaced in tokens.css. */
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-track { height: auto; }
+  .scene-pin { position: static; height: auto; padding: 40px 0 72px; }
+  .scene-step { position: static; opacity: 1; transform: none; }
+  .scene-steps { min-height: 0; display: grid; gap: 40px; }
+  .scene-art { height: 60vh; }
+  .scene-ticks span { color: var(--red110); }
+}

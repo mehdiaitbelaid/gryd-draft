@@ -1,0 +1,92 @@
+/* The spotlight rail, the opening Mehdi picked out of menu-lab.html.
+
+   The interaction is the highlight, not the panel. One capsule lives inside the
+   pill and travels to whatever the pointer or the keyboard is on, leaning a few
+   pixels toward the cursor inside an item, and the dropdown unfolds from
+   wherever it stopped. Every item moves it, plain links included, so the bar is
+   live along its whole length and not only over the two items that have
+   children.
+
+   Two rules hold this file together, and both are about the judder:
+
+   nothing here animates anything but transform and opacity. The capsule's box
+   is sized once by the script and its travel is a translate and a scale, so no
+   frame of it is a layout. The panel fades and unfolds; it never animates its
+   own size.
+
+   and the glass is painted at all times, never animated. A backdrop-filter that
+   is transitioned from blur(0) is the classic pop, because the compositor has to
+   build the backdrop layer on the first frame that needs it. Here the blur is in
+   draft.css on the panel's own surface and it is present before the panel is
+   ever shown, so what changes on open is opacity and nothing else.
+
+   The narrow layout is not covered by this file. Below 901px the whole tree is
+   one panel the burger opens, and neither the capsule nor the unfold applies. */
+
+/* The capsule does not exist below the breakpoint. This has to be display none
+   rather than merely transparent: the pill is a flex row with a gap, so an
+   in-flow element of no width still costs one gap and pushes the lockup over. */
+.dnav .cap { display: none; }
+
+@media (min-width: 901px) {
+
+/* ------------------------------------------------------------- the capsule */
+/* Sized once in pixels by the script and moved with translate3d plus a scaleX
+   off that size, so its width is never a layout property. transform-origin at
+   the left edge is what makes that scale mean "this item's width" rather than
+   "this item's width about its own centre". */
+.dnav .cap {
+  display: block; position: absolute; left: 0; top: 0; z-index: 0;
+  width: 1px; height: 1px; transform-origin: 0 0;
+  border-radius: 999px; background: rgba(255,255,255,.16);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+  opacity: 0; pointer-events: none;
+  transition: opacity .18s linear;
+}
+/* the pill's own contents sit over it */
+.dnav .lockup, .dnav .links, .dnav .cta, .dnav-burger { position: relative; z-index: 1; }
+
+/* The item's own hover fill comes off. The capsule arrives as the highlight,
+   and a highlight that is already sitting there means the travel does not read.
+   The keyboard keeps a ring, because the capsule is a decoration and a focus
+   ring is not. */
+.dnav .link:hover, .dnav .link:focus-visible,
+.dnav .has-menu.open > .link { background: none; color: #fff; }
+.dnav .link:focus-visible {
+  outline: 2px solid rgba(255,255,255,.7); outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------- the unfold */
+/* Shut, the panel is a fraction of its height, pinned at the edge it hangs
+   from; open, it is itself. The wrapper carries the fade and the list carries
+   the unfold, so the 12px gap the pointer crosses between the pill and the
+   panel is never scaled and never moves. */
+.dnav .submenu {
+  transition: opacity .16s cubic-bezier(.4,0,.7,1), visibility .16s;
+}
+.dnav .submenu ul {
+  transform-origin: 50% 0; transform: scaleY(.86);
+  transition: transform .18s cubic-bezier(.4,0,.7,1);
+}
+.dnav .has-menu.open > .submenu {
+  /* visibility flips on the first frame, not at the end of one, so the glass is
+     already blurred before the fade starts */
+  transition: opacity .22s cubic-bezier(.22,.61,.36,1), visibility 0s;
+}
+.dnav .has-menu.open > .submenu ul {
+  transform: none;
+  transition: transform .30s cubic-bezier(.16,.84,.34,1);
+}
+
+}
+
+/* --------------------------------------------------------- reduced motion */
+/* The end state and nothing between. The script still measures and still places
+   the capsule, so the rail is in the right spot instantly rather than switched
+   off, and the panel simply appears. */
+@media (prefers-reduced-motion: reduce) {
+  .dnav, .dnav .cap, .dnav .submenu, .dnav .submenu ul, .dnav .links {
+    transition: none !important;
+  }
+  .dnav .submenu ul { transform: none !important; }
+}

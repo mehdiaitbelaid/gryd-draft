@@ -1,0 +1,307 @@
+/* The Gryd system section: one scrubbed film of the scene building itself on a
+   pinned scroll.
+
+   Geometry rule for the whole file: every row of the pin is the same grid, so
+   the five step rows and the film land their artwork in exactly the same box at
+   every window size.
+
+   The section owns no scroll logic. system.js writes three things and nothing
+   else: --sys-scale on the pin, the film's currentTime, and (only when there is
+   no film) an opacity per plate. */
+
+.sys { padding-bottom: 0; }
+/* 5.5 viewports, not 7. The curve already puts nearly all the scroll on
+   moving frames; a shorter track raises the motion density again, so a
+   hand's worth of scrolling is always worth a visible change. */
+.sys-track { position: relative; height: 550vh; }
+.sys-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+
+/* one row, five times over, plus the line's own.
+
+   The words lead on the left and the film answers on the right. The section is
+   read before it is watched, and a reader coming down the page meets the left
+   edge first, so the side that has to be read is the side that gets it. The
+   film was on the left until 1 September and took the whole section with it:
+   it is the only thing in here that moves, it was the bigger half, and it had
+   first position as well, so the copy was competing for attention it should
+   never have had to compete for. Reversing the two costs the film nothing,
+   since a picture is found wherever it is put.
+
+   Neither side is ever drawn over the other: the words live in column one and
+   the film is contained inside column two, which is the whole reason this
+   arrangement was chosen over the overlay ones. Placement is still explicit
+   rather than by source order, and now the two agree: the copy is first in the
+   document and first on screen, so a screen reader and an eye take the same
+   route.
+
+   The left padding is the larger of the two. The copy now carries that edge and
+   text against a window edge reads as an accident, while the film's own frame
+   has generous margin baked into the render. */
+.sys-row {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: minmax(0, var(--sys-copy, 580px)) 1fr;
+  align-items: center; gap: 52px;
+  padding: 0 30px 0 64px;
+}
+/* The row is one row. Naming the column without naming the row let grid's own
+   auto placement put the film on a second row underneath the copy. Both sides
+   say which row they are in, so there is only ever one. */
+.sys-row .txt { grid-column: 1; grid-row: 1; }
+.sys-row .sys-frame { grid-column: 2; grid-row: 1; }
+
+/* ------------------------------------------------- the film and the plates */
+/* The frame carries the film's own 16:9, so object-fit contain fills it edge to
+   edge and the line's viewBox maps one to one onto the picture. */
+/* The ceiling is 1024px, down from 1200. It started as the source's own
+   resolution talking and it is now doing a second job, so both are written
+   down.
+
+   The resolution argument first. On a retina screen the frame is drawn at twice
+   its CSS width plus the pin's own scale, and the master is 1920 wide, so an
+   uncapped frame on a 2560px window asked that film to cover about 2970 device
+   pixels and the browser was inventing half of them. 1200 held the worst case
+   at 1.31 to one; 1024 holds it at 1024 times the 1.05 scale times two, or 2150
+   device pixels from a 1920 source, which is 1.12 to one and near enough to
+   native that the cap is no longer the softest thing in the frame.
+
+   The second job is weight. Mehdi's read on 1 September was that the film took
+   the whole section and the words went unread, which is a ratio problem rather
+   than a size problem: the film moves and the copy does not, so parity of area
+   is not parity of attention and the picture has to be the smaller half of the
+   argument to be an equal half of the page. With a 580px copy column and the
+   paddings below, the frame is 714px on a 1440 window, against 794 before this
+   pass and about 940 before the split, which puts the two sides at roughly
+   55/45. The cap binds on any window wider than about 1750px, so a 1920 screen
+   gets 1024 against 580 with the slack falling either side of the frame rather
+   than into it. The film is still comfortably the largest object in the
+   section; it is no longer the only one. */
+.sys-frame {
+  position: relative;
+  width: min(100%, calc(84vh * 16 / 9), 1024px);
+  aspect-ratio: 16 / 9;
+  margin-inline: auto;
+  transform: scale(var(--sys-scale, 1));
+  transform-origin: 50% 55%;
+}
+.sys-plate { position: absolute; inset: 0; display: block; }
+/* The renders sit on their own near white ground, lighter than the page's
+   stone, so an untreated frame reads as a white rectangle pasted onto the
+   section. No blend mode fixes that: multiply greys the ground, lighten keeps
+   it. Feathering the four edges does, because the artwork has generous margin
+   inside its own frame and only the ground reaches the boundary. The bottom
+   edge earns it twice over, since that is where the render carries its ember
+   and a hard cut there would read as a crop across the light. */
+/* The ramp is not a straight line. A linear alpha ramp between two grounds that
+   differ by a few points still shows its own start and end as faint creases, so
+   each edge is four stops shaped like a smoothstep and the two axes are
+   intersected, which gives the corners the product of both and no seam.
+
+   --sys-dark widened the mask over the old cut's night exterior, whose ground
+   sat far under the page's stone. The film is now one constant daylight take
+   and the driver publishes no such reading, so the variable is left declared
+   with a fallback of 0 and the ramp resolves to its daylight width, 7% and 6%,
+   for the whole film. Kept rather than folded flat because it is the one seam
+   a future night cut would need, and folding it costs the same edit back. */
+.sys-plate img,
+.sys-film {
+  width: 100%; height: 100%; object-fit: contain; display: block;
+  --edge-x: calc(7% + 11% * var(--sys-dark, 0));
+  --edge-y: calc(6% + 10% * var(--sys-dark, 0));
+  --feather:
+    linear-gradient(to right,
+      rgba(0, 0, 0, 0) 0,
+      rgba(0, 0, 0, .18) calc(var(--edge-x) * .32),
+      rgba(0, 0, 0, .72) calc(var(--edge-x) * .68),
+      #000 var(--edge-x),
+      #000 calc(100% - var(--edge-x)),
+      rgba(0, 0, 0, .72) calc(100% - var(--edge-x) * .68),
+      rgba(0, 0, 0, .18) calc(100% - var(--edge-x) * .32),
+      rgba(0, 0, 0, 0) 100%),
+    linear-gradient(to bottom,
+      rgba(0, 0, 0, 0) 0,
+      rgba(0, 0, 0, .18) calc(var(--edge-y) * .32),
+      rgba(0, 0, 0, .72) calc(var(--edge-y) * .68),
+      #000 var(--edge-y),
+      #000 calc(100% - var(--edge-y)),
+      rgba(0, 0, 0, .72) calc(100% - var(--edge-y) * .68),
+      rgba(0, 0, 0, .18) calc(100% - var(--edge-y) * .32),
+      rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: var(--feather);
+  mask-image: var(--feather);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.sys-film { position: absolute; inset: 0; }
+.sys-step .sys-frame { opacity: 0; }
+/* Once the film has enough data to answer a seek it is the artwork, and the
+   still stack stops being painted at all. Until then, and if the file never
+   decodes, the stack is what is on screen and the film is not in the way. */
+.sys-pin:not(.has-film) .sys-film { display: none; }
+.sys-pin.has-film .sys-step .sys-frame { display: none; }
+
+/* The holder of the progress rail and the film. No connector is drawn over the
+   picture: the ember through the houses belongs to the render itself. */
+.sys-lineholder { pointer-events: none; }
+
+/* --------------------------------------------------------------- the copy */
+.sys-steps { list-style: none; margin: 0; padding: 0; }
+.sys-step { pointer-events: none; }
+.sys-step .txt {
+  opacity: 0; transform: translate3d(0, 12px, 0);
+  transition: opacity .3s cubic-bezier(0, 0, .2, 1),
+              transform .3s cubic-bezier(0, 0, .2, 1);
+}
+.sys-step .txt.on { opacity: 1; transform: none; pointer-events: auto; }
+/* leaving is quicker than arriving and goes the other way, so the two never
+   read as the same block sliding */
+.sys-step .txt.out {
+  opacity: 0; transform: translate3d(0, -12px, 0); transition-duration: .15s;
+}
+/* The numeral is small now, not a 46px display figure. The ladder beside the
+   column already says which of the five this is, and two large numbers within
+   an inch of each other read as a mistake. It stays in the markup and in the
+   copy contract; it is simply no longer competing with the title. */
+.sys-step .n {
+  font-family: "Borna", sans-serif; font-size: 17px; line-height: 1;
+  color: var(--flare); letter-spacing: .16em; display: block;
+}
+/* The one moment worth catching the eye with. The film never stops moving, so
+   motion is not what marks a step change in here; timing is. The block arrives
+   as it always did and the numeral follows it a tenth of a second later, which
+   is late enough to register as its own event and small enough that nobody will
+   name it. It retriggers on its own because .on is taken off the outgoing step
+   and put on the incoming one, and `backwards` holds the numeral out of sight
+   through the delay rather than flashing it first. */
+@keyframes sys-num {
+  from { opacity: 0; transform: translate3d(0, -4px, 0); }
+  to { opacity: 1; transform: none; }
+}
+.sys-step .txt.on .n {
+  animation: sys-num .45s cubic-bezier(0, 0, .2, 1) .1s backwards;
+}
+/* Sized to be read across a room, which is the whole point of giving the copy
+   its own column instead of a caption's worth of space. */
+/* The title sits at the top of its approved band rather than in the middle of
+   it. The clamp's floor is 38px and its slope reaches the 46px ceiling by about
+   1355px, so every window this layout pins on gets a title within a few points
+   of the largest size the design allows. A column that has been widened to be
+   read is only worth widening if the type grows into it. */
+.sys-step h3 { font-size: clamp(38px, 3.4vw, 46px); margin-top: 16px; }
+/* 20px is the floor now, at every pinned width. The 1180 step used to drop the
+   body to 18.5px to buy the title room in a 440px column; the column is 500px
+   there now and does not need buying out of the body's size. Leading went from
+   1.62 to 1.68 for the same reason the column got wider: this is the one block
+   on the page a reader is expected to stop and read. */
+.sys-step p {
+  font-size: 20px; line-height: 1.68; color: var(--ink-soft);
+  max-width: 37ch; margin: 22px 0 0;
+}
+/* The pairs share the paragraph's measure, so their rules start and stop on the
+   same two verticals the text does. At 34ch they stopped short of it, which read
+   as a third margin in a column that only has two. */
+.sys-step .labs { display: grid; gap: 0; margin-top: 30px; max-width: 37ch; }
+.sys-step .labs span {
+  font-size: 15px; color: var(--warm-grey);
+  border-top: 1px solid var(--stone-mid); padding: 13px 0;
+}
+.sys-step .labs em {
+  display: block; font-style: normal; color: var(--red110); font-weight: 500;
+}
+
+/* ------------------------------------------- the copy column's own left edge */
+/* The rail is not a separate bar parked at the bottom of the screen any more.
+   It is the edge of the copy column: a vertical spine carrying the progress
+   fill, with the five numbers beside it. It sits in column two, in the same
+   cell as the words, and the words are indented past it, so the two never
+   collide and the column reads as one object.
+
+   The spine is the progress bar itself rather than a second indicator. The
+   driver still writes a percentage width, which this orientation ignores, and
+   also publishes --sys-p, which is what the fill's height reads. Keeping both
+   means no other reader of the bar had to change. */
+/* Mirrored with the section: the rail is now the copy column's right hand edge,
+   the one facing the film, and the ticks sit inside it. That is the edge the
+   spine has to take. The copy's left edge is the reader's alignment axis and
+   the page margin behind it, so a spine there would either push the words off
+   the window or park itself against it, which is the arrangement this rail was
+   built to replace. On the right it separates the two halves instead: one line
+   between the words and the picture, doing the work a gutter cannot. */
+.sys-rail {
+  grid-column: 1; grid-row: 1; justify-self: end; align-self: stretch;
+  display: flex; align-items: center; gap: 18px;
+  margin: 12vh 0; width: max-content;
+}
+/* Ordered rather than reordered in the markup: the builder emits the spine
+   before the ticks, and the document is the wrong place to encode which side of
+   the section the film is on. */
+.sys-bar {
+  order: 2;
+  flex: none; width: 2px; height: 100%;
+  background: var(--stone-mid); position: relative;
+}
+.sys-bar i {
+  position: absolute; inset: 0 0 auto 0; width: 100%;
+  height: calc(var(--sys-p, 0) * 100%); background: var(--flare); display: block;
+}
+/* The ticks come before the spine in the flex order, so the spine is the
+   outermost thing in the column and the numbers read inward towards the words.
+   They are right aligned against it and set in tabular figures, so the five sit
+   on one vertical and nothing shifts when the lit one changes. */
+.sys-ticks {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 20px;
+  font-size: 12px; letter-spacing: .12em; color: var(--warm-grey);
+  font-variant-numeric: tabular-nums;
+}
+/* the ticks are the one thing in the holder a reader may touch */
+.sys-ticks button {
+  pointer-events: auto; cursor: pointer;
+  background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; letter-spacing: inherit; color: inherit;
+  transition: color .25s ease;
+}
+.sys-ticks button:hover { color: var(--red110); }
+.sys-ticks button.on { color: var(--flare); }
+.sys-ticks button:focus-visible {
+  outline: 2px solid var(--flare); outline-offset: 4px; border-radius: 3px;
+}
+
+/* The copy clears the rail rather than sharing its space, on the right now that
+   the rail has moved there. 76px is the rail's own width plus a gutter wide
+   enough that the ragged right edge of the text never reaches for the spine. */
+.sys-step .txt { padding-right: 76px; }
+
+/* The copy column gives ground before the film does, but it gives less than it
+   used to and never below the width the 20px body needs. The old step dropped
+   to a flat 440px, which at 900px left the copy wider than the film and turned
+   the whole arrangement inside out one pixel above the unpinned breakpoint. The
+   ceiling and the viewport term together keep the film the larger half all the
+   way down to 900. */
+@media (max-width: 1180px) {
+  .sys-row { --sys-copy: min(500px, 44vw); gap: 40px; padding: 0 24px 0 44px; }
+  .sys-step .txt { padding-right: 64px; }
+}
+
+/* ------------------------------------------------------- unpinned layout */
+/* Below 900px and under reduced motion the section stops being a scroll piece
+   and becomes what it is describing: five blocks, each with its own plate and
+   its own words, in order. No pin, no line, nothing to scrub. */
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  .sys-track { height: auto; }
+  .sys-pin { position: static; height: auto; overflow: visible; padding: 8px 0 64px; }
+  .sys-steps { display: grid; gap: 56px; padding: 0 max(20px, calc((100% - var(--measure)) / 2)); }
+  /* the artwork leads each block, the way it leads each step on the pin */
+  /* the grid placement of the pinned layout has to go with the grid itself,
+     or the stacked blocks inherit a column that no longer exists */
+  .sys-row { position: static; display: flex; flex-direction: column; padding: 0; }
+  .sys-row .sys-frame, .sys-row .txt { grid-column: auto; grid-row: auto; }
+  .sys-step .txt { padding-right: 0; }
+  .sys-lineholder { display: none; }
+  .sys-frame {
+    width: 100%; transform: none; margin-bottom: 22px; order: -1;
+  }
+  .sys-step .sys-frame { opacity: 1; }
+  .sys-step .txt { opacity: 1; transform: none; transition: none; }
+  /* nothing swaps on the stacked layout, so the numeral has no arrival to mark */
+  .sys-step .txt.on .n { animation: none; }
+  .sys-step { pointer-events: auto; }
+}
