@@ -5,9 +5,9 @@
    the five step rows and the film land their artwork in exactly the same box at
    every window size.
 
-   The section owns no scroll logic. system.js writes three things and nothing
-   else: --sys-scale on the pin, the film's currentTime, and (only when there is
-   no film) an opacity per plate. */
+   The film layout owns no film scroll logic. system.js writes the pin scale,
+   the film currentTime, and an opacity per plate when there is no film. It also
+   measures the title reserve and toggles the compact title state. */
 
 .sys {
   --sys-title-reserve: 132px;

@@ -28,7 +28,10 @@
 
    The still stack is not a second implementation. It is the layout the section
    falls back to when the pin is off (narrow, reduced motion) and when the film
-   will not load or decode, and it is the markup the copy lives in either way. */
+   will not load or decode, and it is the markup the copy lives in either way.
+
+   The title uses the same scroll read only to change its compact class. Its
+   measured reserve never enters the film progress or time mapping. */
 (function () {
   'use strict';
 
