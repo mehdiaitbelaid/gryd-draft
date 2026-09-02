@@ -28,10 +28,7 @@
 
    The still stack is not a second implementation. It is the layout the section
    falls back to when the pin is off (narrow, reduced motion) and when the film
-   will not load or decode, and it is the markup the copy lives in either way.
-
-   The title uses the same scroll read only to change its compact class. Its
-   measured reserve never enters the film progress or time mapping. */
+   will not load or decode, and it is the markup the copy lives in either way. */
 (function () {
   'use strict';
 
@@ -39,10 +36,6 @@
   var pin = document.getElementById('sysPin');
   if (!track || !pin) return;
 
-  var section = track.closest('.sys');
-  var stage = document.getElementById('sysStage');
-  var title = document.getElementById('sysTitle');
-  var titleHead = title && title.querySelector('.sys-title__head');
   var video = document.getElementById('sysVideo');
   var frames = [].slice.call(pin.querySelectorAll('.sys-step .sys-frame'));
   var texts = [].slice.call(pin.querySelectorAll('.sys-step .txt'));
@@ -62,7 +55,7 @@
   var SWAP = 150;       // the outgoing copy is gone before the incoming starts
   var RETRY = 600;      // frames the loop keeps asking after a write was refused
 
-  var top = 0, span = 1, titleFull = 0;
+  var top = 0, span = 1;
   // active is the step on screen. Two values are not steps: NONE is the opening
   // hero, which deliberately carries no copy, and UNSET means nothing has been
   // painted yet. They have to be distinct, or arriving at the hero from the
@@ -76,37 +69,6 @@
       (matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
-  function measureTitle() {
-    if (!section || !titleHead) return;
-    var was = section.classList.contains('is-title-compact');
-    section.classList.add('is-title-measuring');
-    section.classList.remove('is-title-compact');
-    var full = titleHead.getBoundingClientRect().height;
-    section.classList.add('is-title-compact');
-    var compact = titleHead.getBoundingClientRect().height;
-    section.classList.toggle('is-title-compact', was);
-    section.classList.remove('is-title-measuring');
-    if (full > 0) {
-      titleFull = Math.ceil(full);
-      section.style.setProperty('--sys-title-reserve', titleFull + 'px');
-    }
-    if (compact > 0) {
-      section.style.setProperty('--sys-title-band', Math.ceil(compact) + 'px');
-    }
-  }
-
-  function updateTitle() {
-    if (!section || !stage) return;
-    if (unpinned()) {
-      section.classList.remove('is-title-compact');
-      return;
-    }
-    var y = window.pageYOffset || document.documentElement.scrollTop;
-    var start = stage.getBoundingClientRect().top + y;
-    var end = top + span + titleFull;
-    section.classList.toggle('is-title-compact', y >= start && y <= end);
-  }
-
   function measure() {
     var r = track.getBoundingClientRect();
     top = r.top + (window.pageYOffset || document.documentElement.scrollTop);
@@ -118,10 +80,9 @@
      the right frame there rather than sprint to it from the top. Without the
      snap the trailing lerp would play the whole film at the reader on load. */
   function resync(snap) {
-    if (unpinned()) { updateTitle(); return; }
+    if (unpinned()) return;
     var before = top;
     measure();
-    updateTitle();
     var y = window.pageYOffset || document.documentElement.scrollTop;
     target = clamp((y - top) / span);
     if (snap || vis < 0) vis = target;
@@ -321,7 +282,6 @@
   }
 
   function onScroll() {
-    updateTitle();
     if (unpinned()) return;
     // The track's box is re-read once per scroll burst, while the loop is idle,
     // and never again until the next one. That is the whole cost of being right
@@ -371,14 +331,11 @@
     ticks.forEach(function (t, i) { t.classList.toggle('on', i === 0); });
     if (bar) bar.style.width = '';
     pin.style.removeProperty('--sys-p');
-    if (section) section.classList.remove('is-title-compact');
   }
 
   function init() {
-    measureTitle();
-    if (unpinned()) { reset(); updateTitle(); return; }
+    if (unpinned()) { reset(); return; }
     measure();
-    updateTitle();
     var y = window.pageYOffset || document.documentElement.scrollTop;
     // the first paint snaps: the trailing lag is for scrolling, not for arriving
     target = clamp((y - top) / span);
@@ -452,15 +409,15 @@
      opening overlay coming out, a late font, a lazy image above, the browser
      restoring the scroll position after load, a bfcache restore: each of these
      is a box that moved with no scroll event to notice it. */
-  addEventListener('load', function () { measureTitle(); resync(true); });
-  addEventListener('pageshow', function () { measureTitle(); resync(true); });
+  addEventListener('load', function () { resync(true); });
+  addEventListener('pageshow', function () { resync(true); });
   // a hidden tab delivers no animation frames, so the loop can be left holding
   // its running flag; coming back re-reads the page rather than trusting it
   addEventListener('visibilitychange', function () {
     if (!document.hidden) { running = false; resync(true); start(); }
   });
   if (window.ResizeObserver) {
-    var ro = new ResizeObserver(function () { measureTitle(); resync(false); });
+    var ro = new ResizeObserver(function () { resync(false); });
     ro.observe(track);
     ro.observe(document.documentElement);
   }

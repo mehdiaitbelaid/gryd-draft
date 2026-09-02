@@ -452,6 +452,46 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 /* the band's own lede sits at the standing readability bar rather than at
    the 18px the shared .lede carries */
 .a-ben .aud-head .lede { font-size: 20px; line-height: 1.6; }
+.a-ben {
+  position: relative; padding-top: 0;
+  --aud-head-reserve: 240px;
+  --aud-head-compact: 66px;
+}
+.a-ben .aud-title-layer {
+  position: absolute; inset: 0 0 auto; z-index: 10;
+  height: 100%; pointer-events: none;
+}
+.a-ben .aud-head {
+  position: sticky; top: 0; max-width: none; overflow: hidden;
+  pointer-events: none;
+}
+.a-ben .aud-head-reserve { height: var(--aud-head-reserve); }
+.a-ben .aud-head__inner {
+  padding-top: 96px;
+  transition: padding .24s, max-width .24s;
+}
+.a-ben .aud-head .sec-head {
+  margin-top: 0;
+  transition: font-size .24s, line-height .24s, letter-spacing .24s;
+}
+.a-ben .aud-head .lede {
+  max-height: 120px; margin: 24px 0 0; overflow: hidden;
+  transition: opacity .24s, max-height .24s, margin .24s;
+}
+.a-ben.is-audience-compact .aud-head { background: var(--paper); }
+.a-ben.is-audience-compact .aud-head__inner {
+  max-width: none; padding: 22px 40px;
+}
+.a-ben.is-audience-compact .aud-head .sec-head {
+  max-width: none; font-size: 17px; line-height: 22px;
+  letter-spacing: .005em; white-space: nowrap;
+}
+.a-ben.is-audience-compact .aud-head .lede {
+  max-height: 0; margin-top: 0; opacity: 0;
+}
+.a-ben.is-audience-measuring .aud-head__inner,
+.a-ben.is-audience-measuring .aud-head .sec-head,
+.a-ben.is-audience-measuring .aud-head .lede { transition: none; }
 .a-ben .aud-paths {
   display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 58px;
 }
@@ -479,10 +519,14 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 .a-ben .aud-path .ticks li { font-size: 20px; line-height: 1.55; padding: 16px 0; }
 
 @media (max-width: 900px) {
+  .a-ben .aud-head__inner { padding-top: 68px; }
+  .a-ben.is-audience-compact .aud-head__inner { padding: 78px 20px 18px; }
   .a-ben .aud-paths { grid-template-columns: 1fr; gap: 52px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .a-ben .aud-head__inner, .a-ben .aud-head .sec-head,
+  .a-ben .aud-head .lede { transition: none; }
   .a-ben .aud-shot img, .a-ben .aud-keyline { transition: none; }
   .a-ben .aud-path:hover .aud-shot img { transform: scale(1); }
 }
