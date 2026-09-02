@@ -22,18 +22,8 @@ html, body { overflow-x: visible; }
 .d-hero .field { position: absolute; }
 .d-hero .hero-scrim { position: absolute; }
 .d-hero .stub { min-height: 100svh; }
-/* flex, not block. Block dropped the shared label back to an inline dash on
-   the text baseline, which put the rule 3.5px below the cap centre and closed
-   the 10px gap the same label carries in every band below. flex is still
-   block level, so the margin under it is unchanged. */
-.d-hero .eyebrow { display: flex; color: #fff; opacity: .82; font-size: 13px;
+.d-hero .eyebrow { display: block; color: #fff; opacity: .82; font-size: 13px;
   letter-spacing: .08em; text-transform: uppercase; margin-bottom: 20px; }
-/* The hero's own column and its button spacing are left as 11n drew them,
-   which is Mehdi's call of 2 September: the opening is signed off and nothing
-   but the two button boxes and the label dash is touched inside it. It is
-   measured by the validator and reported, not corrected: the copy column runs
-   28px wider on each side than every .wrap below it, and the two buttons sit
-   12px apart rather than the 16px the rest of the site keeps. */
 .d-hero .sub { color: #fff; opacity: .88; font-size: clamp(17px, 1.7vw, 21px);
   max-width: 46ch; margin: 22px 0 0; }
 .d-hero .hint { position: absolute; right: 28px; bottom: 30px; z-index: 3;
@@ -536,9 +526,7 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 }
 .a-ben .aud-head-reserve { height: var(--aud-head-reserve); }
 .a-ben .aud-head__inner {
-  /* the section's top air, which .a-ben itself cannot carry: its label is
-     sticky and the padding has to sit inside the sticky box */
-  padding-top: var(--sec-pad);
+  padding-top: 96px;
   transition: padding .24s, max-width .24s;
 }
 .a-ben .aud-head .sec-head {
@@ -592,6 +580,7 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 .a-ben .aud-path .ticks li { font-size: 20px; line-height: 1.55; padding: 16px 0; }
 
 @media (max-width: 900px) {
+  .a-ben .aud-head__inner { padding-top: 68px; }
   .a-ben.is-audience-compact .aud-head__inner { padding: 78px 20px 18px; }
   .a-ben .aud-paths { grid-template-columns: 1fr; gap: 52px; }
 }

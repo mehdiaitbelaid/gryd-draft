@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request a site assessment, Gryd</title>
+<meta name="description" content="Send us your scheme drawings and unit mix. We come back with system sizing per plot, the effect on EPC, and what the homeowner pays.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="g.css">
+<style>
+  /* A request page, not a listing, so the masthead is set at the FAQ step down
+     and everything below it sits on the reading measure rather than the grid. */
+  .g-mast h1 { font-size: clamp(34px, 4.2vw, 56px); max-width: 22ch; }
+
+  .sa-lede { max-width: 62ch; margin: 0 auto; }
+  .sa-lede + .sa-lede { margin-top: 64px; }
+
+  .sa-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 28px;
+  }
+  .sa-facts .g-pill { font-size: 13px; }
+
+  .sa-covers {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .sa-item {
+    border: 1px solid var(--stone-mid);
+    border-radius: var(--radius-panel);
+    padding: 22px 22px 24px;
+    background: var(--paper);
+  }
+  .sa-item h3 {
+    margin: 0;
+    font-family: var(--font-display, "Borna"), "DM Sans", sans-serif;
+    font-weight: 500;
+    font-size: 19px;
+    line-height: 1.25;
+    letter-spacing: -.015em;
+    color: var(--red110);
+  }
+  .sa-item p {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft, #6B4A3E);
+  }
+
+  .sa-h2 {
+    margin: 0 0 6px;
+    font-family: var(--font-display, "Borna"), "DM Sans", sans-serif;
+    font-weight: 500;
+    font-size: clamp(24px, 2.6vw, 32px);
+    line-height: 1.14;
+    letter-spacing: -.02em;
+    color: var(--red110);
+  }
+  .sa-lede > p {
+    margin: 12px 0 0;
+    font-size: 17px;
+    line-height: 1.62;
+    color: var(--ink-soft, #6B4A3E);
+  }
+
+  /* The form. One column on narrow, two once there is room, with the message
+     and the actions running the full width. */
+  .sa-form {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+  }
+  .sa-form .wide { grid-column: 1 / -1; }
+  .sa-form label {
+    display: block;
+    font-size: 14px;
+    letter-spacing: .01em;
+    color: var(--red110);
+    margin-bottom: 7px;
+  }
+  .sa-form input,
+  .sa-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 16px;
+    color: var(--red110);
+    background: var(--paper);
+    border: 1px solid var(--stone-mid);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .sa-form textarea { min-height: 132px; resize: vertical; }
+  .sa-form input:focus-visible,
+  .sa-form textarea:focus-visible,
+  .sa-actions .btn:focus-visible,
+  .sa-mailto:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 2px;
+  }
+  .sa-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  .sa-actions .btn { border: 0; cursor: pointer; font: inherit; font-size: 15px; }
+  .sa-note {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--warm-grey);
+  }
+  .sa-mailto { color: var(--ember); }
+
+  @media (max-width: 760px) {
+    .sa-covers { grid-template-columns: 1fr; }
+    .sa-form { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- the shared pill nav, the same one every other page in the tree carries -->
+<script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="g-page">
+
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="eyebrow">Site Assessment</span>
+    <h1>Request a site assessment.</h1>
+    <p class="stand">Send us your scheme drawings and unit mix. We&rsquo;ll come back with an indicative proposal for every home. A bespoke system design, energy performance, savings and subscriptions, usually within a week.</p>
+    <div class="sa-facts">
+      <span class="g-pill">Turnaround: Numbers back in a week</span>
+      <span class="g-pill">Hardware cost: &pound;0 to the developer</span>
+    </div>
+  </header>
+
+  <section class="sa-lede">
+    <h2 class="sa-h2">What a site assessment covers</h2>
+    <p>A site assessment gives you system sizing per plot, the effect on EPC, and what the homeowner pays, before you commit to anything.</p>
+    <div class="sa-covers">
+      <div class="sa-item">
+        <h3>Array size</h3>
+        <p>Sized in kWp, plot by plot.</p>
+      </div>
+      <div class="sa-item">
+        <h3>SAP uplift</h3>
+        <p>+10 to 20 points.</p>
+      </div>
+      <div class="sa-item">
+        <h3>Savings and subscriptions</h3>
+        <p>Homeowners pay one fixed monthly subscription, around 20% below the grid, locked in for 25 years.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sa-lede">
+    <h2 class="sa-h2">Talk with a Gryd expert for a simple site assessment</h2>
+    <p>Send the plots to <a class="sa-mailto" href="mailto:hello@gryd.energy?subject=Site%20assessment%20request">hello@gryd.energy</a> and we will come back with system sizing per plot, the effect on EPC and the homeowner numbers.</p>
+
+    <!-- TODO: no backend exists on the draft, so the form hands its answers to
+         the mail client rather than posting anywhere. Point the action at the
+         real endpoint when there is one and drop the submit handler. -->
+    <form class="sa-form" id="saForm" novalidate>
+      <div>
+        <label for="sa-name">Name</label>
+        <input id="sa-name" name="name" type="text" autocomplete="name" required>
+      </div>
+      <div>
+        <label for="sa-company">Company</label>
+        <input id="sa-company" name="company" type="text" autocomplete="organization" required>
+      </div>
+      <div>
+        <label for="sa-postcode">Site postcode</label>
+        <input id="sa-postcode" name="postcode" type="text" autocomplete="postal-code" placeholder="NR20" required>
+      </div>
+      <div>
+        <label for="sa-plots">Number of plots</label>
+        <input id="sa-plots" name="plots" type="number" min="1" step="1" inputmode="numeric" required>
+      </div>
+      <div class="wide">
+        <label for="sa-message">Message</label>
+        <textarea id="sa-message" name="message" placeholder="Programme dates, unit mix, anything already specified."></textarea>
+      </div>
+      <div class="sa-actions">
+        <button class="btn" type="submit">Request a site assessment</button>
+        <p class="sa-note">Opens your mail client with the details filled in, addressed to hello@gryd.energy.</p>
+      </div>
+    </form>
+  </section>
+
+</div>
+
+</div>
+
+<script>
+  /* Draft behaviour only. Everything typed is folded into a mailto body so a
+     request still reaches Gryd while the form has nowhere to post. */
+  (function () {
+    var form = document.getElementById('saForm');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var f = new FormData(form);
+      var lines = [
+        'Name: ' + (f.get('name') || ''),
+        'Company: ' + (f.get('company') || ''),
+        'Site postcode: ' + (f.get('postcode') || ''),
+        'Number of plots: ' + (f.get('plots') || ''),
+        '',
+        f.get('message') || ''
+      ];
+      window.location.href = 'mailto:hello@gryd.energy?subject=' +
+        encodeURIComponent('Site assessment request') +
+        '&body=' + encodeURIComponent(lines.join('\n'));
+    });
+  })();
+</script>
+
+<!-- the canonical footer, generated from the homepage's own -->
+<script src="../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>

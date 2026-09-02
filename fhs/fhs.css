@@ -77,7 +77,8 @@ button.btn { font: inherit; border: 0; cursor: pointer; }
 .foot a { color: var(--warm-grey); }
 .foot h4 { font-size: 15px; color: var(--red110); margin-bottom: 10px; }
 .foot ul { list-style: none; margin: 0; padding: 0; }
-.foot li { margin-bottom: 6px; }
+/* 16px between adjacent hover targets, the site's standing clearance */
+.foot li { margin-bottom: 16px; }
 
 @media (max-width: 900px) {
   .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }

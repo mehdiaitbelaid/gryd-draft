@@ -36,6 +36,16 @@
   --radius-panel: 28px;
   --radius-chip: 10px;
   --measure: 1200px;
+  /* The page has one content column and one vertical rhythm, and both are
+     stated here so a section cannot quietly drift off them. --gutter is the
+     column's own side padding, so .wrap's content box is --measure less two
+     gutters and every band's inner box is measured against that pair.
+     --sec-pad is the air a headed section carries above and below its content;
+     --label-gap is label to heading and --head-gap heading to body. */
+  --gutter: 28px;
+  --sec-pad: 96px;
+  --label-gap: 20px;
+  --head-gap: 22px;
 
   /* names the ported intro and scrub scene read, mapped onto the direction palette */
   --ember-deep: #4E251B;
@@ -85,15 +95,29 @@ h1, h2, h3, h4, .display {
   align-items: center;
   gap: 10px;
 }
+/* The dash is set on the label's cap centre rather than on its box centre.
+   Uppercase text has no descenders, so a rule centred in the line box sits
+   visibly low against the caps: 0.5px inside a flex row, 3.5px where the label
+   is not a flex container and the dash falls onto the baseline. Both cases are
+   answered here in em, so the correction rides the type size.
+
+   cap height measures 0.70em in Borna at every size the label is used at; the
+   dash centre therefore wants to be 0.35em above the baseline. vertical-align
+   puts it there in a block or inline container, align-self plus the top nudge
+   in a flex one, and each mechanism is ignored by the layout the other serves. */
 .eyebrow::before {
   content: "";
   width: 18px;
   height: 2px;
   background: var(--flare);
   display: inline-block;
+  align-self: center;
+  vertical-align: 0.27em;
+  position: relative;
+  top: -0.042em;
 }
 
-.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 28px; }
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 var(--gutter); }
 
 /* Floating pill nav, shared skeleton. Directions restyle the surface only.
 
@@ -168,7 +192,7 @@ h1, h2, h3, h4, .display {
 .btn.ghost { background: transparent; color: var(--red110); box-shadow: inset 0 0 0 1px var(--stone-mid); }
 
 .foot {
-  padding: 64px 0 72px;
+  padding: var(--sec-pad) 0;
   border-top: 1px solid var(--stone-mid);
   margin-top: 96px;
   font-size: 14px;
@@ -183,5 +207,12 @@ h1, h2, h3, h4, .display {
   .nav { --logo-h: 17px; --logo-safezone: 8px; gap: 2px; overflow-x: auto; }
   .nav a.link { padding: 8px 10px; font-size: 13px; }
   .nav .cta { padding: 10px 14px; font-size: 13px; }
-  .wrap { padding: 0 20px; }
+  :root { --gutter: 20px; }
+}
+
+/* The section rhythm comes down one step on a narrow screen, and it comes down
+   at the layout's own breakpoint rather than at the type one above: 900px is
+   where the two up bands become stacks, and a stack wants the shorter air. */
+@media (max-width: 900px) {
+  :root { --sec-pad: 68px; }
 }

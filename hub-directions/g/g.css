@@ -138,7 +138,9 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  /* 16px, the standing clearance between adjacent hover targets on this site.
+     At 8px two filters lit under one wandering pointer. */
+  gap: 16px;
   margin: 0 auto 22px;
   max-width: 900px;
 }
@@ -489,7 +491,7 @@
 
 .g-share { text-align: center; margin-top: 84px; }
 .g-share h3 { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 17px; letter-spacing: 0; }
-.g-share .row { display: flex; justify-content: center; gap: 12px; margin-top: 18px; }
+.g-share .row { display: flex; justify-content: center; gap: 16px; margin-top: 18px; }
 .g-share .row a {
   width: 42px;
   height: 42px;

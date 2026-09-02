@@ -22,9 +22,9 @@
   if (!me) return;
 
   var ROOT = new URL('../../', me.src).href;   // the served root, gryd-homepage
-  var TREE = [{"label": "Developers", "section": "developers", "href": "home-final/draft/index.html#developers", "kids": []}, {"label": "Hub", "section": "hub", "href": "home-final/draft/index.html#hub", "kids": [{"label": "Projects", "href": "hub-directions/g/projects.html"}, {"label": "Blog", "href": "hub-directions/g/blog.html"}, {"label": "News", "href": "hub-directions/g/news.html"}]}, {"label": "Tools", "section": "tools", "href": "hub-directions/g/tools.html", "kids": [{"label": "All tools", "href": "hub-directions/g/tools.html"}, {"label": "Site Assessment", "href": "home-final/draft/site-assessment.html"}, {"label": "FHS Checker", "href": "fhs/pages/2/index.html#assess"}]}, {"label": "FHS", "section": "fhs", "href": "fhs/pages/2/index.html", "kids": []}, {"label": "FAQs", "section": "faqs", "href": "hub-directions/g/faq.html", "kids": []}];
+  var TREE = [{"label": "Developers", "section": "developers", "href": "home-final/draft/index.html#developers", "kids": []}, {"label": "Hub", "section": "hub", "href": "home-final/draft/index.html#hub", "kids": [{"label": "Projects", "href": "hub-directions/g/projects.html"}, {"label": "Blog", "href": "hub-directions/g/blog.html"}, {"label": "News", "href": "hub-directions/g/news.html"}]}, {"label": "Tools", "section": "tools", "href": "hub-directions/g/tools.html", "kids": [{"label": "All tools", "href": "hub-directions/g/tools.html"}, {"label": "Site Assessment", "href": "hub-directions/g/site-assessment.html"}, {"label": "FHS Checker", "href": "fhs/pages/2/index.html#assess"}]}, {"label": "FHS", "section": "fhs", "href": "fhs/pages/2/index.html", "kids": []}, {"label": "FAQs", "section": "faqs", "href": "hub-directions/g/faq.html", "kids": []}];
   var HOME = "home-final/draft/index.html";
-  var CTA = {"label": "Request a site assessment", "short": "Assessment", "href": "home-final/draft/index.html#assessment"};
+  var CTA = {"label": "Request a site assessment", "short": "Assessment", "href": "hub-directions/g/site-assessment.html"};
 
   function abs(p) { return new URL(p, ROOT).href; }
   function same(href) {
@@ -56,6 +56,29 @@
      reason the hrefs do. It is appended rather than written so a page that
      already loads it is not made to load it twice. It goes in after the block
      above, so it wins everything the two both name. */
+  /* The page to page crossfade rides with the nav, because every page that
+     carries the nav is a page the reader can leave by clicking something in it.
+     It is a separate file rather than more of this one: this file is generated
+     and that one is written, and the fade is not the pill's business. */
+  if (!document.querySelector('script[data-page-fade]')) {
+    /* The arriving state is set here, synchronously, and not left to the file
+       below: a script element appended with a src loads out of band, and by the
+       time it runs the page has already painted. Peeked rather than consumed,
+       so page-fade.js still sees the flag and still owns the clearing of it. */
+    try {
+      if (sessionStorage.getItem('gryd-page-fade') === '1') {
+        var fst = document.createElement('style');
+        fst.textContent = 'html{background:#F8F6F2}html.gryd-fade-in body{opacity:0}';
+        document.head.appendChild(fst);
+        document.documentElement.classList.add('gryd-fade-in');
+      }
+    } catch (fe) {}
+    var fade = document.createElement('script');
+    fade.src = new URL('page-fade.js', me.src).href;
+    fade.setAttribute('data-page-fade', '');
+    document.head.appendChild(fade);
+  }
+
   var sheet = new URL('site-nav.css', me.src).href;
   if (!document.querySelector('link[data-site-nav]')) {
     var link = document.createElement('link');

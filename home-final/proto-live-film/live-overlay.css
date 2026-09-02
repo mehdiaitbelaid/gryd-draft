@@ -1,0 +1,35 @@
+/* Ambient overlay for the system film, v3. Prototype only: nothing here is in
+   the built draft.
+
+   The layer is a child of .sys-frame, so the frame's own transform (the scroll
+   scale and the idle breath) carries it and it never has to be told where the
+   film went. The film is 16:9 inside a 16:9 box under object-fit: contain, so
+   the picture fills that box exactly and a viewBox over that box makes overlay
+   coordinates percentages of the frame at any width. */
+.sys-live {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.sys-pin:not(.has-film) .sys-live { display: none; }
+
+/* Both groups are gated on the beat and cross fade in 300ms. Everything gated
+   starts at zero, so a group that has not been switched on paints nothing:
+   that is what makes the no orange rule for beats 1 to 4 hold by construction
+   rather than by remembering to hide something. */
+.sys-live .lg,
+.sys-live .am { opacity: 0; transition: opacity .3s ease; }
+.sys-live .lg.on { opacity: 1; }
+.sys-live .am.on { opacity: 1; }
+
+/* The cloud is lighting, not an object: at this strength it reads as the sun
+   going behind something rather than as a grey shape on the plate. */
+.sys-live .cloud { opacity: .055; }
+.sys-live .bsh { opacity: .1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sys-live { display: none; }
+}

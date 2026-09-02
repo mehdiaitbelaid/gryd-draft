@@ -15,9 +15,13 @@
   .nav .cta .sm { display: inline; }
 }
 
-.sec { padding: 96px 0; }
-.sec.tight { padding: 72px 0; }
-h2.sec-head { font-size: clamp(30px, 3.6vw, 50px); max-width: 20ch; margin-top: 20px; }
+/* One rhythm for every headed band, off the tokens. .tight used to take 24px
+   off the top and bottom, which read on the page as two sections sitting closer
+   to their neighbours than the rest; the class is kept because pages already
+   carry it, and now resolves to the same air as everything else. */
+.sec { padding: var(--sec-pad) 0; }
+.sec.tight { padding: var(--sec-pad) 0; }
+h2.sec-head { font-size: clamp(30px, 3.6vw, 50px); max-width: 20ch; margin-top: var(--label-gap); }
 .lede { font-size: 18px; line-height: 1.55; color: var(--ink-soft); max-width: 62ch; }
 .hint { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm-grey); }
 .rule { height: 1px; background: var(--stone-mid); border: 0; margin: 0; }
@@ -25,7 +29,7 @@ h2.sec-head { font-size: clamp(30px, 3.6vw, 50px); max-width: 20ch; margin-top: 
 .foot { margin-top: 0; }
 .f-cols { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; width: 100%; }
 .f-cols h3 { font-family: "DM Sans", sans-serif; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--warm-grey); font-weight: 500; margin-bottom: 14px; }
-.f-cols ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.f-cols ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
 .f-cols a { text-decoration: none; }
 .f-strap { font-family: "Borna", sans-serif; font-size: 21px; line-height: 1.2; color: var(--red110); max-width: 24ch; letter-spacing: -0.02em; }
 .f-legal { width: 100%; margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--stone-mid); display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; }
@@ -40,7 +44,6 @@ h2.sec-head { font-size: clamp(30px, 3.6vw, 50px); max-width: 20ch; margin-top: 
 .map-plate img { width: 100%; height: 100%; object-fit: contain; }
 
 @media (max-width: 900px) {
-  .sec { padding: 68px 0; }
   .f-cols { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 560px) {

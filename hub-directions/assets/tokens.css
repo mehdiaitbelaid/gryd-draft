@@ -28,6 +28,12 @@
   --radius-panel: 28px;
   --radius-chip: 10px;
   --measure: 1200px;
+  /* one content column and one vertical rhythm, matching
+     home-final/assets/tokens.css */
+  --gutter: 28px;
+  --sec-pad: 96px;
+  --label-gap: 20px;
+  --head-gap: 22px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -73,9 +79,18 @@ h1, h2, h3, h4, .display {
   height: 2px;
   background: var(--flare);
   display: inline-block;
+  /* the dash sits on the label's cap centre, not on its box centre. Cap height
+     is 0.70em in Borna, so the centre wants 0.35em above the baseline:
+     vertical-align puts it there in a block or inline container and the nudge
+     answers the half pixel a flex row's own centring leaves. Kept identical to
+     home-final/assets/tokens.css. */
+  align-self: center;
+  vertical-align: 0.27em;
+  position: relative;
+  top: -0.042em;
 }
 
-.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 28px; }
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 var(--gutter); }
 
 /* Floating pill nav, shared skeleton. Directions restyle the surface only. */
 .nav {
@@ -146,5 +161,9 @@ h1, h2, h3, h4, .display {
   .nav .mark { margin-right: 6px; font-size: 17px; }
   .nav a.link { padding: 8px 10px; font-size: 13px; }
   .nav .cta { padding: 10px 14px; font-size: 13px; }
-  .wrap { padding: 0 20px; }
+  :root { --gutter: 20px; }
+}
+
+@media (max-width: 900px) {
+  :root { --sec-pad: 68px; }
 }

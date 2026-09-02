@@ -39,24 +39,16 @@
   background: linear-gradient(90deg, rgba(248,246,242,0) 62%, rgba(255,255,255,0.55) 100%);
 }
 
-/* The copy column takes the page's section rhythm rather than a rhythm of its
-   own. It was carrying 32 to 56px above and below against the 96px every other
-   headed band carries, and on a phone, where the pin is dropped and the band is
-   simply two stacked blocks, 32px against 68px: read down the page this section
-   was the one that felt squeezed. The side padding stays a clamp because it is
-   the gap between the photograph and the words, not a page gutter. */
 .d-batt .panel {
-  padding: var(--sec-pad) clamp(26px, 4vw, 64px);
+  padding: clamp(32px, 3.4vw, 56px) clamp(26px, 4vw, 64px);
   display: flex; flex-direction: column; justify-content: center;
 }
 /* The label here used to be set in the ember, which made it the one section
    label on the page that did not match the rest. The dash beside it is already
    the flare and is what carries the colour. */
 .d-batt .eyebrow { color: var(--warm-grey); }
-/* label to heading and heading to body on the shared gaps, so the three lines
-   open at the same rate here as under every other section label */
-.d-batt h2 { font-size: clamp(26px, 2.6vw, 36px); max-width: 20ch; margin-top: var(--label-gap); color: var(--red110); }
-.d-batt .lede { margin-top: var(--head-gap); max-width: 48ch; font-size: 16px; }
+.d-batt h2 { font-size: clamp(26px, 2.6vw, 36px); max-width: 20ch; margin-top: 14px; color: var(--red110); }
+.d-batt .lede { margin-top: 14px; max-width: 48ch; font-size: 16px; }
 
 /* The rows were sitting apart with a screen of nothing under them. They close
    up here, and the last one carries a rule under it so the set is a closed
@@ -95,9 +87,4 @@
   .batt-pin { height: auto; }
   .d-batt { position: static; grid-template-columns: 1fr; min-height: 0; }
   .d-batt .shot { height: 300px; }
-  /* Stacked, the band is no longer a two up bleed and its copy is simply a
-     block on the page, so it takes the page's gutter and starts where every
-     other section starts. 26px against 20px was the one column on a phone
-     that did not line up with the rest. */
-  .d-batt .panel { padding-left: var(--gutter); padding-right: var(--gutter); }
 }

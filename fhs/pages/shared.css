@@ -26,7 +26,8 @@
 
 .qwrap .q { font-family: "Borna", sans-serif; font-weight: 500; font-size: clamp(21px, 2.2vw, 28px); letter-spacing: -0.02em; line-height: 1.1; }
 .qwrap .hint { font-size: 14px; color: var(--warm-grey); margin-top: 8px; max-width: 60ch; }
-.acts { display: flex; gap: 10px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+/* 16px between adjacent hover targets, Back and Next included */
+.acts { display: flex; gap: 16px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
 .acts .btn { padding: 12px 22px; }
 
 /* answered questions folded to one line */
@@ -52,7 +53,7 @@
 .tbl { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px 11px 0; border-top: 1px solid var(--stone-mid); }
 .tbl th { color: var(--warm-grey); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
-.sum-acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.sum-acts { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
 
 /* editorial primitives */
 .kicker { font-family: "Borna", sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ember); }

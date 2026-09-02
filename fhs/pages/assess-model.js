@@ -30,7 +30,7 @@
     'Detached': { 2: { panels: 12, battery: 5 }, 3: { panels: 16, battery: 10 }, 4: { panels: 18, battery: 10 }, '5+': { panels: 22, battery: 13.5 } }
   };
   var GROUND_RATIO = 0.4, M2_PER_KWP = 4.5, KWP_PER_PANEL = 0.44;
-  var YIELD = 900, LOSS = 0.95, SELF_USE = 0.35, SELF_USE_BATT = 0.65, CAP = 0.95, DEMAND_PER_M2 = 50;
+  var YIELD = 900, LOSS = 0.95, SELF_USE = 0.35, SELF_USE_BATT = 0.65, DEMAND_PER_M2 = 50;
 
   var QUESTIONS = [
     {
@@ -73,7 +73,8 @@
     company: '',
     email: '',
     phone: '',
-    homesPerYear: ''
+    homesPerYear: '',
+    consent: false
   };
 
   function bedKey(b) { return Number(b) >= 5 ? '5+' : String(Number(b)); }
@@ -387,9 +388,11 @@
       add(selectField('f-hy', 'Approximate homes per year', 'Select range', HOMES_PER_YEAR, a.homesPerYear, function (v) { a.homesPerYear = v; sync(); }));
       var consent = document.createElement('div');
       consent.className = 'col wide';
-      consent.innerHTML = '<label class="toggle" for="f-gd"><input type="checkbox" id="f-gd"><span>' +
+      consent.innerHTML = '<label class="toggle" for="f-gd"><input type="checkbox" id="f-gd"' +
+      (a.consent ? ' checked' : '') + '><span>' +
         'I consent to Gryd storing my details to provide this assessment and contact me about their services. View our ' +
         '<a href="https://gryd.energy/wp-content/uploads/2025/04/PRIVACY-POLICY.pdf" target="_blank" rel="noopener noreferrer">privacy policy</a>.</span></label>';
+      consent.querySelector('input').addEventListener('change', function () { a.consent = this.checked; sync(); });
       add(consent);
     }
     return el;

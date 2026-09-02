@@ -55,7 +55,8 @@
 /* Proof is one project. The film of Lower Farm Mews runs as the band arrives
    and two stills from the same scheme ride past it at their own rates. */
 .sec.a-trust { padding: 76px 0; }
-.a-trust .sec-head { font-size: clamp(28px, 3.2vw, 44px); max-width: 26ch; margin-top: 14px; }
+/* label to heading on the shared gap, not 14px of its own */
+.a-trust .sec-head { font-size: clamp(28px, 3.2vw, 44px); max-width: 26ch; margin-top: var(--label-gap); }
 /* The project is named before the film so the band reads as work Gryd has
    delivered rather than an unattributed clip. */
 .proof-project { margin-top: 26px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
