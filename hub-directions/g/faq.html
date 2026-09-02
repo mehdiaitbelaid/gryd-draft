@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQs, Gryd</title>
+<meta name="description" content="Answers on funded solar and battery for new build homes, and on the Future Homes Standard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="g.css">
+<style>
+  /* the page's own masthead: the shared clamp is a listing title size and this
+     heading is a sentence, so it is set a step down and given a wider measure */
+  .g-mast h1 { font-size: clamp(34px, 4.2vw, 56px); max-width: 24ch; }
+  .faq-group { max-width: 62ch; margin: 0 auto; }
+  .faq-group + .faq-group { margin-top: 72px; }
+  .faq-group > .g-pill { margin-bottom: 18px; }
+  .faq-group .faq {
+    border-bottom: 1px solid var(--stone-mid);
+  }
+  .faq-group .faq > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    padding: 22px 0;
+    font-family: var(--font-display, "Borna"), "DM Sans", sans-serif;
+    font-size: 19px;
+    line-height: 1.35;
+    color: var(--red110);
+  }
+  .faq-group .faq > summary::-webkit-details-marker { display: none; }
+  .faq-group .faq > summary::after {
+    content: "";
+    flex: none;
+    width: 9px; height: 9px;
+    margin-top: 6px;
+    border-right: 1.5px solid var(--warm-grey);
+    border-bottom: 1.5px solid var(--warm-grey);
+    transform: rotate(45deg);
+    transition: transform .25s ease;
+  }
+  .faq-group .faq[open] > summary::after { transform: rotate(-135deg); }
+  .faq-group .faq .body { padding: 0 0 24px; }
+  .faq-group .faq .body p {
+    margin: 0 0 14px;
+    font-size: 17px;
+    line-height: 1.62;
+    color: var(--ink-soft, #6B4A3E);
+    max-width: 58ch;
+  }
+  .faq-group .faq .body p:last-child { margin-bottom: 0; }
+  .faq-close { text-align: center; margin-top: 72px; }</style>
+</head>
+<body>
+
+<!-- the shared pill nav, the same one every other page in the tree carries -->
+<script src="../../home-final/assets/site-nav.js" data-nav-current="faqs"></script>
+
+<div class="g-page">
+
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="eyebrow">FAQs</span>
+    <h1>Quick answers to your most pressing questions.</h1>
+    <p class="stand">Everything developers ask us about funded solar, batteries and the Future Homes Standard.</p>
+  </header>
+
+  <section class="faq-group">
+    <span class="g-pill">Working with Gryd</span>
+    <details class="faq"><summary>Does Gryd really cover 100% of the hardware cost?</summary><div class="body"><p>Yes. Gryd funds all solar panel, battery, inverter and monitoring hardware on every plot. The developer pays nothing for the renewable energy equipment. The developer covers installation labour as part of the normal build programme, using their own MCS-certified subcontractor or a Gryd-recommended installer partner.</p></div></details>
+    <details class="faq"><summary>Does Gryd help with Future Homes Standard compliance?</summary><div class="body"><p>Gryd systems meet and typically exceed the FHS on-site renewable generation requirement. Systems are designed from a home optimisation perspective, not a minimum compliance perspective, typically delivering a SAP uplift of 10 to 20 points. FHS regulations come into force March 2027.</p></div></details>
+    <details class="faq"><summary>Does Gryd only work on south-facing plots?</summary><div class="body"><p>No. Gryd does not cherry-pick only south-facing or optimally orientated plots. Systems are designed and deployed across all home types, orientations and roof arrangements, including terraces and apartments.</p></div></details>
+    <details class="faq"><summary>What does the developer have to do?</summary><div class="body"><p>Coordinate the installation as part of the normal build programme. Gryd provides comprehensive support through the deployment. We'll work with you and your installer to schedule hardware deliveries to site in batches aligned with your build programme.</p></div></details>
+    <details class="faq"><summary>What happens if a homeowner sells the property?</summary><div class="body"><p>The 25-year subscription transfers with the property. The new owner inherits the same fixed price and benefits. Homeowners can also choose to buy the system outright at any point, at a transparent, depreciation-based price that is cheaper than an equivalent retrofit from day one.</p></div></details>
+    <details class="faq"><summary>What happens after the homes are sold?</summary><div class="body"><p>The developer has no ongoing responsibility. All customer care, maintenance, monitoring and warranty obligations sit with Gryd for 25 years, including a mid-life battery and inverter replacement. The homeowner's contract is with Gryd, not the developer.</p></div></details>
+    <details class="faq"><summary>What scheme sizes do you work with?</summary><div class="body"><p>Each Gryd system is self-contained and operates entirely behind the meter, so there is no shared infrastructure required. The model is fully scalable from a handful of homes to several hundred units.</p></div></details>
+  </section>
+  <section class="faq-group">
+    <span class="g-pill">Future Homes Standard</span>
+    <details class="faq"><summary>What is the Future Homes Standard?</summary><div class="body"><p>The Future Homes Standard (FHS) is a set of updated Building Regulations for new homes in England, published on 24 March 2026. It requires new homes to produce 75% fewer greenhouse gas emissions than homes built under the 2013 regulations. It mandates low-carbon heating (such as heat pumps), improved building fabric, and on-site renewable electricity generation. For the vast majority of new homes, rooftop solar PV is the most practical way to meet this requirement.</p></div></details>
+    <details class="faq"><summary>When does the Future Homes Standard come into effect?</summary><div class="body"><p>The FHS regulations were published on 24 March 2026. The standard comes into force on 24 March 2027 for most new dwellings (24 September 2027 for higher-risk buildings). A 12-month transition period follows: building work must have commenced under previous regulations by 24 March 2028. After that date, all new homes must be built to FHS.</p><p>For developers, the critical question is when Building Regulations applications are submitted and when work starts on site. Schemes already well progressed may proceed under the previous regime if they meet the transitional arrangements. Transitional arrangements operate on an individual building basis, so different homes on the same site may fall under different regulations.</p></div></details>
+    <details class="faq"><summary>Does the FHS require solar panels on new homes?</summary><div class="body"><p>The FHS introduces a functional requirement for on-site renewable electricity generation, not specifically solar. However, its anticipated that the majority of compliance will be achieved through rooftop solar PV as its the most affordable and realistic way to meet this requirement. Developers must install on-site renewables equivalent to solar coverage of at least 40% of the building&rsquo;s ground floor area where feasible. Where 40% coverage is not achievable (due to shading, orientation or building type), a reasonable amount of coverage is still required. Some exemptions apply, including high-rise buildings.</p></div></details>
+    <details class="faq"><summary>How much solar does a new home need under FHS?</summary><div class="body"><p>The confirmed requirement is on-site renewable electricity generation equivalent to solar coverage of at least 40% of the building&rsquo;s ground floor area. For a typical 3-bedroom semi-detached home with approximately 80m&sup2; of ground floor area, meeting this with solar PV translates to roughly 32m&sup2; of panels, or a system of around 4-5 kWp. Gryd recommends larger systems paired with battery storage to maximise energy coverage and homeowner savings beyond the FHS minimum.</p></div></details>
+    <details class="faq"><summary>What does Gryd&rsquo;s zero-cost solar model mean for developers?</summary><div class="body"><p>Gryd funds the full cost of solar PV and battery hardware through an SPV financing structure. Developers pay nothing to add full scale solar and battery systems to homes. Homeowners pay a fixed monthly subscription that delivers bill savings from day one, with an ownership option available at any time.</p></div></details>
+    <details class="faq"><summary>Can Gryd help with homes that already have solar in the spec?</summary><div class="body"><p>Yes. Many developers are specifying minimum-compliant 3&ndash;4 panel systems. Gryd can upgrade these to full-scale solar + battery systems that genuinely reduce bills &mdash; at no additional cost to the developer.</p></div></details>
+  </section>
+
+  <div class="faq-close">
+    <a class="btn" href="../../home-final/draft/index.html#assessment">Request a site assessment</a>
+  </div>
+
+</div>
+
+</div>
+
+<!-- the canonical footer, generated from the homepage's own -->
+<script src="../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>

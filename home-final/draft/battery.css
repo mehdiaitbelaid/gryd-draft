@@ -43,7 +43,10 @@
   padding: clamp(32px, 3.4vw, 56px) clamp(26px, 4vw, 64px);
   display: flex; flex-direction: column; justify-content: center;
 }
-.d-batt .eyebrow { color: var(--flare-dark); }
+/* The label here used to be set in the ember, which made it the one section
+   label on the page that did not match the rest. The dash beside it is already
+   the flare and is what carries the colour. */
+.d-batt .eyebrow { color: var(--warm-grey); }
 .d-batt h2 { font-size: clamp(26px, 2.6vw, 36px); max-width: 20ch; margin-top: 14px; color: var(--red110); }
 .d-batt .lede { margin-top: 14px; max-width: 48ch; font-size: 16px; }
 

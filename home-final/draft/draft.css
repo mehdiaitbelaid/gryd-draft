@@ -44,7 +44,8 @@ html, body { overflow-x: visible; }
   /* opacity keeps the opening's own .4s; transform and visibility are the
      retraction's, and neither is touched by the opening */
   transition: opacity .4s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s;
 }
 .dnav .lockup { display: flex; align-items: center; gap: 8px; margin-right: 10px; flex: none; }
 .dnav .lockup svg { display: block; color: #fff; }
@@ -143,7 +144,8 @@ body.vid-playing .dnav, body.vid-fade:not(.nav-landed) .dnav { opacity: 0; point
   opacity: 0; visibility: hidden; pointer-events: none;
   transform: translateX(-50%) scale(.86);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
 }
 .dnav-tab .mk { display: block; width: 22px; height: 22px; color: #fff; }
 /* the narrow bar's own burger glyph, so the affordance is a word the site has
@@ -164,13 +166,15 @@ html.nav-tuck .dnav {
   opacity: 0; visibility: hidden; pointer-events: none;
   transform: translateX(-50%) scale(.97);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
 }
 html.nav-tuck .dnav-tab {
   opacity: 1; visibility: visible; pointer-events: auto;
   transform: translateX(-50%) scale(1);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s;
 }
 /* peeking: hovered, focused or tapped, so the bar comes back for as long as
    the reader is on it */
@@ -180,7 +184,8 @@ html.nav-tuck.nav-peek .dnav {
   pointer-events: none;
   transform: translateX(-50%);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s;
 }
 /* The bar becomes clickable once it is actually there, and not before.
    The capsule stands on the bar's own centre, which is what makes the
@@ -194,8 +199,35 @@ html.nav-tuck.nav-peek .dnav-tab {
   opacity: 0; visibility: hidden; pointer-events: none;
   transform: translateX(-50%) scale(.86);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
 }
+/* Off screen entirely, on the way down the page.
+
+   Scott's second nav note: reading downward the bar should get out of the way,
+   and the smallest deliberate flick back up should bring it straight back. The
+   capsule stays what the bar retracts into; this is a layer over that, and the
+   two compose. At the top there is a full bar. Scrolling down takes whichever of
+   the two is showing off the top of the window. About ten pixels of upward
+   travel brings it back, as the capsule if the reader is into the page and as
+   the full bar if they have reached the top.
+
+   translate rather than transform, and that is the whole reason it composes: the
+   bar is centred with a translateX of its own and the retraction scales it, so a
+   transform here would have to restate both at every width. The translate
+   property is applied before transform and multiplies with it, so this rule
+   names one axis and leaves every other rule alone. */
+html.nav-away .dnav, html.nav-away .dnav-tab {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  translate: 0 -180%;
+  transition: opacity .26s cubic-bezier(.4,0,.6,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .34s;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.nav-away .dnav, html.nav-away .dnav-tab { transition: none; }
+}
+html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { translate: none; }
+
 /* The opening outranks all of it, and has to: a first visit is at the top of
    the page, where nothing is retracted, and the handover still lands on the
    full bar exactly as it did. This is the belt to that brace. */
@@ -303,7 +335,12 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   opacity: .3;
   transition: none;
 }
-.map-beads .map-bead { fill: var(--flare); }
+/* The skip links carry the same drawing at half the weight, so the chain in
+   latitude order still reads first and the network reads behind it. */
+.map-beads .map-curve.hop2 { opacity: .15; }
+/* No fill declared here on purpose. The travelling mark takes the radial
+   gradient named on the element, and a flat colour set from the sheet would
+   win over it and put the solid dot back. */
 
 /* The beads are decoration on a route that is already drawn, so without motion
    they are simply not there rather than parked mid arc. */
@@ -314,13 +351,26 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 
 /* The trust band keeps its quiet language: no cards, no boxes, text and marks
    on the paper, hairlines between ideas, slow passes, and masked ends. */
+/* Both rails are held to the copy column and clipped hard at its edges, so a
+   quote or a press mark enters and leaves on the same line the text starts and
+   ends on. Scott read the old viewport wide rails with faded ends as a second
+   layout running behind the page, so the fades are gone and the column is the
+   only edge. The width is .wrap's content box: --measure less its 28px gutters,
+   20px under 820. */
 .a-quotes .q-rail {
-  margin-top: 44px;
+  margin: 44px auto 0;
+  width: calc(100% - 56px);
+  max-width: calc(var(--measure) - 56px);
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  /* one.css fades this rail at 5 and 95 percent. The column is the edge now, so
+     the inherited mask is cleared rather than replaced. */
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 .a-quotes .q-track { animation: quote-drift 78s linear infinite; }
+@media (max-width: 820px) {
+  .a-quotes .q-rail { width: calc(100% - 40px); max-width: calc(var(--measure) - 40px); }
+}
 .a-quotes .q-rail:hover .q-track,
 .a-quotes .q-rail:focus-within .q-track { animation-play-state: paused; }
 @keyframes quote-drift { to { transform: translateX(-50%); } }
@@ -367,33 +417,37 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   color: var(--warm-grey);
 }
 
-/* Seen in stays over the middle of the band rather than off to the left, which
-   is where the row was centred before this redesign and where Scott read it. */
-.a-quotes .press {
+/* Seen in is its own quiet band between the projects stack and the proof
+   quotes, centred on the copy column, closed off on a hairline above it. */
+.a-seen { padding-bottom: 0; }
+.a-seen .press {
   max-width: var(--measure);
-  margin: 64px auto 0;
-  padding-top: 30px;
+  margin: 0 auto;
+  padding: 30px 28px 0;
   border-top: 1px solid var(--stone-mid);
 }
-.a-quotes .press .hint {
+.a-seen .press .hint {
   display: block;
   text-align: center;
 }
-.a-quotes .p-rail {
-  margin-top: 26px;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+/* the column's own gutter on a phone, matching .wrap */
+@media (max-width: 820px) {
+  .a-seen .press { padding-left: 20px; padding-right: 20px; }
 }
-.a-quotes .p-track {
+.a-seen .p-rail {
+  margin: 26px auto 0;
+  width: 100%;
+  overflow: hidden;
+}
+.a-seen .p-track {
   display: flex;
   width: max-content;
   animation: press-drift 46s linear infinite;
 }
-.a-quotes .p-rail:hover .p-track,
-.a-quotes .p-rail:focus-within .p-track { animation-play-state: paused; }
+.a-seen .p-rail:hover .p-track,
+.a-seen .p-rail:focus-within .p-track { animation-play-state: paused; }
 @keyframes press-drift { to { transform: translateX(-50%); } }
-.a-quotes .p-set {
+.a-seen .p-set {
   display: flex;
   align-items: center;
   gap: clamp(24px, 4vw, 54px);
@@ -401,7 +455,7 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 }
 /* Other people's brands, so they stay in their own faces at one optical weight,
    greyed back and brought up on hover. */
-.a-quotes .pmark img {
+.a-seen .pmark img {
   height: 26px;
   width: auto;
   object-fit: contain;
@@ -409,8 +463,8 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   opacity: .62;
   transition: opacity .3s ease, filter .3s ease;
 }
-.a-quotes .pmark:hover img { filter: grayscale(0); opacity: 1; }
-.a-quotes .pmark.word {
+.a-seen .pmark:hover img { filter: grayscale(0); opacity: 1; }
+.a-seen .pmark.word {
   font-family: "DM Sans", sans-serif;
   font-weight: 500;
   font-size: 21px;
@@ -424,21 +478,20 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   .a-quotes .q-track { animation: none; }
   .a-quotes .q-set { justify-content: center; row-gap: 34px; }
   .a-quotes .qc { flex: 0 1 420px; }
-  .a-quotes .p-rail { -webkit-mask-image: none; mask-image: none; }
-  .a-quotes .p-track {
+  .a-seen .p-track {
     animation: none;
     width: auto;
     flex-wrap: wrap;
     transform: none;
   }
-  .a-quotes .p-set {
+  .a-seen .p-set {
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
     row-gap: 24px;
     padding-right: 0;
   }
-  .a-quotes .p-track .p-set + .p-set { display: none; }
+  .a-seen .p-track .p-set + .p-set { display: none; }
 }
 
 /* ----------------------------------------- developers and homeowners paths */
@@ -538,3 +591,19 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   .a-ben .aud-shot img, .a-ben .aud-keyline { transition: none; }
   .a-ben .aud-path:hover .aud-shot img { transform: scale(1); }
 }
+
+
+/* ------------------------------------------------------- section labels */
+/* One label style for the whole page. .eyebrow in tokens.css is the drawing,
+   12px uppercase on the warm grey with the flare dash; sec-label is what says a
+   given eyebrow is a section's own label rather than a caption inside one, and
+   it owns the space under it so every labelled section opens on the same
+   rhythm. h2.sec-head already carries that 20px, so the rule below only has to
+   answer the headings that are not sec-head. */
+.sec-label { display: inline-flex; margin: 0; }
+.sec-label + h2 { margin-top: 20px; }
+
+/* The projects band that drew its own 13px ember label has been folded into
+   the proof band, which uses the shared one. Nothing on the homepage sets a
+   second label style now; if the stack comes back it comes back carrying
+   sec-label like everything else. */

@@ -309,3 +309,54 @@
   .sys-step .txt.on .n { animation: none; }
   .sys-step { pointer-events: auto; }
 }
+
+/* --------------------------------------------------- the paused section */
+/* A scrubbed film has one failure a played one does not: stop scrolling and it
+   stops entirely, and a section this size holding a single frame reads as
+   broken rather than as paused. is-idle is put on the pin by the driver once
+   the scroll has been quiet for about a second, and taken off again on the
+   first scroll event.
+
+   The breath is written through --sys-scale rather than over it. The driver
+   owns that variable and keeps writing it, so a keyframe that set its own
+   scale would fight the scrub; multiplying the variable inside the keyframe
+   leaves the driver in charge of where the frame sits and this rule in charge
+   only of the 1.2% it drifts around that. Amplitude and period are both chosen
+   to be noticed peripherally and not watched: nine seconds, and a rise smaller
+   than the section's own scroll scale travels in a hundred pixels.
+
+   Nothing here touches the copy column. The words are the one thing on the pin
+   that must never move on its own. */
+@keyframes sys-breathe {
+  0%, 100% {
+    transform: scale(var(--sys-scale, 1)) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(calc(var(--sys-scale, 1) * 1.012)) translate3d(0, -0.35%, 0);
+  }
+}
+.sys-pin.is-idle .sys-frame {
+  animation: sys-breathe 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* The ladder gets the same treatment for the same reason: the lit tick is the
+   one mark on the pin that says which step is up, and a slow pulse on it keeps
+   the ladder alive while the picture is held. Opacity only, so the numeral
+   never shifts against the four beside it. */
+@keyframes sys-tick-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .52; }
+}
+.sys-pin.is-idle .sys-ticks button.on {
+  animation: sys-tick-breathe 3.4s ease-in-out infinite;
+}
+
+/* The pinned layout is already off under reduced motion, so this is belt and
+   braces rather than the only guard. It is worth having: it is the rule anyone
+   auditing the section for idle motion will look for. */
+@media (prefers-reduced-motion: reduce) {
+  .sys-pin.is-idle .sys-frame,
+  .sys-pin.is-idle .sys-ticks button.on { animation: none; }
+  .sys-pin.is-idle .sys-frame { will-change: auto; }
+}

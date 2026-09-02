@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools, Gryd</title>
+<meta name="description" content="The two Gryd tools live at launch: the site assessment, and the Future Homes Standard readiness checker.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="g.css">
+<style>
+  /* Two tools, so the three column listing grid would leave a hole. The pair sits
+     on its own two column grid at the listing's gutter.
+
+     The covers carry no photograph on purpose: a tool is not a project or an
+     article, and a stock rooftop under a calculator would read as a case study.
+     Each cover is the listing's plate treatment over a flat brand ground, with
+     the tool's own line mark in place of the artwork. */
+  .g-mast h1 { font-size: clamp(34px, 4.2vw, 56px); max-width: 20ch; }
+
+  .t-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px;
+    align-items: start;
+  }
+  .t-card { text-decoration: none; display: block; min-width: 0; }
+  .t-cover {
+    position: relative;
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+    aspect-ratio: 1.5;
+    background: var(--red110);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+    color: var(--paper);
+  }
+  .t-card:nth-child(2) .t-cover { background: var(--ember); }
+  .t-cover svg {
+    width: 54px;
+    height: 54px;
+    fill: none;
+    stroke: var(--flare);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .t-card:nth-child(2) .t-cover svg { stroke: #FFC9BB; }
+  .t-cover .over {
+    margin-top: 20px;
+    font-family: "Borna", sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.04;
+    font-size: clamp(24px, 2.6vw, 34px);
+    max-width: 15ch;
+  }
+  .t-card h2 { margin-top: 26px; font-size: 25px; line-height: 1.12; max-width: 24ch; }
+  .t-card .dek {
+    margin: 12px 0 0;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #6B4A3E;
+    max-width: 46ch;
+  }
+  .t-card .facts {
+    margin: 18px 0 0;
+    font-size: 14px;
+    color: #6B4A3E;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .t-card .go {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ember);
+  }
+  .t-card:hover .go { text-decoration: underline; }
+  .t-card:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 6px;
+    border-radius: var(--radius-panel);
+  }
+
+  .t-note {
+    margin: 72px auto 0;
+    max-width: 62ch;
+    text-align: center;
+    font-size: 15px;
+    color: #6B4A3E;
+  }
+
+  @media (max-width: 900px) {
+    .t-grid { grid-template-columns: 1fr; gap: 44px; }
+    .t-cover { aspect-ratio: 1.7; }
+  }
+</style>
+</head>
+<body>
+
+<!-- the shared pill nav, the same one every other page in the tree carries -->
+<script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="g-page">
+
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="eyebrow">Tools</span>
+    <h1>Two tools. Both answer a question before you commit a plot.</h1>
+    <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. The other checks a house type specification against the incoming Future Homes Standard.</p>
+  </header>
+
+  <div class="t-grid">
+
+    <a class="t-card" href="../../home-final/draft/site-assessment.html">
+      <span class="t-cover">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M4 25.5 16 4l12 21.5z"/>
+          <path d="M9.6 19h12.8M12.6 13.6h6.8"/>
+          <path d="M3 28.5h26"/>
+        </svg>
+        <span class="over">Site Assessment</span>
+      </span>
+      <span class="g-pill">Developers</span>
+      <h2>See what a scheme carries before it is priced</h2>
+      <p class="dek">Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.</p>
+      <p class="facts"><span>Scheme level</span><span>Under two minutes</span></p>
+      <span class="go">Open the tool &rarr;</span>
+    </a>
+
+    <a class="t-card" href="../../fhs/pages/2/index.html#assess">
+      <span class="t-cover">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M4 13.5 16 5l12 8.5V27H4z"/>
+          <path d="M11 16.8 14.6 20.4 21.4 13.6"/>
+        </svg>
+        <span class="over">Future Homes Standard Checker</span>
+      </span>
+      <span class="g-pill">Future Homes Standard</span>
+      <h2>Check a house type against the published standard</h2>
+      <p class="dek">Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.</p>
+      <p class="facts"><span>House type level</span><span>60 seconds</span></p>
+      <span class="go">Open the checker &rarr;</span>
+    </a>
+
+  </div>
+
+  <p class="t-note">More tools are in design, including battery modelling and a grid constraint check. They are listed here once they are ready to be used rather than looked at.</p>
+
+  <div class="g-close">
+    <h2>Not sure which one you need?</h2>
+    <p>Send us the scheme. We will run both and come back with the numbers.</p>
+    <a class="btn" href="../../home-final/draft/index.html#assessment">Request a site assessment</a>
+  </div>
+
+</div>
+
+</div>
+
+<!-- the canonical footer, generated from the homepage's own -->
+<script src="../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>

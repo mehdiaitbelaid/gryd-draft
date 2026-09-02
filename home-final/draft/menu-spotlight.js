@@ -366,7 +366,24 @@
   function y() { return window.pageYOffset || root.scrollTop || 0; }
 
   var ARM = 340;        // the fade's own length, after which the bar is real
+  /* Reading downward, the nav leaves; the smallest deliberate flick upward
+     brings it back. UP_BACK is that flick, in pixels of accumulated upward
+     travel, and ten is the middle of the eight to twelve Scott asked for: below
+     about six a trackpad's own overscroll wobble brings the bar back on its
+     own, and above about fifteen the gesture stops feeling like a reflex. */
+  var UP_BACK = 10;
   var tucked = false, peeking = false, arm = 0;
+  var away = false, lastY = 0, upRun = 0;
+
+  function hide(on) {
+    if (away === on) return;
+    away = on;
+    root.classList.toggle('nav-away', on);
+    if (!on) return;
+    // a bar leaving the screen takes its dropdown and its peek with it
+    if (bar.grydShut) bar.grydShut();
+    peek(false);
+  }
 
   function peek(on) {
     if (peeking === on) return;
@@ -401,6 +418,21 @@
     tuck(tucked ? at > FREE_AT : at > TUCK_AT);
     // scrolling is the reader looking at the page, not at the menu
     if (tucked && peeking) peek(false);
+
+    /* The direction layer. The top of the page is always the full bar, so
+       nothing is hidden there whichever way the reader arrived. Below it, any
+       downward movement takes the nav off screen at once, and upward movement is
+       accumulated rather than acted on per event: a single wheel notch is many
+       small scroll events, and one stray upward pixel inside a downward gesture
+       is not a request for the menu. */
+    var dy = at - lastY;
+    lastY = at;
+    if (at <= TUCK_AT) { upRun = 0; hide(false); return; }
+    if (dy > 0) { upRun = 0; hide(true); return; }
+    if (dy < 0) {
+      upRun -= dy;
+      if (upRun >= UP_BACK) hide(false);
+    }
   }
 
   /* --------------------------------------------------------------- input */
@@ -487,7 +519,12 @@
   }, { passive: true });
   addEventListener('resize', sync, { passive: true });
 
-  // the state the page opens in, set before anything can transition into it
+  /* The state the page opens in, set before anything can transition into it.
+     lastY is seeded first so an arrival that restores a position halfway down
+     the page is not read as the reader having scrolled there: the nav opens
+     retracted into its capsule, which is the old behaviour, rather than opening
+     hidden altogether. */
+  lastY = y();
   sync();
   function live() {
     requestAnimationFrame(function () {

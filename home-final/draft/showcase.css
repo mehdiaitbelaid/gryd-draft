@@ -18,22 +18,37 @@
 .showcase-place {
   display: block; margin-top: 4px; font-size: 15px; color: var(--warm-grey);
 }
+
+/* The block. Scott asked for one enclosure holding the site: its figures, its
+   pictures and the way in to the case study, with the route to the rest of the
+   projects left outside it. The keyline is what draws that edge; the ground
+   stays paper so nothing inside changes contrast against the page. */
+.showcase-block {
+  margin-top: 28px; padding: clamp(22px, 2.2vw, 32px);
+  border: 1px solid var(--stone-mid); border-radius: var(--radius-panel);
+  background: var(--paper);
+}
+
 .showcase-hero {
-  width: min(100%, 1120px); margin-inline: auto; aspect-ratio: 16 / 9;
+  width: 100%; margin-inline: auto; aspect-ratio: 16 / 9;
   border-radius: var(--radius-panel); overflow: hidden; background: var(--stonelight);
 }
-.showcase-hero-image {
+.showcase-hero-image, .showcase-hero-video {
   display: block; width: 100%; height: 100%; object-fit: cover;
+  /* the poster is drawn on the same box as the frames, so a reduced motion
+     read and a playing read are the same picture in the same place */
+  object-position: center;
+  background: var(--stonelight);
 }
 .showcase-under {
   display: grid; grid-template-columns: minmax(0, 1fr) .78fr;
   gap: clamp(32px, 5vw, 72px); margin-top: 34px; align-items: start;
 }
 .showcase-copy .lede { margin: 0; }
-.showcase-copy .btn { margin-top: 26px; }
-.showcase-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+/* the right hand column: the two smaller stills, then the way in to the study */
+.showcase-side { display: flex; flex-direction: column; align-items: flex-start; }
+.showcase-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
 .showcase-pair figure { margin: 0; }
-.showcase-pair figure:only-child { grid-column: 1 / -1; }
 .showcase-frame {
   margin: 0; border-radius: var(--radius-panel); overflow: hidden;
   aspect-ratio: 4 / 3; background: var(--stonelight);
@@ -42,15 +57,30 @@
   display: block; width: 100%; height: 100%; object-fit: cover;
 }
 .showcase-caption { font-size: 14px; color: var(--warm-grey); margin-top: 8px; }
+/* 26px clears the caption baseline and keeps this button well away from the
+   one below the block, so the two never read as a pair. */
+.showcase-case { margin-top: 26px; }
+
 .showcase-stats {
   display: flex; flex-wrap: wrap; gap: 10px clamp(28px, 5vw, 66px);
-  margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--stone-mid);
+  padding-top: 16px; border-top: 1px solid var(--stone-mid);
   font-size: 15px; color: var(--warm-grey);
 }
+/* numbers at the foot of the block, the placement the draft shipped with */
+.showcase-stats.is-low { margin-top: 40px; }
+/* numbers high, directly under the section head and above the picture */
+.showcase-stats.is-high { margin-top: 0; margin-bottom: 28px; }
 .showcase-stats strong {
   font-family: var(--font-display); font-weight: 500; font-size: 17px;
   letter-spacing: -.02em; color: var(--red110); margin-inline-end: 8px;
 }
+
+/* outside the block, on the page ground, so it reads as the way on rather than
+   as part of this site's story */
+.showcase-more { margin-top: 26px; }
+/* the anchor the removed projects band used to own, kept so #projects still
+   lands on the projects content */
+.anchor-mark { height: 0; }
 .showcase-band .btn:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
 
 @media (max-width: 900px) {

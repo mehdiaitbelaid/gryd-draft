@@ -281,6 +281,35 @@
     if (film && !unpinned()) start();
   }
 
+  /* Idle life. The film is scrubbed, so a reader who stops scrolling is left
+     on one still frame, and a section this size going completely dead reads as
+     broken rather than paused. Once the scroll has been quiet for IDLE and the
+     pin is on screen, a class goes on and the sheet runs a slow breath on the
+     frame and a pulse on the lit tick. Both are compositor properties on the
+     artwork alone: no text moves, nothing here writes a style, and the class
+     comes off on the first scroll event, so the scrub is never fighting an
+     animation for the same transform. */
+  var IDLE = 1100;
+  var idleTimer = 0, idling = false, onScreen = true;
+
+  function setIdle(on) {
+    if (on === idling) return;
+    idling = on;
+    pin.classList.toggle('is-idle', on);
+  }
+
+  /* Called by everything that counts as the reader still moving. Stopping the
+     loop is not the signal: the loop sleeps on a settled frame long before the
+     reader has actually stopped scrolling. */
+  function idleWake() {
+    clearTimeout(idleTimer);
+    setIdle(false);
+    if (unpinned() || !onScreen) return;
+    idleTimer = setTimeout(function () {
+      if (!unpinned() && onScreen) setIdle(true);
+    }, IDLE);
+  }
+
   function onScroll() {
     if (unpinned()) return;
     // The track's box is re-read once per scroll burst, while the loop is idle,
@@ -290,6 +319,7 @@
     if (!running) measure();
     var y = window.pageYOffset || document.documentElement.scrollTop;
     target = clamp((y - top) / span);
+    idleWake();
     start();
   }
 
@@ -319,6 +349,9 @@
     // the unpinned layout is the stacked one, so nothing the loop writes may
     // survive into it
     clearTimeout(swapTimer);
+    clearTimeout(idleTimer);
+    idling = false;
+    pin.classList.remove('is-idle');
     film = false;
     wrote = -1;
     want = -1;
@@ -347,6 +380,7 @@
     if (video && video.readyState >= 2) film = true;
     pin.classList.toggle('has-film', film);
     paint(vis);
+    idleWake();
   }
 
   if (video) {
@@ -401,6 +435,13 @@
       scrollTo({ top: top + p * span, behavior: 'smooth' });
     });
   });
+
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) {
+      onScreen = es[es.length - 1].isIntersecting;
+      if (!onScreen) { clearTimeout(idleTimer); setIdle(false); } else idleWake();
+    }, { threshold: 0 }).observe(pin);
+  }
 
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', init);

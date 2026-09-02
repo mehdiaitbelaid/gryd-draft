@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FHS checker as a pop up, prototype</title>
+<meta name="description" content="Prototype: the Future Homes Standard checker opened as a modal dialog over the tools page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../hub-directions/assets/tokens.css">
+<link rel="stylesheet" href="../../hub-directions/g/g.css">
+<link rel="stylesheet" href="../fhs.css">
+<link rel="stylesheet" href="../pages/shared.css">
+<link rel="stylesheet" href="../pages/g-skin.css">
+<style>
+  /* Prototype only. Nothing on the site links here: it exists so the pop up can
+     be judged against the page it would open over, which is the tools page.
+     The page behind is a trimmed copy of hub-directions/g/tools.html, so the
+     comparison is like for like rather than against an empty ground. */
+
+  .g-page { padding-top: 138px; }
+  .g-mast h1 { font-size: clamp(34px, 4.2vw, 56px); max-width: 20ch; }
+  .proto-flag {
+    display: inline-block;
+    margin: 0 auto 30px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 7px 15px;
+    border-radius: 999px;
+    background: var(--red110);
+    color: var(--paper);
+  }
+
+  .t-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; align-items: start; }
+  .t-card { text-decoration: none; display: block; min-width: 0; font: inherit; text-align: left; border: 0; padding: 0; background: none; cursor: pointer; width: 100%; }
+  .t-cover {
+    position: relative; border-radius: var(--radius-panel); overflow: hidden;
+    aspect-ratio: 1.5; background: var(--red110); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 30px; color: var(--paper);
+  }
+  .t-card:nth-child(2) .t-cover { background: var(--ember); }
+  .t-cover svg { width: 54px; height: 54px; fill: none; stroke: var(--flare); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .t-card:nth-child(2) .t-cover svg { stroke: #FFC9BB; }
+  .t-cover .over { margin-top: 20px; font-family: "Borna", sans-serif; font-weight: 500; letter-spacing: -0.025em; line-height: 1.04; font-size: clamp(24px, 2.6vw, 34px); max-width: 15ch; }
+  .t-card h2 { margin-top: 26px; font-size: 25px; line-height: 1.12; max-width: 24ch; }
+  .t-card .dek { margin: 12px 0 0; font-size: 16px; line-height: 1.55; color: #6B4A3E; max-width: 46ch; }
+  .t-card .go { display: inline-block; margin-top: 20px; font-size: 15px; font-weight: 500; color: var(--ember); }
+  .t-card:hover .go { text-decoration: underline; }
+  .t-card:focus-visible { outline: 2px solid var(--ember); outline-offset: 6px; border-radius: var(--radius-panel); }
+
+  /* ---------- the dialog ---------- */
+
+  dialog.fhs-modal {
+    width: min(760px, calc(100vw - 32px));
+    max-height: min(88vh, 900px);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-panel);
+    background: var(--paper);
+    color: var(--red110);
+    overflow: hidden;
+  }
+  dialog.fhs-modal::backdrop { background: rgba(30, 12, 8, 0.58); }
+
+  .fm-in { display: flex; flex-direction: column; max-height: inherit; }
+  .fm-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+    padding: 26px 30px 20px; background: var(--blush); flex: none;
+  }
+  .fm-head h2 { font-size: clamp(22px, 2.4vw, 28px); max-width: 20ch; }
+  .fm-head .eyebrow { margin-bottom: 12px; }
+  .fm-x {
+    flex: none; width: 38px; height: 38px; border-radius: 999px; border: 0; cursor: pointer;
+    background: var(--paper); color: var(--red110); font: inherit; font-size: 17px; line-height: 1;
+  }
+  .fm-x:hover { background: var(--stonelight); }
+  .fm-x:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+
+  /* The wizard scrolls inside the dialog. The dialog itself never scrolls, so
+     the header and the actions stay put while the answers grow. */
+  .fm-body { overflow-y: auto; padding: 26px 30px 30px; -webkit-overflow-scrolling: touch; }
+  .fm-body .answered { margin-bottom: 20px; }
+  .fm-body .answered:empty { display: none; }
+  .fm-body .answered li:first-child { border-top: 0; }
+  .fm-body .sum-grid { grid-template-columns: 1fr; }
+  .fm-body .scores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fm-body .tbl { min-width: 460px; }
+
+  @media (max-width: 560px) {
+    dialog.fhs-modal { width: 100vw; max-width: 100vw; max-height: 100vh; height: 100vh; border-radius: 0; }
+    .fm-head { padding: 22px 20px 18px; }
+    .fm-body { padding: 22px 20px 26px; }
+    .fm-body .scores { grid-template-columns: 1fr; }
+    .t-grid { grid-template-columns: 1fr; gap: 44px; }
+    .t-cover { aspect-ratio: 1.7; }
+  }
+  @media (max-width: 900px) {
+    .t-grid { grid-template-columns: 1fr; gap: 44px; }
+    .t-cover { aspect-ratio: 1.7; }
+  }
+</style>
+</head>
+<body>
+
+<script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="g-page">
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="proto-flag">Prototype, not wired into the site</span>
+    <span class="eyebrow" style="display:flex">Tools</span>
+    <h1>Two tools. Both answer a question before you commit a plot.</h1>
+    <p class="stand">The checker below opens as a pop up over this page instead of on a page of its own. Escape closes it, the answers stay put behind it, and the results come back inside the same dialog.</p>
+  </header>
+
+  <div class="t-grid">
+
+    <a class="t-card" href="../../home-final/draft/site-assessment.html">
+      <span class="t-cover">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M4 25.5 16 4l12 21.5z"/><path d="M9.6 19h12.8M12.6 13.6h6.8"/><path d="M3 28.5h26"/>
+        </svg>
+        <span class="over">Site Assessment</span>
+      </span>
+      <span class="g-pill">Developers</span>
+      <h2>See what a scheme carries before it is priced</h2>
+      <p class="dek">Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.</p>
+      <span class="go">Open the tool &rarr;</span>
+    </a>
+
+    <button class="t-card" type="button" id="openFhs">
+      <span class="t-cover">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M4 13.5 16 5l12 8.5V27H4z"/><path d="M11 16.8 14.6 20.4 21.4 13.6"/>
+        </svg>
+        <span class="over">Future Homes Standard Checker</span>
+      </span>
+      <span class="g-pill">Future Homes Standard</span>
+      <h2>Check a house type against the published standard</h2>
+      <p class="dek">Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.</p>
+      <span class="go">Open the checker &rarr;</span>
+    </button>
+
+  </div>
+
+</div>
+</div>
+
+<dialog class="fhs-modal" id="fhsModal" aria-labelledby="fmTitle">
+  <div class="fm-in">
+    <div class="fm-head">
+      <div>
+        <span class="eyebrow" style="display:flex">Future Homes Standard</span>
+        <h2 id="fmTitle">Check your FHS readiness</h2>
+      </div>
+      <button class="fm-x" type="button" id="fmClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="fm-body" id="assess">
+      <ul class="answered" data-answered></ul>
+      <div class="stepline"><span class="chrome" data-chrome></span><span class="count" data-count></span></div>
+      <div class="progress" data-progress><i></i></div>
+      <div data-stage>
+        <div class="qwrap" style="margin-top:24px">
+          <div class="q" data-q></div>
+          <p class="hint" data-hint></p>
+          <div data-fields></div>
+        </div>
+        <div class="acts">
+          <button type="button" class="btn ghost js-back">Back</button>
+          <button type="button" class="btn js-next">Next</button>
+        </div>
+        <p class="note" data-foot>Updated for the published Future Homes Standard &mdash; March 2026</p>
+      </div>
+      <div class="sum" data-summary></div>
+    </div>
+  </div>
+</dialog>
+
+<script src="../pages/assess-model.js"></script>
+<script src="../pages/stepper.js"></script>
+<script>
+(function () {
+  var dlg = document.getElementById('fhsModal');
+  var panel = document.getElementById('assess');
+  var opener = document.getElementById('openFhs');
+  var opened = false;
+
+  // The stepper is mounted once, on first open, and left mounted. Mounting it
+  // on every open would throw the visitor's half finished answers away the
+  // moment they closed the dialog to look at something on the page behind.
+  function mount() {
+    if (opened) return;
+    opened = true;
+    GRYD.mountStepper(panel, {
+      onDone: function (a) {
+        // Same handoff key the two page flow uses, so nothing downstream has to
+        // know which mechanism collected the answers. Here the results render in
+        // the dialog rather than on a page of their own, so it is written and
+        // left for anything else that wants it.
+        try { sessionStorage.setItem('gryd.fhs.answers', JSON.stringify(a)); } catch (e) {}
+        panel.scrollTop = 0;
+      }
+    });
+  }
+
+  function open() {
+    mount();
+    dlg.showModal();
+    // showModal moves focus to the first focusable child, which is the close
+    // button. The first question is what the visitor came for, so focus goes
+    // there instead.
+    var first = panel.querySelector('select, input, .js-next');
+    if (first) first.focus();
+  }
+
+  opener.addEventListener('click', open);
+  document.getElementById('fmClose').addEventListener('click', function () { dlg.close(); });
+
+  // Escape is native on <dialog>. Returning focus to the control that opened the
+  // dialog is not, so it is done here.
+  dlg.addEventListener('close', function () { opener.focus(); });
+
+  // A clean showModal already traps the tab ring, but the trap is what this
+  // prototype is being judged on, so it is explicit rather than assumed: Tab off
+  // the last control wraps to the first and Shift+Tab off the first wraps back.
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), ' +
+                  'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  dlg.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    var ring = Array.prototype.filter.call(
+      dlg.querySelectorAll(FOCUSABLE),
+      function (el) { return el.offsetParent !== null || el === document.activeElement; });
+    if (!ring.length) return;
+    var first = ring[0], last = ring[ring.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // A deep link so the pop up can be shown without a click, which is what a
+  // screenshot run and Scott's own look need.
+  if (/[?#]open\b/.test(location.href)) open();
+})();
+</script>
+
+<script src="../../home-final/assets/site-footer.js"></script>
+</body>
+</html>

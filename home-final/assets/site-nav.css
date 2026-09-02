@@ -34,7 +34,8 @@
   /* opacity keeps the opening's own .4s; transform and visibility are the
      retraction's, and neither is touched by the opening */
   transition: opacity .4s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s;
 }
 .dnav .lockup { display: flex; align-items: center; gap: 8px; margin-right: 10px; flex: none; }
 .dnav .lockup svg { display: block; color: #fff; }
@@ -133,7 +134,8 @@ body.vid-playing .dnav, body.vid-fade:not(.nav-landed) .dnav { opacity: 0; point
   opacity: 0; visibility: hidden; pointer-events: none;
   transform: translateX(-50%) scale(.86);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
 }
 .dnav-tab .mk { display: block; width: 22px; height: 22px; color: #fff; }
 /* the narrow bar's own burger glyph, so the affordance is a word the site has
@@ -154,13 +156,15 @@ html.nav-tuck .dnav {
   opacity: 0; visibility: hidden; pointer-events: none;
   transform: translateX(-50%) scale(.97);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
 }
 html.nav-tuck .dnav-tab {
   opacity: 1; visibility: visible; pointer-events: auto;
   transform: translateX(-50%) scale(1);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s;
 }
 /* peeking: hovered, focused or tapped, so the bar comes back for as long as
    the reader is on it */
@@ -170,7 +174,8 @@ html.nav-tuck.nav-peek .dnav {
   pointer-events: none;
   transform: translateX(-50%);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s;
 }
 /* The bar becomes clickable once it is actually there, and not before.
    The capsule stands on the bar's own centre, which is what makes the
@@ -184,8 +189,35 @@ html.nav-tuck.nav-peek .dnav-tab {
   opacity: 0; visibility: hidden; pointer-events: none;
   transform: translateX(-50%) scale(.86);
   transition: opacity .32s cubic-bezier(.4,0,.6,1),
-              transform .45s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
+              transform .45s cubic-bezier(.22,.61,.36,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .32s;
 }
+/* Off screen entirely, on the way down the page.
+
+   Scott's second nav note: reading downward the bar should get out of the way,
+   and the smallest deliberate flick back up should bring it straight back. The
+   capsule stays what the bar retracts into; this is a layer over that, and the
+   two compose. At the top there is a full bar. Scrolling down takes whichever of
+   the two is showing off the top of the window. About ten pixels of upward
+   travel brings it back, as the capsule if the reader is into the page and as
+   the full bar if they have reached the top.
+
+   translate rather than transform, and that is the whole reason it composes: the
+   bar is centred with a translateX of its own and the retraction scales it, so a
+   transform here would have to restate both at every width. The translate
+   property is applied before transform and multiplies with it, so this rule
+   names one axis and leaves every other rule alone. */
+html.nav-away .dnav, html.nav-away .dnav-tab {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  translate: 0 -180%;
+  transition: opacity .26s cubic-bezier(.4,0,.6,1),
+              translate .34s cubic-bezier(.22,.61,.36,1), visibility 0s .34s;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.nav-away .dnav, html.nav-away .dnav-tab { transition: none; }
+}
+html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { translate: none; }
+
 /* The opening outranks all of it, and has to: a first visit is at the top of
    the page, where nothing is retracted, and the handover still lands on the
    full bar exactly as it did. This is the belt to that brace. */
