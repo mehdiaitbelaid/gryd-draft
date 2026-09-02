@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Future Homes Standard: How to Calculate How Much Solar You Need</title>
+<meta name="description" content="On-site renewables is now a functional requirement for every new home in England. This guide breaks down the confirmed sizing formula from Approved Document L 2026 and explains why designing beyond the minimum is essential.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../g.css">
+</head>
+<body>
+
+<!-- the shared pill nav, injected in place of this page's own bar.
+     One tree, one look, one source: home-final/_build_draft.py. -->
+<script src="../../../home-final/assets/site-nav.js" data-nav-current="hub"></script>
+
+<div class="g-page">
+
+<div class="wrap">
+
+  <header class="g-hero">
+    <img src="../../assets/img/original/blog-fhs-sizing.jpg" alt="Installer lifting a solar panel into place on a roof">
+    <div class="plate">
+      <h1>Sizing the Array</h1>
+      <p class="stand">The confirmed formula, worked through.</p>
+    </div>
+  </header>
+
+  <div class="g-measure">
+
+    <div class="g-title">
+      <span class="g-pill">FHS</span>
+      <h2>Future Homes Standard: How to Calculate How Much Solar You Need</h2>
+    </div>
+
+    <div class="g-byline">
+      <span class="face" aria-hidden="true">SW</span>
+      <span>
+        <span class="who">Scott Whiteside</span><br>
+        <span class="when">24 March 2026</span>
+      </span>
+    </div>
+
+    <article class="g-body">
+
+      <p class="lead-in">The Future Homes Standard is published. On-site renewables (effectively solar) is now a functional requirement of the Building Regulations, not just part of the notional building specification. Every new home approved in England must include on-site renewable electricity generation from 24 March 2027.</p>
+      <p>But knowing you need solar and knowing how much solar you need are two different things.</p>
+      <p>This guide walks through the confirmed sizing formula, the key variables that affect real-world system size, and why designing to the minimum compliance threshold is likely to still leave homebuyers underserved.</p>
+      <h3>What the FHS requires: the confirmed baseline</h3>
+      <p>Approved Document L 2026 sets out the sizing formula (Equation 5.1):</p>
+      <p>Required kWp = panel area × panel efficiency</p>
+      <p>Or in the regulation’s notation: PPDWELLING = APVD × EFFPV</p>
+      <p>Where:</p>
+      <ul>
+        <li>PPDWELLING is the required installed peak power (in kWp) for the home</li>
+        <li>APVD is the area of roof covered by solar panels, which must be at least 40% of the ground floor area</li>
+        <li>EFFPV is the assumed panel efficiency: 0.22 kWp per m² (or higher)</li>
+      </ul>
+      <p>The formula assumes panels face between south-east and south-west, on a 45-degree pitch, with no overshading.</p>
+      <p>A worked example: a typical 3-bed home with 50 m² of ground floor area needs at least 20 m² of panels (50 × 0.4). At 0.22 kWp/m², that gives a minimum system size of 4.4 kWp.</p>
+      <h4>Why the numbers are higher than you might expect</h4>
+      <p>The FHS updates the assumed panel efficiency from 6.5 m²/kWp (Part L 2021) to 4.5 m²/kWp. In the regulation’s terms, that’s 0.22 kWp per m² of panel. This reflects where commercially available panel technology already is: a standard 400W panel occupies about 1.7-1.8 m², delivering 0.22-0.24 kWp/m². The regulation has caught up with the market.</p>
+      <p>The combined effect of the new 40% ground floor area rule and the updated efficiency factor is significant. Take a typical 3-bed semi with a 50 m² ground floor. The formula gives 20 m² of panel area at 0.22 kWp/m², requiring a 4.4 kWp system. Had the old 6.5 m²/kWp factor been used instead, the same area would have required only 3.1 kWp. The difference is roughly 40% more installed capacity, driven entirely by the efficiency assumption.</p>
+      <p>For developers, this translates directly into cost. Industry estimates put the solar-specific cost uplift at £5,000-10,000 per plot depending on house type and system size, making solar the single largest component of the overall FHS build cost increase.</p>
+      <h4>Two ways to comply</h4>
+      <p>The regulation gives developers two routes:</p>
+      <ul>
+        <li>Route (a): Install panels covering at least 40% of the ground floor area at 0.22 kWp/m² (the standard route for most homes).</li>
+        <li>Route (b): Where the roof cannot accommodate 40% coverage (due to orientation, shading, or complex geometry), cover as much of the reasonably practicable roof area as possible at 0.22 kWp/m².</li>
+      </ul>
+      <p>Route (b) is the fallback, not a loophole. Developers must still install panels on whatever usable roof area is available.</p>
+      <p>Critically, solar is now a functional requirement of the Building Regulations. Under the previous rules, solar was part of the notional dwelling specification and could theoretically be traded away by improving other elements like insulation. That is no longer possible.</p>
+      <p>The removal of terrace averaging also means each home must individually meet solar requirements. A south-facing end-of-terrace can no longer compensate for a north-facing mid-terrace unit.</p>
+      <h4>The compliance methodology</h4>
+      <p>At FHS launch (24 March 2027), SAP 10.3 is the sole compliance methodology. SAP 10.3 credits solar generation based on standard annual yield calculations using the updated 4.5 m²/kWp factor, but does not granularly model self-consumption.</p>
+      <p>The Home Energy Model (HEM) becomes available via the centralised ECaaS platform no earlier than 3 months after launch. HEM models energy at 30-minute intervals, fundamentally changing how solar generation, self-consumption and battery storage are valued. SAP 10.3 and HEM will run in parallel for a minimum of 24 months, after which HEM is expected to become the sole methodology.</p>
+      <h3>The regulated vs. unregulated energy gap</h3>
+      <p>The most important thing most developers may not know about solar sizing: the HEM calculation, like SAP before it, is based on regulated energy only.</p>
+      <p>Regulated energy covers the consumption controllable by the building’s design: heating, hot water, mechanical ventilation and lighting. It does not include unregulated energy — appliances, TVs, computers, EV chargers and everything else plugged into a socket.</p>
+      <p>When SAP was introduced in the early 90’s, regulated energy represented 70–90% of a home’s total energy demand. Today, it represents 40–60%. The rest, the majority in many modern homes, sits entirely outside the compliance calculation.</p>
+      <p>What this means in practice: a solar system sized purely for HEM compliance may generate enough energy to satisfy the model, but not enough to make a material difference to the homebuyer’s real electricity bill.</p>
+      <h3>The key variables in solar sizing</h3>
+      <p>A proper solar sizing exercise for an FHS-compliant new-build should consider:</p>
+      <h4>Roof area and orientation</h4>
+      <ul>
+        <li>South-facing roofs yield the highest annual generation — a south-facing pitch at 30–35° will outperform an east/west split by 15–25% for the same panel count.</li>
+        <li>East/west splits are common on pitched roofs in dense developments — they produce less per panel but spread generation more evenly across the day, which can improve self-consumption without battery storage.</li>
+        <li>Flat roofs offer flexibility but require ballasted mounting frames and may have different planning implications.</li>
+      </ul>
+      <h4>System capacity: applying Equation 5.1</h4>
+      <p>Using the published formula (APVD × 0.22 kWp/m²), assuming optimal SE-SW orientation at 45° with no overshading:</p>
+      <ul>
+        <li>A 2-bed terrace with ~35–45 m² ground floor area → APVD of ~14–18 m² → ~3.1–4.0 kWp</li>
+        <li>A 3-bed semi with ~45–55 m² ground floor area → APVD of ~18–22 m² → ~4.0–4.8 kWp</li>
+        <li>A 3-bed detached with ~55–70 m² ground floor area → APVD of ~22–28 m² → ~4.8–6.2 kWp</li>
+        <li>A 4-bed detached with ~70–90 m² ground floor area → APVD of ~28–36 m² → ~6.2–7.9 kWp</li>
+      </ul>
+      <p>These are the minimum installed peak power figures under Equation 5.1. Actual panel count depends on the specific product used. A standard 400W panel at ~1.75 m² delivers ~0.23 kWp/m², comfortably exceeding the 0.22 kWp/m² threshold. Non-optimal orientation (east/west split, sub-optimal pitch, partial shading) does not change the required kWp, but it increases the annual generation shortfall that must be compensated for by additional capacity or alternative roof area under route (b).</p>
+      <h4>Total energy demand: sizing beyond compliance</h4>
+      <p>A home designed for real-world FHS performance should model:</p>
+      <ul>
+        <li>Heat pump consumption — typically 2,500–4,500 kWh/year depending on home size and fabric performance</li>
+        <li>Hot water — typically 1,500–2,500 kWh/year for a heat pump cylinder</li>
+        <li>Lighting and ventilation — typically 500–1,000 kWh/year</li>
+        <li>Unregulated demand (appliances, TV, home working) — typically 1,500–3,000 kWh/year</li>
+        <li>EV charging — typically 2,000–4,000 kWh/year if the household has one EV</li>
+      </ul>
+      <p>A well-specified 4–5 bedroom home with an EV could have a total annual demand of 10,000–14,000 kWh.</p>
+      <p>The real-world gap between what compliance requires and what buyers actually need is significant. Consider going beyond compliance to make a meaningful difference to the long term energy savings of you home buyers.</p>
+      <h3>Battery storage: the multiplier</h3>
+      <p>Adding battery storage changes the economics materially. A well-sized battery, typically 5–10 kWh for a family home, can increase solar self-consumption from ~30% to 60–80%. Instead of exporting cheap daytime solar and buying back expensive evening electricity, homeowners store and use their own generation.</p>
+      <p>For all-electric homes with heat pumps and EV chargers, the combination of appropriately sized solar and battery storage is the difference between a home that feels energy-efficient and one that actually is.</p>
+      <h3>The practical recommendation</h3>
+      <p>Design to the maximum solar coverage the roof geometry allows, not the minimum the compliance model requires. Model total energy demand including unregulated consumption and EV charging. Specify battery storage as standard to give your homes a real edge.</p>
+      <p>This is not gold-plating. It is designing homes that work for the people who live in them, and for developers who want their projects to stand out in a market where every new home nominally meets the same standard.</p>
+      <p>The FHS comes into force on 24 March 2027. Every home approved after that date must comply. Developers have a 12-month transition period to start construction for homes already approved, with all building work needing to commence by 24 March 2028. The time to get solar sizing right is now.</p>
+
+      <p class="g-return"><a class="btn ghost" href="../blog.html">Back to the Knowledge Hub</a></p>
+    </article>
+
+    <section class="g-share">
+      <h3>Share this article</h3>
+      <div class="row">
+        <a href="#" aria-label="Share on LinkedIn">in</a>
+        <a href="#" aria-label="Share on X">X</a>
+        <a href="#" aria-label="Copy link">&#128279;</a>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="g-more">
+    <h3>Keep reading</h3>
+    <div class="pair">
+
+    <a class="g-card" href="future-homes-standard-solar-mandate.html">
+      <div class="cover">
+        <img src="../../assets/img/original/blog-fhs-explained.jpg" alt="New build estate photographed from the air with rooftop solar">
+        <div class="plate">
+          <span class="over">The Solar Mandate</span>
+          <span class="sub">What the standard asks of housebuilders.</span>
+        </div>
+      </div>
+      <span class="g-pill">FHS</span>
+      <h2>Future Homes Standard: What It Means For UK Housebuilders – And A Closer Look At The Solar Mandate</h2>
+      <p class="facts"><span>Scott Whiteside</span><span>19 March 2026</span></p>
+    </a>
+    <a class="g-card" href="solar-and-affordable-housing.html">
+      <div class="cover">
+        <img src="../../assets/img/original/blog-affordable-housing.jpg" alt="A family standing outside a home with solar panels on the roof">
+        <div class="plate">
+          <span class="over">Affordable, and Cheap to Run</span>
+          <span class="sub">Rising expectations, tighter budgets.</span>
+        </div>
+      </div>
+      <span class="g-pill">Social housing</span>
+      <h2>Why Solar Matters for the Future of Affordable Housing</h2>
+      <p class="facts"><span>Danielle Todd</span><span>17 February 2026</span></p>
+    </a>
+
+    </div>
+  </section>
+
+
+  <section class="g-close">
+    <h2>Tell us about the site and we will model the <span class="flare">numbers</span>.</h2>
+    <p>A site assessment gives you system sizing per plot, the effect on EPC, and what the homeowner pays, before you commit to anything.</p>
+    <a class="btn" href="../site-assessment.html">Request a site assessment</a>
+  </section>
+
+</div>
+
+<!-- the canonical footer, generated from the homepage's own by
+     home-final/_build_draft.py. Do not hand edit a footer. -->
+<script src="../../../home-final/assets/site-footer.js"></script>
+
+</div>
+
+</body>
+</html>

@@ -22,7 +22,7 @@
   if (!me) return;
 
   var ROOT = new URL('../../', me.src).href;   // the served root, gryd-homepage
-  var TREE = [{"label": "Developers", "section": "developers", "href": "home-final/draft/index.html#developers", "kids": []}, {"label": "Hub", "section": "hub", "href": "home-final/draft/index.html#hub", "kids": [{"label": "Projects", "href": "hub-directions/g/projects.html"}, {"label": "Blog", "href": "hub-directions/g/blog.html"}, {"label": "News", "href": "hub-directions/g/news.html"}]}, {"label": "Tools", "section": "tools", "href": "hub-directions/g/tools.html", "kids": [{"label": "All tools", "href": "hub-directions/g/tools.html"}, {"label": "Site Assessment", "href": "hub-directions/g/site-assessment.html"}, {"label": "FHS Checker", "href": "fhs/pages/2/index.html#assess"}]}, {"label": "FHS", "section": "fhs", "href": "fhs/pages/2/index.html", "kids": []}, {"label": "FAQs", "section": "faqs", "href": "hub-directions/g/faq.html", "kids": []}];
+  var TREE = [{"label": "Developers", "section": "developers", "href": "home-final/draft/index.html#developers", "kids": []}, {"label": "Hub", "section": "hub", "href": "home-final/draft/index.html#hub", "kids": [{"label": "Projects", "href": "hub-directions/g/projects.html"}, {"label": "Blog", "href": "hub-directions/g/blog.html"}, {"label": "News", "href": "hub-directions/g/news.html"}]}, {"label": "Tools", "section": "tools", "href": "hub-directions/g/tools.html", "kids": [{"label": "All tools", "href": "hub-directions/g/tools.html"}, {"label": "Site Assessment", "href": "hub-directions/g/site-assessment.html"}, {"label": "FHS Checker", "href": "fhs/pages/2/index.html#assess"}, {"label": "Battery modelling", "href": "hub-directions/g/battery-tool.html"}]}, {"label": "FHS", "section": "fhs", "href": "fhs/pages/2/index.html", "kids": []}, {"label": "FAQs", "section": "faqs", "href": "hub-directions/g/faq.html", "kids": []}];
   var HOME = "home-final/draft/index.html";
   var CTA = {"label": "Request a site assessment", "short": "Assessment", "href": "hub-directions/g/site-assessment.html"};
 
@@ -70,7 +70,7 @@
         var fst = document.createElement('style');
         fst.textContent = 'html{background:#F8F6F2}html.gryd-fade-in body{opacity:0}';
         document.head.appendChild(fst);
-        document.documentElement.classList.add('gryd-fade-in');
+        document.documentElement.classList.add('gryd-fade-in', 'gryd-arriving');
       }
     } catch (fe) {}
     var fade = document.createElement('script');

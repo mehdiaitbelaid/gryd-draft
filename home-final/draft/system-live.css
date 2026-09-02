@@ -1,4 +1,4 @@
-/* Ambient overlay for the system film, v4.
+/* Ambient overlay for the system film.
 
    The layer is a child of .sys-frame, so the frame's own transform (the scroll
    scale and the idle breath) carries it and it never has to be told where the

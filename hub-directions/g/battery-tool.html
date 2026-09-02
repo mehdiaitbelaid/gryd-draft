@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battery modelling, Gryd</title>
+<meta name="description" content="Four priced years for one plot: no solar, solar only, solar and battery on a time of use tariff, and solar and battery run by Gryd on a dynamic tariff.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="g.css">
+<style>
+  /* The battery modelling tool in direction G. The form controls are the ones the
+     FHS restyle already settled in fhs/pages/g-skin.css, restated here so this page
+     carries no dependency on that sheet: same 46px height, same chip radius, same
+     flare focus ring.
+
+     Layout is one column at the reading measure for the form, and a four across
+     card row for the priced columns, because a column is read against its three
+     neighbours. */
+
+  .g-mast h1 { font-size: clamp(34px, 4.4vw, 58px); max-width: 18ch; }
+
+  .b-form { max-width: 720px; margin: 0 auto; }
+  .b-step { display: none; }
+  .b-step.on { display: block; }
+
+  .steps {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    max-width: 720px; margin: 0 auto 40px; padding: 0; list-style: none;
+  }
+  .steps li {
+    font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    font-weight: 500; padding: 7px 14px; border-radius: 999px;
+    background: var(--stonelight); color: var(--warm-grey);
+  }
+  .steps li[aria-current="step"] { background: var(--red110); color: var(--paper); }
+  .steps li.done { background: var(--blush); color: var(--ember); }
+
+  .b-head h2 { font-size: clamp(28px, 3.4vw, 40px); }
+  .b-head .lede { margin: 18px 0 0; color: #6B4A3E; max-width: 56ch; }
+  .b-head .label-caps {
+    display: block; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    font-weight: 500; color: var(--warm-grey); margin-bottom: 14px;
+  }
+
+  .fld { margin-top: 34px; }
+  .fld > label, .fld legend, .fld .lab {
+    display: block; font-size: 13px; font-weight: 500; letter-spacing: 0.01em;
+    color: #6B4A3E; margin-bottom: 6px; padding: 0;
+  }
+  .fld input[type="text"], .fld input[type="number"] {
+    font: inherit; font-size: 15px; width: 100%; height: 46px; padding: 0 13px;
+    border: 1px solid var(--stone-mid); border-radius: var(--radius-chip);
+    background: var(--paper); color: var(--red110);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .fld input:hover { border-color: var(--warm-grey); }
+  .fld input:focus-visible {
+    outline: none; border-color: var(--flare);
+    box-shadow: 0 0 0 3px rgba(255, 85, 50, 0.24);
+  }
+  .fld input[aria-invalid="true"] { border-color: var(--ember); }
+  .fld .suffixed { display: flex; align-items: center; gap: 10px; }
+  .fld .suffixed input { max-width: 200px; }
+  .fld .suffixed .unit { font-size: 14px; color: var(--warm-grey); }
+  .fld .help { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: #6B4A3E; }
+  .fld .err { margin: 8px 0 0; font-size: 13px; font-weight: 500; color: var(--ember); }
+  .fld fieldset { border: 0; margin: 0; padding: 0; }
+
+  .choices { display: flex; flex-wrap: wrap; gap: 10px; }
+  .choices label {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 15px; padding: 11px 17px; border-radius: 999px;
+    border: 1px solid var(--stone-mid); background: var(--paper);
+    color: var(--red110); cursor: pointer;
+  }
+  .choices label:hover { border-color: var(--warm-grey); }
+  .choices input[type="radio"] {
+    -webkit-appearance: none; appearance: none; flex: none;
+    width: 15px; height: 15px; margin: 0; border-radius: 50%;
+    border: 1px solid var(--stone-mid); background: var(--paper); position: relative;
+  }
+  .choices input[type="radio"]:checked { border-color: var(--flare); }
+  .choices input[type="radio"]:checked::after {
+    content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--flare);
+  }
+  .choices input[type="radio"]:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  .choices label:has(input:checked) { border-color: var(--flare); background: var(--blush); }
+  .choices .hint { display: block; font-size: 13px; color: var(--warm-grey); margin-top: 4px; }
+  .choices label.stacked { align-items: flex-start; flex-direction: row; max-width: 340px; }
+
+  .toggle { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; cursor: pointer; }
+  .toggle input[type="checkbox"] {
+    -webkit-appearance: none; appearance: none; flex: none;
+    width: 20px; height: 20px; margin: 2px 0 0; position: relative;
+    border: 1px solid var(--stone-mid); border-radius: 6px; background: var(--paper);
+    cursor: pointer; transition: background .15s ease, border-color .15s ease;
+  }
+  .toggle input[type="checkbox"]::after {
+    content: ""; position: absolute; left: 6px; top: 2.5px; width: 5px; height: 10px;
+    border: solid #ffffff; border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(.4); opacity: 0; transition: transform .15s ease, opacity .15s ease;
+  }
+  .toggle input[type="checkbox"]:checked { background: var(--flare); border-color: var(--flare); }
+  .toggle input[type="checkbox"]:checked::after { transform: rotate(45deg) scale(1); opacity: 1; }
+  .toggle input[type="checkbox"]:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+
+  .stepper { display: flex; align-items: center; gap: 14px; }
+  .stepper button {
+    font: inherit; width: 44px; height: 44px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--stone-mid); background: var(--paper); color: var(--red110);
+    font-size: 20px; line-height: 1;
+  }
+  .stepper button:hover:not(:disabled) { border-color: var(--flare); color: var(--ember); }
+  .stepper button:disabled { opacity: .4; cursor: not-allowed; }
+  .stepper button:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  .stepper .val { font-size: 26px; font-weight: 500; min-width: 62px; text-align: center; }
+
+  .note {
+    margin-top: 14px; font-size: 13px; line-height: 1.55; color: #6B4A3E;
+    border-left: 2px solid var(--stone-mid); padding-left: 14px; max-width: 62ch;
+  }
+
+  .panel {
+    margin-top: 26px; border: 1px solid var(--stone-mid);
+    border-radius: var(--radius-panel); background: var(--stonelight); padding: 26px;
+  }
+  .panel .cap {
+    display: block; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    font-weight: 500; color: var(--warm-grey);
+  }
+  .panel .fig { font-size: 38px; font-weight: 500; font-family: var(--font-display); margin-top: 8px; }
+  .panel .formula { margin: 10px 0 0; font-size: 14px; color: #6B4A3E; }
+  .terms { margin: 22px 0 0; border-top: 1px solid var(--stone-mid); }
+  .terms > div {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+    gap: 6px 16px; border-bottom: 1px solid var(--stone-mid); padding: 11px 0;
+  }
+  .terms dt { font-size: 14px; }
+  .terms dd { margin: 0; font-size: 15px; font-weight: 500; }
+  .terms dd.calc { width: 100%; font-size: 13px; font-weight: 400; color: #6B4A3E; margin-top: 3px; }
+
+  .echo { border: 1px solid var(--stone-mid); border-radius: var(--radius-chip); background: var(--paper); padding: 4px 16px; margin: 0; }
+  .echo > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 10px 0; border-bottom: 1px solid var(--stonelight); }
+  .echo > div:last-child { border-bottom: 0; }
+  .echo dt { font-size: 14px; color: #6B4A3E; }
+  .echo dd { margin: 0; font-size: 14px; font-weight: 500; }
+
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 44px; }
+  .sec-head h3 { font-size: 22px; }
+  .linkbtn {
+    font: inherit; font-size: 14px; background: none; border: 0; padding: 0;
+    color: var(--ember); cursor: pointer; text-decoration: underline;
+  }
+  .linkbtn:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; border-radius: 4px; }
+
+  .tariffs { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+  .tariffs th, .tariffs td { text-align: left; vertical-align: top; padding: 11px 14px 11px 0; border-bottom: 1px solid var(--stone-mid); }
+  .tariffs thead th { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warm-grey); font-weight: 500; }
+  .tariffs tbody th { font-weight: 500; }
+  .tariffs td { color: #6B4A3E; }
+  .tscroll { overflow-x: auto; margin-top: 14px; }
+
+  .acts { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--stone-mid); }
+  .acts .btn { border: 0; font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; padding: 14px 26px; border-radius: 999px; background: var(--flare); color: #ffffff; }
+  .acts .btn.ghost { background: transparent; color: var(--red110); box-shadow: inset 0 0 0 1px var(--stone-mid); }
+  .acts .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .acts .btn:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  .blocked { width: 100%; margin: 0 0 4px; font-size: 13px; color: var(--ember); }
+
+  /* ---------- results ---------- */
+
+  .b-results { max-width: 1200px; margin: 0 auto; }
+  .sample-flag {
+    display: inline-block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    font-weight: 500; padding: 7px 14px; border-radius: 999px;
+    background: var(--blush); color: var(--ember);
+  }
+  .pricedon { display: flex; flex-wrap: wrap; gap: 8px 30px; margin: 22px 0 0; padding: 16px 20px; font-size: 14px; background: var(--stonelight); border-radius: var(--radius-chip); }
+  .pricedon > div { display: flex; gap: 8px; }
+  .pricedon dt { color: var(--warm-grey); }
+  .pricedon dd { margin: 0; font-weight: 500; }
+
+  .cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 26px; align-items: stretch; }
+  .col {
+    border: 1px solid var(--stone-mid); border-radius: var(--radius-panel);
+    background: var(--paper); padding: 24px; display: flex; flex-direction: column;
+  }
+  .col h3 { font-size: 20px; line-height: 1.1; }
+  .col .strategy { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #6B4A3E; }
+  .col .tar { margin: 16px 0 0; font-size: 14px; }
+  .col .tar .cap, .col .bill .cap { display: block; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--warm-grey); margin-bottom: 3px; }
+  .col .bill { margin: 18px 0 0; }
+  .col .bill .amt { font-family: var(--font-display); font-weight: 500; font-size: 34px; }
+  .col .diff { margin: 10px 0 0; font-size: 13px; line-height: 1.45; color: #6B4A3E; }
+  .col .diff.more { color: var(--ember); }
+  .col .month { margin: 16px 0 0; font-size: 13px; color: #6B4A3E; }
+  .col .month b { font-weight: 500; color: var(--red110); }
+  .col .foot { margin-top: auto; padding-top: 18px; }
+  .col .foot .linkbtn { font-size: 14px; }
+  .col.ref { background: var(--stonelight); }
+
+  .chart { margin-top: 40px; }
+  .chart h3 { font-size: 22px; }
+  .chart .cap { margin: 8px 0 18px; font-size: 14px; color: #6B4A3E; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart .bar { fill: var(--stone-mid); }
+  .chart .bar.gryd { fill: var(--flare); }
+  .chart .lbl { font-size: 12px; fill: #6B4A3E; font-family: "DM Sans", sans-serif; }
+  .chart .amt { font-size: 13px; fill: var(--red110); font-weight: 500; font-family: "DM Sans", sans-serif; }
+
+  .working { margin-top: 26px; border: 1px solid var(--stone-mid); border-radius: var(--radius-panel); padding: 30px; background: var(--stonelight); }
+  .working > .cap { display: block; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; color: var(--warm-grey); }
+  .working h3 { font-size: 26px; margin-top: 10px; outline: none; }
+  .working h4 { font-size: 18px; margin-top: 32px; }
+  .working .bnote { margin: 10px 0 0; font-size: 14px; line-height: 1.55; color: #6B4A3E; max-width: 76ch; }
+  .working .frows { margin-top: 14px; background: var(--paper); border-radius: var(--radius-chip); padding: 2px 18px; }
+  .frow { border-bottom: 1px solid var(--stonelight); }
+  .frow:last-child { border-bottom: 0; }
+  .frow > summary {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 13px 0; font-size: 14px; cursor: pointer; list-style: none;
+  }
+  .frow > summary::-webkit-details-marker { display: none; }
+  .frow > summary::after { content: "+"; color: var(--warm-grey); font-size: 16px; margin-left: 4px; }
+  .frow[open] > summary::after { content: "\2212"; }
+  .frow > summary:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; border-radius: 4px; }
+  .frow .fv { font-weight: 500; margin-left: auto; }
+  .frow .fbody { padding: 0 0 14px; }
+  .frow .fbody p { margin: 0 0 8px; font-size: 13px; line-height: 1.55; color: #6B4A3E; max-width: 76ch; }
+  .frow .fbody b { color: var(--red110); font-weight: 500; }
+  .working > .linkbtn { margin-top: 26px; }
+
+  .subs { margin-top: 30px; background: var(--blush); border-radius: var(--radius-panel); padding: 30px; }
+  .subs h3 { font-size: 24px; margin-top: 10px; }
+  .subs p { margin: 12px 0 0; font-size: 14px; color: #6B4A3E; max-width: 74ch; }
+  .subs .fee { font-family: var(--font-display); font-weight: 500; font-size: 34px; margin-top: 16px; }
+  .subs .rows { margin: 18px 0 0; background: var(--paper); border-radius: var(--radius-chip); padding: 4px 18px; }
+  .subs .rows > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--stonelight); }
+  .subs .rows > div:last-child { border-bottom: 0; }
+  .subs .rows dt { font-size: 14px; }
+  .subs .rows dd { margin: 0; font-size: 14px; font-weight: 500; }
+  .subs .rows dd.calc { width: 100%; font-weight: 400; font-size: 13px; color: #6B4A3E; margin-top: 3px; }
+
+  .vers { margin-top: 30px; font-size: 13px; color: var(--warm-grey); max-width: 74ch; }
+
+  @media (max-width: 1080px) { .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 620px) {
+    .cols { grid-template-columns: 1fr; }
+    .fld .suffixed input { max-width: none; }
+    .steps li { font-size: 11px; padding: 6px 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- the shared pill nav, the same one every other page in the tree carries -->
+<script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="g-page">
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="eyebrow">Battery modelling</span>
+    <h1>Four priced years for one plot, before it is committed.</h1>
+    <p class="stand">The plot with no solar and no battery, with solar only, with solar and a battery on a time of use tariff, and with solar and a battery run by Gryd on a dynamic tariff. Each on the tariff it would actually be sold on.</p>
+  </header>
+
+  <ol class="steps" id="steps">
+    <li data-step="1" aria-current="step">1 &middot; Site and home</li>
+    <li data-step="2">2 &middot; Electricity use</li>
+    <li data-step="3">3 &middot; Check everything</li>
+    <li data-step="4">4 &middot; Four priced years</li>
+  </ol>
+
+  <div class="b-form">
+
+    <!-- Step 1 -->
+    <section class="b-step on" id="step1" aria-labelledby="h-site">
+      <div class="b-head">
+        <span class="label-caps">Step 1 of 4 &middot; Site and home</span>
+        <h2 id="h-site">Site and home</h2>
+        <p class="lede">Where the plot is and what is being built on it. The year&rsquo;s electricity use, the roof headroom and the pack that gets quoted all follow from these answers. Every question is needed unless it says optional.</p>
+      </div>
+
+      <div class="fld">
+        <label for="postcode">Site postcode</label>
+        <input type="text" id="postcode" placeholder="NG1 1AA" autocomplete="postal-code" aria-describedby="postcode-note">
+        <p class="err" id="postcode-err" hidden></p>
+        <p class="note" id="postcode-note">Priced on frozen region M data. Supported areas: DE, LE, LN, NG, NN. Only the area letters leave the browser.</p>
+      </div>
+
+      <div class="fld">
+        <label for="reference">Plot or house type reference</label>
+        <input type="text" id="reference" maxlength="60">
+        <p class="help">Optional. Labels this run so a printed page can be told from another. Up to 60 characters, and it is never sent to the service.</p>
+      </div>
+
+      <div class="fld">
+        <fieldset>
+          <legend>Tenure</legend>
+          <div class="choices" id="tenure"></div>
+        </fieldset>
+        <p class="note">Recorded for the record. No figure in the result changes with tenure.</p>
+      </div>
+
+      <div class="fld">
+        <fieldset>
+          <legend>Property type</legend>
+          <div class="choices" id="property"></div>
+        </fieldset>
+        <p class="note">The built form scales the year&rsquo;s modelled use and proposes the array size on the check screen. Both are stated assumptions, and the working for each is on the screen that uses it.</p>
+      </div>
+
+      <div class="fld">
+        <p class="lab" id="bedrooms-label">Bedrooms</p>
+        <div class="stepper">
+          <button type="button" id="beds-down" aria-label="Fewer bedrooms">&minus;</button>
+          <span class="val" id="beds-value" aria-live="polite">3</span>
+          <button type="button" id="beds-up" aria-label="More bedrooms">+</button>
+        </div>
+        <p class="help">1 to 6. The count sets the year&rsquo;s modelled use and prefills the battery capacity on the check screen.</p>
+      </div>
+
+      <div class="fld">
+        <label for="gfa">Ground floor area</label>
+        <div class="suffixed">
+          <input type="number" id="gfa" min="0" max="1000" step="1">
+          <span class="unit">m2</span>
+        </div>
+        <p class="err" id="gfa-err" hidden></p>
+        <p class="help">Optional. Recorded on the result and used in no calculation: the modelled basis works from the bedroom count and the built form, and a SAP basis brings its own floor area.</p>
+      </div>
+
+      <div class="acts">
+        <p class="blocked" id="blocked1" hidden></p>
+        <button type="button" class="btn" id="go1">Continue</button>
+      </div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="b-step" id="step2" aria-labelledby="h-use">
+      <div class="b-head">
+        <span class="label-caps">Step 2 of 4 &middot; Electricity use</span>
+        <h2 id="h-use">Electricity use</h2>
+        <p class="lede">One figure for the year. All four columns are priced on it, so the way it was arrived at is printed in full rather than summarised.</p>
+      </div>
+
+      <div class="fld">
+        <fieldset>
+          <legend>How the year&rsquo;s use is arrived at</legend>
+          <div class="choices" id="basis"></div>
+        </fieldset>
+      </div>
+
+      <div id="modelled-note">
+        <p class="note">Every plot here is assumed to have a heat pump, so the heat pump ladder is the only one used. The ladder sets the year&rsquo;s total; the half hourly shape underneath is Elexon Profile Class 1, which carries no heating season.</p>
+      </div>
+
+      <div id="sap-fields" hidden>
+        <p class="note">DPER is the delivered energy rate for regulated energy only: space heating, hot water, ventilation, pumps, fans and fixed lighting. Appliances, cooking and everything else a household plugs in are outside it, which is what the unregulated figure below is for.</p>
+        <div class="fld">
+          <label for="sap-dper">Delivered energy rate (DPER)</label>
+          <div class="suffixed">
+            <input type="number" id="sap-dper" min="0" max="500" step="0.1">
+            <span class="unit">kWh/m2</span>
+          </div>
+          <p class="help">From the plot&rsquo;s SAP assessment, in kWh per square metre per year.</p>
+        </div>
+        <div class="fld">
+          <label for="sap-area">SAP floor area</label>
+          <div class="suffixed">
+            <input type="number" id="sap-area" min="0" max="1000" step="1">
+            <span class="unit">m2</span>
+          </div>
+          <p class="help">The floor area the assessment used, not the ground floor area recorded on screen one.</p>
+        </div>
+        <div class="fld">
+          <label for="sap-unreg">Unregulated energy</label>
+          <div class="suffixed">
+            <input type="number" id="sap-unreg" min="0" max="15000" step="1">
+            <span class="unit">kWh</span>
+          </div>
+          <p class="help">The year&rsquo;s allowance for everything the SAP assessment does not cover.</p>
+        </div>
+      </div>
+
+      <div id="demand-panel"></div>
+
+      <div class="acts">
+        <p class="blocked" id="blocked2" hidden></p>
+        <button type="button" class="btn" id="go2">Continue</button>
+        <button type="button" class="btn ghost" id="back2">Back</button>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="b-step" id="step3" aria-labelledby="h-check">
+      <div class="b-head">
+        <span class="label-caps">Step 3 of 4 &middot; Check everything</span>
+        <h2 id="h-check">Check everything</h2>
+        <p class="lede">Everything the four columns will be priced on. Nothing has been run yet, so change anything here before pricing.</p>
+      </div>
+
+      <div class="sec-head">
+        <h3>Site and home</h3>
+        <button type="button" class="linkbtn" id="edit-site">Edit</button>
+      </div>
+      <dl class="echo" id="echo-site"></dl>
+      <p class="help">Only the postcode area is sent. Tenure and the ground floor area are recorded and enter no calculation.</p>
+
+      <div class="sec-head">
+        <h3>Electricity use</h3>
+        <button type="button" class="linkbtn" id="edit-use">Edit</button>
+      </div>
+      <div id="demand-panel-check"></div>
+      <div class="sec-head"><h3 id="h-ev">Electric car</h3></div>
+      <p class="note">The engine models no vehicle. Turning this on adds a stated number of kWh to the year&rsquo;s total, spread across the existing half hourly shape. It is an assumption about how the plot will be used, not a modelled charging pattern.</p>
+      <div class="fld">
+        <label class="toggle" for="ev-on">
+          <input type="checkbox" id="ev-on">
+          <span>Add an electric car</span>
+        </label>
+      </div>
+      <div class="fld" id="ev-field" hidden>
+        <label for="ev-kwh">Extra annual use</label>
+        <div class="suffixed">
+          <input type="number" id="ev-kwh" min="0" max="10000" step="10">
+          <span class="unit">kWh</span>
+        </div>
+        <p class="err" id="ev-err" hidden></p>
+        <p class="help">An assumption, typically 1,500 to 3,500 kWh a year. Required while the car is on.</p>
+      </div>
+
+
+      <div class="sec-head"><h3>The system being priced</h3></div>
+
+      <div class="fld">
+        <label for="pv-kwp">Array size</label>
+        <div class="suffixed">
+          <input type="number" id="pv-kwp" min="0" max="20" step="0.1">
+          <span class="unit">kWp</span>
+        </div>
+        <p class="err" id="pv-err" hidden></p>
+        <p class="help" id="pv-help"></p>
+      </div>
+
+      <div class="fld">
+        <label for="batt-kwh">Battery capacity</label>
+        <div class="suffixed">
+          <input type="number" id="batt-kwh" min="2" max="20" step="0.01">
+          <span class="unit">kWh</span>
+        </div>
+        <p class="err" id="batt-err" hidden></p>
+        <p class="help" id="batt-help"></p>
+      </div>
+
+      <div class="fld">
+        <label for="inv-kw">Inverter</label>
+        <div class="suffixed">
+          <input type="number" id="inv-kw" min="3.7" max="6" step="0.1">
+          <span class="unit">kW</span>
+        </div>
+        <p class="err" id="inv-err" hidden></p>
+        <p class="help" id="inv-help"></p>
+      </div>
+
+      <div class="sec-head"><h3>Tariffs</h3></div>
+      <div class="tscroll">
+        <table class="tariffs">
+          <caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">The three tariffs the four columns are priced on. Read only.</caption>
+          <thead>
+            <tr><th scope="col">Tariff</th><th scope="col">Import price</th><th scope="col">Standing charge</th><th scope="col">Export price</th></tr>
+          </thead>
+          <tbody id="tariff-rows"></tbody>
+        </table>
+      </div>
+      <p class="note" id="tariff-note"></p>
+
+      <div class="acts">
+        <p class="blocked" id="blocked3" hidden></p>
+        <button type="button" class="btn" id="go3">Price the four options</button>
+        <button type="button" class="btn ghost" id="back3">Back</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Step 4. Sample output, live calculation coming: every figure below is a
+       captured response from the frozen engine for one of three representative
+       plots, not a run of the answers typed above. The banner says so on screen. -->
+  <section class="b-step b-results" id="step4" aria-labelledby="h-results">
+    <div class="b-head">
+      <span class="label-caps">Step 4 of 4 &middot; Four priced years</span>
+      <h2 id="h-results">Four priced years</h2>
+      <p class="lede" id="bill-basis"></p>
+      <p style="margin-top:18px"><span class="sample-flag">Sample output, live calculation coming</span></p>
+      <p class="help" id="sample-note" style="max-width:74ch"></p>
+    </div>
+
+    <dl class="pricedon" id="pricedon"></dl>
+    <div class="cols" id="cols"></div>
+    <p class="help" id="diff-note" style="max-width:80ch;margin-top:22px"></p>
+
+    <div class="chart">
+      <h3>Annual bill, the four columns side by side</h3>
+      <p class="cap">Bars are the annual bill of each column, on its own tariff. Sample figures.</p>
+      <div id="chart"></div>
+    </div>
+
+    <div class="working" id="working" hidden></div>
+
+    <div class="subs" id="subs"></div>
+
+    <p class="vers" id="vers"></p>
+
+    <div class="acts">
+      <button type="button" class="btn ghost" id="back4">Back to the check screen</button>
+      <button type="button" class="btn ghost" id="restart">Start again</button>
+    </div>
+  </section>
+
+  <div class="g-close">
+    <h2>Want this run on a real scheme?</h2>
+    <p>Send us the house types and we will price every plot on them.</p>
+    <a class="btn" href="tools.html">Back to all tools</a>
+  </div>
+
+</div>
+</div>
+
+<!-- the canonical footer, generated from the homepage's own -->
+<script src="../../home-final/assets/site-footer.js"></script>
+
+<script>
+/* The battery modelling tool, static.
+
+   The form is the real one: the same fields, the same options, the same defaults
+   and the same bounds and messages the React app carries, with the bounds taken
+   from the frozen /meta the backend publishes.
+
+   The result screen is NOT live. It renders one of three captured responses from
+   the real engine (a four bedroom detached, a three bedroom semi and a two bedroom
+   terrace, all region M area NG, modelled basis), picked by the property type and
+   bedroom count answered above and labelled on screen as a sample. Wiring the form
+   to the service replaces SAMPLE below and nothing else. */
+
+var SAMPLE = {"cases":{"detached_4bed":{"request":{"postcode_area":"NG","property_type":"detached","bedrooms":4,"tenure":"private_sale","demand_basis":"modelled","pv_kwp":5.0,"battery_nominal_kwh":11.52,"inverter_kw":5.0},"demand":{"terms":[{"id":"demand_base_kwh","label":"Base annual use","value":2500.0,"unit":"kWh","formula":"The heat pump ladder starts at 2,500 kWh before any bedroom is counted."},{"id":"demand_per_bedroom_kwh","label":"Allowance a bedroom","value":800.0,"unit":"kWh","formula":"Each bedroom on the ladder adds 800 kWh."},{"id":"demand_bedrooms","label":"Bedrooms","value":4.0,"unit":"bedrooms","formula":"As answered."},{"id":"demand_bedroom_component_kwh","label":"Bedroom allowance","value":3200.0,"unit":"kWh","formula":"800 kWh times 4 bedrooms is 3,200 kWh."},{"id":"demand_before_multiplier_kwh","label":"Ladder total","value":5700.0,"unit":"kWh","formula":"2,500 kWh plus 3,200 kWh is 5,700 kWh."},{"id":"demand_type_multiplier","label":"Built form multiplier","value":1.05,"unit":"ratio","formula":"A detached takes a multiplier of 1.05."},{"id":"demand_before_ev_kwh","label":"Annual use before any car","value":5985.0,"unit":"kWh","formula":"5,700 kWh times 1.05 is 5,985 kWh."},{"id":"demand_ev_kwh","label":"Electric car allowance","value":0.0,"unit":"kWh","formula":"No car allowance was given."},{"id":"demand_annual_kwh","label":"Annual demand","value":5985.0,"unit":"kWh","formula":"5,985 kWh, with no car allowance to add."}],"formula":"2,500 kWh plus 800 kWh a bedroom, times the built form multiplier. Any electric car allowance is then added flat.","provenance":[{"tag":"Estimated from your home details","formula_id":"developer_demand_modelled","source_ref":"platform estimator src/lib/houseTypeBulkImport.ts:15-19, read 2026-08-04","note":"The platform's air source heat pump ladder, 2,500 kWh plus 800 kWh a bedroom, scaled by a built form multiplier. The ladder sets the year's total; the half hourly shape underneath is Elexon Profile Class 1, which carries no heating season."}]},"columns":[{"id":"no_solar_flat","title":"No solar, flat tariff","note":"No panels and no battery. Every unit the plot uses is bought at the flat rate, so this is what the other three columns are measured against.","tariff":"Flat","bill":1853.9295914999475,"billFormula":"The electricity bought, \u00a31,598.95, plus the standing charge, \u00a3254.98, is \u00a31,853.93. Nothing sold back to the grid is in this figure.","monthly":154.49413262499561,"diffAvail":"reference","diffNote":null,"diff":null,"energy_balance":[{"label":"Annual demand","value":5985.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 5,985 kWh less the year's shortfall 5,985 kWh is 0 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so nothing discharges.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":5984.999999999775,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 5,985 kWh less the 0 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":5984.999999999775,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":2.2464519133791327e-10,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No array in this configuration.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so no solar is stored.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":5984.999999999775,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":5984.999999999775,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Unit price","value":26.716,"unit":"p/kWh","rule":"pence_1dp","formula":"26.716 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":1598.9525999999473,"unit":"GBP","rule":"currency_2dp","formula":"5,985 kWh times 26.716 p is \u00a31,598.95.","prov":[{"tag":"Engine output","formula_id":"import_kwh_times_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":69.85671,"unit":"p/day","rule":"pence_1dp","formula":"69.85671 p a day on the flat tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":254.97699150000005,"unit":"GBP","rule":"currency_2dp","formula":"69.85671 p a day times 365 days is \u00a3254.98.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":1853.9295914999475,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a31,853.93.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":0.0,"unit":"GBP","rule":"currency_2dp","formula":"0 kWh times 12.0 p is \u00a30.00.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_only_flat","title":"Solar only, flat tariff","note":"Panels and nothing else. The roof serves the house first in each half hour, any surplus is exported, and anything the roof cannot cover is bought at the flat rate.","tariff":"Flat","bill":1313.1082513866145,"billFormula":"The electricity bought, \u00a31,058.13, plus the standing charge, \u00a3254.98, is \u00a31,313.11. Nothing sold back to the grid is in this figure.","monthly":109.42568761555121,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":540.821340113333,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":5985.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":2024.3350056646964,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 5,985 kWh less the year's shortfall 3,961 kWh is 2,024 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so nothing discharges.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":3960.664994335089,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 3,961 kWh less the 0 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":5984.999999999785,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":2.1464074961841106e-10,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 4,851 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so no solar is stored.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":2826.999094335298,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4851.334099999995,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":5.4569682106375694e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":3960.664994335089,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":3960.664994335089,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Unit price","value":26.716,"unit":"p/kWh","rule":"pence_1dp","formula":"26.716 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":1058.1312598866143,"unit":"GBP","rule":"currency_2dp","formula":"3,961 kWh times 26.716 p is \u00a31,058.13.","prov":[{"tag":"Engine output","formula_id":"import_kwh_times_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":69.85671,"unit":"p/day","rule":"pence_1dp","formula":"69.85671 p a day on the flat tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":254.97699150000005,"unit":"GBP","rule":"currency_2dp","formula":"69.85671 p a day times 365 days is \u00a3254.98.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":1313.1082513866145,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a31,313.11.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":2826.999094335298,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":339.23989132023695,"unit":"GBP","rule":"currency_2dp","formula":"2,827 kWh times 12.0 p is \u00a3339.24.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_battery_unoptimised_tou","title":"Solar and battery, unoptimised, time of use tariff","note":"An off the shelf clock controller on a time of use tariff. It charges from the grid inside one fixed window, 00:30 to 05:30, every night of the year and always to full, with no seasonal cap and nothing held back for the next day's sun. Solar surplus charges it at any hour there is room. It discharges to the house only outside the window. It reads the clock and never a price.","tariff":"Time of Use","bill":690.4716690662497,"billFormula":"The electricity bought, \u00a3458.92, plus the standing charge, \u00a3231.56, is \u00a3690.47. Nothing sold back to the grid is in this figure.","monthly":57.53930575552081,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":1163.4579224336978,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":5985.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":2024.3350056646964,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 5,985 kWh less the year's shortfall 3,961 kWh is 2,024 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":2985.949781072758,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that served household load, summed over the year.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":974.7152132623551,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 3,969 kWh less the 2,994 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":5984.99999999981,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":1.90084392670542e-10,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 4,851 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":363.5344764373946,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar charged into the pack, measured on the AC side before the charge leg.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":2463.4646178979096,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":3969.0195624306434,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Into the pack","value":3357.838825605683,"unit":"kWh","rule":"kwh_whole","formula":"Solar into the battery 364 kWh plus grid into the battery 2,994 kWh is 3,358 kWh, all measured on the AC side.","prov":[{"tag":"Engine output","formula_id":"throughput","source_ref":null,"note":null}],"disclosure":null},{"label":"Out of the pack","value":2985.949781072758,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that reached household load.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Round trip losses and any change in stored energy","value":371.8890445329248,"unit":"kWh","rule":"kwh_whole","formula":"3,358 kWh in less 2,986 kWh out is 372 kWh. Round trip is 0.889, a 0.9406 charge leg and a 0.9454 discharge leg. The engine does not report a closing state of charge, so the losses and the change in stored energy across the year are stated together rather than split to a tolerance.","prov":[{"tag":"System setting","formula_id":"battery_in_minus_out","source_ref":null,"note":null}],"disclosure":null},{"label":"Grid electricity into the battery","value":2994.3043491682884,"unit":"kWh","rule":"kwh_whole","formula":"Energy bought from the grid to charge the pack rather than to serve load in the same half hour.","prov":[{"tag":"Engine output","formula_id":"grid_charge_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Bought inside the window, 00:30 to 05:30","value":3582.3049005101284,"unit":"kWh","rule":"kwh_whole","formula":"Grid import in the half hours the cheap rate covers.","prov":[{"tag":"Engine output","formula_id":"import_window_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Window price","value":9.5,"unit":"p/kWh","rule":"pence_1dp","formula":"9.5 p a kWh from 00:30 to 05:30.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_offpeak_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost inside the window","value":340.31896554846224,"unit":"GBP","rule":"currency_2dp","formula":"3,582 kWh times 9.5 p is \u00a3340.32.","prov":[{"tag":"System setting","formula_id":"window_kwh_times_offpeak","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought outside the window","value":386.7146619205278,"unit":"kWh","rule":"kwh_whole","formula":"Grid import in every other half hour of the year.","prov":[{"tag":"Engine output","formula_id":"import_outside_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Outside price","value":30.668,"unit":"p/kWh","rule":"pence_1dp","formula":"30.668 p a kWh outside the window.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_peak_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost outside the window","value":118.59765251778747,"unit":"GBP","rule":"currency_2dp","formula":"387 kWh times 30.668 p is \u00a3118.60.","prov":[{"tag":"System setting","formula_id":"outside_kwh_times_peak","source_ref":null,"note":null}],"disclosure":null},{"label":"Electricity bought","value":458.91661806624967,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3340.32 inside the window plus \u00a3118.60 outside it is \u00a3458.92.","prov":[{"tag":"System setting","formula_id":"window_plus_outside_cost","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against the two priced lines","value":-5.684341886080802e-14,"unit":"kWh","rule":"kwh_3dp","formula":"The priced import less the two lines above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"import_cost_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":63.43974,"unit":"p/day","rule":"pence_1dp","formula":"63.43974 p a day on the time of use tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":231.555051,"unit":"GBP","rule":"currency_2dp","formula":"63.43974 p a day times 365 days is \u00a3231.56.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":690.4716690662497,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3690.47.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":2463.4646178979096,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":295.61575414774916,"unit":"GBP","rule":"currency_2dp","formula":"2,463 kWh times 12.0 p is \u00a3295.62.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_battery_gryd_dynamic","title":"Solar and battery, Gryd optimised, dynamic tariff","note":"The same hardware on a half hourly tariff, buying on price instead of on the clock. It charges only when buying now, after round trip losses, beats what discharging later is worth, holds its charge through cheap periods, and never exports from the pack. This is the starting strategy, not a ceiling.","tariff":"Dynamic","bill":613.9995176094286,"billFormula":"The electricity bought, \u00a3372.14, plus the standing charge, \u00a3241.86, is \u00a3614.00. Nothing sold back to the grid is in this figure.","monthly":51.16662646745238,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":1239.930073890519,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":5985.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":2024.3350056646964,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 5,985 kWh less the year's shortfall 3,961 kWh is 2,024 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":2881.140303497414,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that served household load, summed over the year.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":1079.5246908377517,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 2,539 kWh less the 1,460 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":5984.999999999862,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":1.382431946694851e-10,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 4,851 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":1780.4637310263947,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar charged into the pack, measured on the AC side before the charge leg.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":1046.5353633089132,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4851.334100000005,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":-4.547473508864641e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":2539.0366735440225,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Into the pack","value":3239.9757137326515,"unit":"kWh","rule":"kwh_whole","formula":"Solar into the battery 1,780 kWh plus grid into the battery 1,460 kWh is 3,240 kWh, all measured on the AC side.","prov":[{"tag":"Engine output","formula_id":"throughput","source_ref":null,"note":null}],"disclosure":null},{"label":"Out of the pack","value":2881.140303497414,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that reached household load.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Round trip losses and any change in stored energy","value":358.8354102352373,"unit":"kWh","rule":"kwh_whole","formula":"3,240 kWh in less 2,881 kWh out is 359 kWh. Round trip is 0.889, a 0.9406 charge leg and a 0.9454 discharge leg. The engine does not report a closing state of charge, so the losses and the change in stored energy across the year are stated together rather than split to a tolerance.","prov":[{"tag":"System setting","formula_id":"battery_in_minus_out","source_ref":null,"note":null}],"disclosure":null},{"label":"Grid electricity into the battery","value":1459.5119827062708,"unit":"kWh","rule":"kwh_whole","formula":"Energy bought from the grid to charge the pack rather than to serve load in the same half hour.","prov":[{"tag":"Engine output","formula_id":"grid_charge_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":2539.0366735440225,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":372.14040710942857,"unit":"GBP","rule":"currency_2dp","formula":"Grid import in each half hour times that half hour's price, summed over 17,520 half hours of the 2025 Agile region M series.","prov":[{"tag":"Engine output","formula_id":"import_priced_half_hourly","source_ref":null,"note":null}],"disclosure":null},{"label":"Average price achieved","value":14.656755886475237,"unit":"p/kWh","rule":"pence_1dp","formula":"\u00a3372.14 divided by 2,539 kWh is 14.66 p a kWh.","prov":[{"tag":"Published tariff assumption","formula_id":"import_cost_over_import_kwh","source_ref":null,"note":null}],"disclosure":"Derived from this run, not a rate card. A year of half hourly prices cannot be rebuilt from one rate."},{"label":"Standing charge rate","value":66.26277,"unit":"p/day","rule":"pence_1dp","formula":"66.26277 p a day on the dynamic tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":241.8591105,"unit":"GBP","rule":"currency_2dp","formula":"66.26277 p a day times 365 days is \u00a3241.86.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":613.9995176094286,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3614.00.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":1046.5353633089132,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":80.45559609956258,"unit":"GBP","rule":"currency_2dp","formula":"The exported volume priced half hour by half hour on the Agile Outgoing series.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."}]}],"referenceId":"no_solar_flat","differenceNote":"Every difference is measured against the first column, the same plot with no solar and no battery on the flat tariff. Each column carries its own tariff and the three tariffs carry different standing charges, so a difference is the whole change from moving to that configuration and its tariff together, not the effect of the hardware on its own.","billBasis":{"export_included":false,"summary":"Modelled for self use. Nothing sold back to the grid is included in this figure.","detail":"Bills are modelled for self use: the electricity bought plus the standing charge. Anything sold back to the grid is paid separately by your supplier, so it is left out of the figures shown."},"system":{"pv_kwp":5.0,"inverter_kw":5.0},"battery":{"model_name":"Fox ESS EP12","nominal_kwh":11.52,"usable_kwh":10.368},"site":{"postcode_area":"NG","property_type":"detached","bedrooms":4,"tenure":"private_sale","tenure_note":"Recorded for the record. No figure in this response changes with tenure.","ground_floor_area_m2":null,"ground_floor_area_note":null},"versions":{"engine_version":"engine-v2-2026.07.21","data_version":"tariffs-2025.2","api_version":"v1"},"subscription":{"headline":"Gryd subscription fee, indicative","indicative_note":"Indicative only, and not a quote. The fee is half the modelled difference between the first column and the Gryd column, spread over twelve months, so it moves with those two modelled bills and with nothing else. The commercial terms behind it are not settled.","monthly_fee":51.66375307877163,"basis_note":"Both bills are the electricity bought plus the standing charge on the tariff that column is sold on, with nothing sold back to the grid taken off either of them.","exclusion_note":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in.","working":[{"label":"The first column's annual bill","value":1853.9295914999475,"unit":"GBP","rule":"currency_2dp","formula":"The same plot with no solar and no battery on the flat tariff is \u00a31,853.93 a year.","prov":[{"tag":"System setting","formula_id":"reference_column_annual_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The Gryd column's annual bill","value":613.9995176094286,"unit":"GBP","rule":"currency_2dp","formula":"Solar and battery on the dynamic tariff, run on the Gryd strategy, is \u00a3614.00 a year.","prov":[{"tag":"System setting","formula_id":"gryd_column_annual_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The difference between the two","value":1239.930073890519,"unit":"GBP","rule":"currency_2dp","formula":"\u00a31,853.93 less \u00a3614.00 is \u00a31,239.93 a year.","prov":[{"tag":"System setting","formula_id":"reference_bill_minus_gryd_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The share Gryd takes","value":50.0,"unit":"%","rule":"percent_whole","formula":"Gryd takes 50 per cent of that difference and the plot keeps the other 50 per cent.","prov":[{"tag":"System setting","formula_id":"gryd_share_of_difference","source_ref":"docs/platform-calculations-reference.md section 5.6","note":"Mehdi's decision, 2026-08-11. It follows the half clawback in the platform's subscription solver, docs/platform-calculations-reference.md section 5.6, where Gryd takes half of the homeowner's surplus saving."}],"disclosure":null},{"label":"The fee for a year","value":619.9650369452595,"unit":"GBP","rule":"currency_2dp","formula":"\u00a31,239.93 times 0.5 is \u00a3619.97 a year.","prov":[{"tag":"System setting","formula_id":"difference_times_share","source_ref":null,"note":null}],"disclosure":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in."},{"label":"The fee a month","value":51.66375307877163,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3619.97 divided by 12 is \u00a351.66 a month.","prov":[{"tag":"System setting","formula_id":"annual_fee_over_12","source_ref":null,"note":null}],"disclosure":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in."}]}},"semi_3bed":{"request":{"postcode_area":"NG","property_type":"semi_detached","bedrooms":3,"tenure":"private_sale","demand_basis":"modelled","pv_kwp":5.0,"battery_nominal_kwh":11.52,"inverter_kw":5.0},"demand":{"terms":[{"id":"demand_base_kwh","label":"Base annual use","value":2500.0,"unit":"kWh","formula":"The heat pump ladder starts at 2,500 kWh before any bedroom is counted."},{"id":"demand_per_bedroom_kwh","label":"Allowance a bedroom","value":800.0,"unit":"kWh","formula":"Each bedroom on the ladder adds 800 kWh."},{"id":"demand_bedrooms","label":"Bedrooms","value":3.0,"unit":"bedrooms","formula":"As answered."},{"id":"demand_bedroom_component_kwh","label":"Bedroom allowance","value":2400.0,"unit":"kWh","formula":"800 kWh times 3 bedrooms is 2,400 kWh."},{"id":"demand_before_multiplier_kwh","label":"Ladder total","value":4900.0,"unit":"kWh","formula":"2,500 kWh plus 2,400 kWh is 4,900 kWh."},{"id":"demand_type_multiplier","label":"Built form multiplier","value":1.0,"unit":"ratio","formula":"A semi detached takes a multiplier of 1."},{"id":"demand_before_ev_kwh","label":"Annual use before any car","value":4900.0,"unit":"kWh","formula":"4,900 kWh times 1 is 4,900 kWh."},{"id":"demand_ev_kwh","label":"Electric car allowance","value":0.0,"unit":"kWh","formula":"No car allowance was given."},{"id":"demand_annual_kwh","label":"Annual demand","value":4900.0,"unit":"kWh","formula":"4,900 kWh, with no car allowance to add."}],"formula":"2,500 kWh plus 800 kWh a bedroom, times the built form multiplier. Any electric car allowance is then added flat.","provenance":[{"tag":"Estimated from your home details","formula_id":"developer_demand_modelled","source_ref":"platform estimator src/lib/houseTypeBulkImport.ts:15-19, read 2026-08-04","note":"The platform's air source heat pump ladder, 2,500 kWh plus 800 kWh a bedroom, scaled by a built form multiplier. The ladder sets the year's total; the half hourly shape underneath is Elexon Profile Class 1, which carries no heating season."}]},"columns":[{"id":"no_solar_flat","title":"No solar, flat tariff","note":"No panels and no battery. Every unit the plot uses is bought at the flat rate, so this is what the other three columns are measured against.","tariff":"Flat","bill":1564.06099149999,"billFormula":"The electricity bought, \u00a31,309.08, plus the standing charge, \u00a3254.98, is \u00a31,564.06. Nothing sold back to the grid is in this figure.","monthly":130.3384159583325,"diffAvail":"reference","diffNote":null,"diff":null,"energy_balance":[{"label":"Annual demand","value":4900.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 4,900 kWh less the year's shortfall 4,900 kWh is 0 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so nothing discharges.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":4899.999999999944,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 4,900 kWh less the 0 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4899.999999999944,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":5.638867150992155e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No array in this configuration.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so no solar is stored.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":4899.999999999944,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":4899.999999999944,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Unit price","value":26.716,"unit":"p/kWh","rule":"pence_1dp","formula":"26.716 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":1309.08399999999,"unit":"GBP","rule":"currency_2dp","formula":"4,900 kWh times 26.716 p is \u00a31,309.08.","prov":[{"tag":"Engine output","formula_id":"import_kwh_times_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":69.85671,"unit":"p/day","rule":"pence_1dp","formula":"69.85671 p a day on the flat tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":254.97699150000005,"unit":"GBP","rule":"currency_2dp","formula":"69.85671 p a day times 365 days is \u00a3254.98.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":1564.06099149999,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a31,564.06.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":0.0,"unit":"GBP","rule":"currency_2dp","formula":"0 kWh times 12.0 p is \u00a30.00.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_only_flat","title":"Solar only, flat tariff","note":"Panels and nothing else. The roof serves the house first in each half hour, any surplus is exported, and anything the roof cannot cover is bought at the flat rate.","tariff":"Flat","bill":1098.6257617311003,"billFormula":"The electricity bought, \u00a3843.65, plus the standing charge, \u00a3254.98, is \u00a31,098.63. Nothing sold back to the grid is in this figure.","monthly":91.55214681092502,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":465.4352297688897,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":4900.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":1742.159117266223,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 4,900 kWh less the year's shortfall 3,158 kWh is 1,742 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so nothing discharges.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":3157.8408827338385,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 3,158 kWh less the 0 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4900.000000000062,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":-6.184563972055912e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 4,851 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so no solar is stored.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":3109.1749827337785,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4851.334100000002,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":-1.8189894035458565e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":3157.8408827338385,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":3157.8408827338385,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Unit price","value":26.716,"unit":"p/kWh","rule":"pence_1dp","formula":"26.716 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":843.6487702311002,"unit":"GBP","rule":"currency_2dp","formula":"3,158 kWh times 26.716 p is \u00a3843.65.","prov":[{"tag":"Engine output","formula_id":"import_kwh_times_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":69.85671,"unit":"p/day","rule":"pence_1dp","formula":"69.85671 p a day on the flat tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":254.97699150000005,"unit":"GBP","rule":"currency_2dp","formula":"69.85671 p a day times 365 days is \u00a3254.98.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":1098.6257617311003,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a31,098.63.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":3109.1749827337785,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":373.1009979280538,"unit":"GBP","rule":"currency_2dp","formula":"3,109 kWh times 12.0 p is \u00a3373.10.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_battery_unoptimised_tou","title":"Solar and battery, unoptimised, time of use tariff","note":"An off the shelf clock controller on a time of use tariff. It charges from the grid inside one fixed window, 00:30 to 05:30, every night of the year and always to full, with no seasonal cap and nothing held back for the next day's sun. Solar surplus charges it at any hour there is room. It discharges to the house only outside the window. It reads the clock and never a price.","tariff":"Time of Use","bill":560.1285106941942,"billFormula":"The electricity bought, \u00a3328.57, plus the standing charge, \u00a3231.56, is \u00a3560.13. Nothing sold back to the grid is in this figure.","monthly":46.677375891182855,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":1003.9324808057958,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":4900.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":1742.159117266223,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 4,900 kWh less the year's shortfall 3,158 kWh is 1,742 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":2547.6753526497982,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that served household load, summed over the year.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":610.1655300840421,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 3,170 kWh less the 2,560 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4900.000000000063,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":-6.275513442233205e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 4,851 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":305.23431585336334,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar charged into the pack, measured on the AC side before the charge leg.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":2803.940666880422,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4851.334100000008,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":-8.185452315956354e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":3169.910146023854,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Into the pack","value":2864.9789317931754,"unit":"kWh","rule":"kwh_whole","formula":"Solar into the battery 305 kWh plus grid into the battery 2,560 kWh is 2,865 kWh, all measured on the AC side.","prov":[{"tag":"Engine output","formula_id":"throughput","source_ref":null,"note":null}],"disclosure":null},{"label":"Out of the pack","value":2547.6753526497982,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that reached household load.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Round trip losses and any change in stored energy","value":317.3035791433772,"unit":"kWh","rule":"kwh_whole","formula":"2,865 kWh in less 2,548 kWh out is 317 kWh. Round trip is 0.889, a 0.9406 charge leg and a 0.9454 discharge leg. The engine does not report a closing state of charge, so the losses and the change in stored energy across the year are stated together rather than split to a tolerance.","prov":[{"tag":"System setting","formula_id":"battery_in_minus_out","source_ref":null,"note":null}],"disclosure":null},{"label":"Grid electricity into the battery","value":2559.744615939812,"unit":"kWh","rule":"kwh_whole","formula":"Energy bought from the grid to charge the pack rather than to serve load in the same half hour.","prov":[{"tag":"Engine output","formula_id":"grid_charge_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Bought inside the window, 00:30 to 05:30","value":3040.3183290268253,"unit":"kWh","rule":"kwh_whole","formula":"Grid import in the half hours the cheap rate covers.","prov":[{"tag":"Engine output","formula_id":"import_window_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Window price","value":9.5,"unit":"p/kWh","rule":"pence_1dp","formula":"9.5 p a kWh from 00:30 to 05:30.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_offpeak_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost inside the window","value":288.8302412575484,"unit":"GBP","rule":"currency_2dp","formula":"3,040 kWh times 9.5 p is \u00a3288.83.","prov":[{"tag":"System setting","formula_id":"window_kwh_times_offpeak","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought outside the window","value":129.59181699701918,"unit":"kWh","rule":"kwh_whole","formula":"Grid import in every other half hour of the year.","prov":[{"tag":"Engine output","formula_id":"import_outside_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Outside price","value":30.668,"unit":"p/kWh","rule":"pence_1dp","formula":"30.668 p a kWh outside the window.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_peak_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost outside the window","value":39.74321843664584,"unit":"GBP","rule":"currency_2dp","formula":"130 kWh times 30.668 p is \u00a339.74.","prov":[{"tag":"System setting","formula_id":"outside_kwh_times_peak","source_ref":null,"note":null}],"disclosure":null},{"label":"Electricity bought","value":328.57345969419424,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3288.83 inside the window plus \u00a339.74 outside it is \u00a3328.57.","prov":[{"tag":"System setting","formula_id":"window_plus_outside_cost","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against the two priced lines","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"The priced import less the two lines above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"import_cost_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":63.43974,"unit":"p/day","rule":"pence_1dp","formula":"63.43974 p a day on the time of use tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":231.555051,"unit":"GBP","rule":"currency_2dp","formula":"63.43974 p a day times 365 days is \u00a3231.56.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":560.1285106941942,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3560.13.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":2803.940666880422,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":336.4728800256507,"unit":"GBP","rule":"currency_2dp","formula":"2,804 kWh times 12.0 p is \u00a3336.47.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_battery_gryd_dynamic","title":"Solar and battery, Gryd optimised, dynamic tariff","note":"The same hardware on a half hourly tariff, buying on price instead of on the clock. It charges only when buying now, after round trip losses, beats what discharging later is worth, holds its charge through cheap periods, and never exports from the pack. This is the starting strategy, not a ceiling.","tariff":"Dynamic","bill":494.58573657826787,"billFormula":"The electricity bought, \u00a3252.73, plus the standing charge, \u00a3241.86, is \u00a3494.59. Nothing sold back to the grid is in this figure.","monthly":41.21547804818899,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":1069.4752549217221,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":4900.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":1742.159117266223,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 4,900 kWh less the year's shortfall 3,158 kWh is 1,742 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":2483.344637956491,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that served household load, summed over the year.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":674.4962447773194,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 1,804 kWh less the 1,129 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4900.000000000034,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":-3.3651303965598345e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 4,851 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":1663.5924799962245,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar charged into the pack, measured on the AC side before the charge leg.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":1445.5825027375529,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":4851.3341,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":1803.5398283701911,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Into the pack","value":2792.6360635890933,"unit":"kWh","rule":"kwh_whole","formula":"Solar into the battery 1,664 kWh plus grid into the battery 1,129 kWh is 2,793 kWh, all measured on the AC side.","prov":[{"tag":"Engine output","formula_id":"throughput","source_ref":null,"note":null}],"disclosure":null},{"label":"Out of the pack","value":2483.344637956491,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that reached household load.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Round trip losses and any change in stored energy","value":309.2914256326021,"unit":"kWh","rule":"kwh_whole","formula":"2,793 kWh in less 2,483 kWh out is 309 kWh. Round trip is 0.889, a 0.9406 charge leg and a 0.9454 discharge leg. The engine does not report a closing state of charge, so the losses and the change in stored energy across the year are stated together rather than split to a tolerance.","prov":[{"tag":"System setting","formula_id":"battery_in_minus_out","source_ref":null,"note":null}],"disclosure":null},{"label":"Grid electricity into the battery","value":1129.0435835928718,"unit":"kWh","rule":"kwh_whole","formula":"Energy bought from the grid to charge the pack rather than to serve load in the same half hour.","prov":[{"tag":"Engine output","formula_id":"grid_charge_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":1803.5398283701911,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":252.72662607826786,"unit":"GBP","rule":"currency_2dp","formula":"Grid import in each half hour times that half hour's price, summed over 17,520 half hours of the 2025 Agile region M series.","prov":[{"tag":"Engine output","formula_id":"import_priced_half_hourly","source_ref":null,"note":null}],"disclosure":null},{"label":"Average price achieved","value":14.012810923429948,"unit":"p/kWh","rule":"pence_1dp","formula":"\u00a3252.73 divided by 1,804 kWh is 14.01 p a kWh.","prov":[{"tag":"Published tariff assumption","formula_id":"import_cost_over_import_kwh","source_ref":null,"note":null}],"disclosure":"Derived from this run, not a rate card. A year of half hourly prices cannot be rebuilt from one rate."},{"label":"Standing charge rate","value":66.26277,"unit":"p/day","rule":"pence_1dp","formula":"66.26277 p a day on the dynamic tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":241.8591105,"unit":"GBP","rule":"currency_2dp","formula":"66.26277 p a day times 365 days is \u00a3241.86.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":494.58573657826787,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3494.59.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":1445.5825027375529,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":110.9091821079403,"unit":"GBP","rule":"currency_2dp","formula":"The exported volume priced half hour by half hour on the Agile Outgoing series.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."}]}],"referenceId":"no_solar_flat","differenceNote":"Every difference is measured against the first column, the same plot with no solar and no battery on the flat tariff. Each column carries its own tariff and the three tariffs carry different standing charges, so a difference is the whole change from moving to that configuration and its tariff together, not the effect of the hardware on its own.","billBasis":{"export_included":false,"summary":"Modelled for self use. Nothing sold back to the grid is included in this figure.","detail":"Bills are modelled for self use: the electricity bought plus the standing charge. Anything sold back to the grid is paid separately by your supplier, so it is left out of the figures shown."},"system":{"pv_kwp":5.0,"inverter_kw":5.0},"battery":{"model_name":"Fox ESS EP12","nominal_kwh":11.52,"usable_kwh":10.368},"site":{"postcode_area":"NG","property_type":"semi_detached","bedrooms":3,"tenure":"private_sale","tenure_note":"Recorded for the record. No figure in this response changes with tenure.","ground_floor_area_m2":null,"ground_floor_area_note":null},"versions":{"engine_version":"engine-v2-2026.07.21","data_version":"tariffs-2025.2","api_version":"v1"},"subscription":{"headline":"Gryd subscription fee, indicative","indicative_note":"Indicative only, and not a quote. The fee is half the modelled difference between the first column and the Gryd column, spread over twelve months, so it moves with those two modelled bills and with nothing else. The commercial terms behind it are not settled.","monthly_fee":44.56146895507175,"basis_note":"Both bills are the electricity bought plus the standing charge on the tariff that column is sold on, with nothing sold back to the grid taken off either of them.","exclusion_note":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in.","working":[{"label":"The first column's annual bill","value":1564.06099149999,"unit":"GBP","rule":"currency_2dp","formula":"The same plot with no solar and no battery on the flat tariff is \u00a31,564.06 a year.","prov":[{"tag":"System setting","formula_id":"reference_column_annual_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The Gryd column's annual bill","value":494.58573657826787,"unit":"GBP","rule":"currency_2dp","formula":"Solar and battery on the dynamic tariff, run on the Gryd strategy, is \u00a3494.59 a year.","prov":[{"tag":"System setting","formula_id":"gryd_column_annual_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The difference between the two","value":1069.4752549217221,"unit":"GBP","rule":"currency_2dp","formula":"\u00a31,564.06 less \u00a3494.59 is \u00a31,069.48 a year.","prov":[{"tag":"System setting","formula_id":"reference_bill_minus_gryd_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The share Gryd takes","value":50.0,"unit":"%","rule":"percent_whole","formula":"Gryd takes 50 per cent of that difference and the plot keeps the other 50 per cent.","prov":[{"tag":"System setting","formula_id":"gryd_share_of_difference","source_ref":"docs/platform-calculations-reference.md section 5.6","note":"Mehdi's decision, 2026-08-11. It follows the half clawback in the platform's subscription solver, docs/platform-calculations-reference.md section 5.6, where Gryd takes half of the homeowner's surplus saving."}],"disclosure":null},{"label":"The fee for a year","value":534.7376274608611,"unit":"GBP","rule":"currency_2dp","formula":"\u00a31,069.48 times 0.5 is \u00a3534.74 a year.","prov":[{"tag":"System setting","formula_id":"difference_times_share","source_ref":null,"note":null}],"disclosure":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in."},{"label":"The fee a month","value":44.56146895507175,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3534.74 divided by 12 is \u00a344.56 a month.","prov":[{"tag":"System setting","formula_id":"annual_fee_over_12","source_ref":null,"note":null}],"disclosure":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in."}]}},"terraced_2bed":{"request":{"postcode_area":"NG","property_type":"terraced","bedrooms":2,"tenure":"rental","demand_basis":"modelled","pv_kwp":4.0,"battery_nominal_kwh":5.76,"inverter_kw":5.0},"demand":{"terms":[{"id":"demand_base_kwh","label":"Base annual use","value":2500.0,"unit":"kWh","formula":"The heat pump ladder starts at 2,500 kWh before any bedroom is counted."},{"id":"demand_per_bedroom_kwh","label":"Allowance a bedroom","value":800.0,"unit":"kWh","formula":"Each bedroom on the ladder adds 800 kWh."},{"id":"demand_bedrooms","label":"Bedrooms","value":2.0,"unit":"bedrooms","formula":"As answered."},{"id":"demand_bedroom_component_kwh","label":"Bedroom allowance","value":1600.0,"unit":"kWh","formula":"800 kWh times 2 bedrooms is 1,600 kWh."},{"id":"demand_before_multiplier_kwh","label":"Ladder total","value":4100.0,"unit":"kWh","formula":"2,500 kWh plus 1,600 kWh is 4,100 kWh."},{"id":"demand_type_multiplier","label":"Built form multiplier","value":0.95,"unit":"ratio","formula":"A terraced takes a multiplier of 0.95."},{"id":"demand_before_ev_kwh","label":"Annual use before any car","value":3895.0,"unit":"kWh","formula":"4,100 kWh times 0.95 is 3,895 kWh."},{"id":"demand_ev_kwh","label":"Electric car allowance","value":0.0,"unit":"kWh","formula":"No car allowance was given."},{"id":"demand_annual_kwh","label":"Annual demand","value":3895.0,"unit":"kWh","formula":"3,895 kWh, with no car allowance to add."}],"formula":"2,500 kWh plus 800 kWh a bedroom, times the built form multiplier. Any electric car allowance is then added flat.","provenance":[{"tag":"Estimated from your home details","formula_id":"developer_demand_modelled","source_ref":"platform estimator src/lib/houseTypeBulkImport.ts:15-19, read 2026-08-04","note":"The platform's air source heat pump ladder, 2,500 kWh plus 800 kWh a bedroom, scaled by a built form multiplier. The ladder sets the year's total; the half hourly shape underneath is Elexon Profile Class 1, which carries no heating season."}]},"columns":[{"id":"no_solar_flat","title":"No solar, flat tariff","note":"No panels and no battery. Every unit the plot uses is bought at the flat rate, so this is what the other three columns are measured against.","tariff":"Flat","bill":1295.5651915000471,"billFormula":"The electricity bought, \u00a31,040.59, plus the standing charge, \u00a3254.98, is \u00a31,295.57. Nothing sold back to the grid is in this figure.","monthly":107.96376595833726,"diffAvail":"reference","diffNote":null,"diff":null,"energy_balance":[{"label":"Annual demand","value":3895.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 3,895 kWh less the year's shortfall 3,895 kWh is 0 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so nothing discharges.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":3895.0000000001255,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 3,895 kWh less the 0 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3895.0000000001255,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":-1.255102688446641e-10,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No array in this configuration.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so no solar is stored.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":3895.0000000001255,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":3895.0000000001255,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Unit price","value":26.716,"unit":"p/kWh","rule":"pence_1dp","formula":"26.716 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":1040.5882000000472,"unit":"GBP","rule":"currency_2dp","formula":"3,895 kWh times 26.716 p is \u00a31,040.59.","prov":[{"tag":"Engine output","formula_id":"import_kwh_times_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":69.85671,"unit":"p/day","rule":"pence_1dp","formula":"69.85671 p a day on the flat tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":254.97699150000005,"unit":"GBP","rule":"currency_2dp","formula":"69.85671 p a day times 365 days is \u00a3254.98.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":1295.5651915000471,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a31,295.57.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":0.0,"unit":"GBP","rule":"currency_2dp","formula":"0 kWh times 12.0 p is \u00a30.00.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_only_flat","title":"Solar only, flat tariff","note":"Panels and nothing else. The roof serves the house first in each half hour, any surplus is exported, and anything the roof cannot cover is bought at the flat rate.","tariff":"Flat","bill":925.046973367311,"billFormula":"The electricity bought, \u00a3670.07, plus the standing charge, \u00a3254.98, is \u00a3925.05. Nothing sold back to the grid is in this figure.","monthly":77.08724778060925,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":370.51821813273614,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":3895.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":1386.8775944479435,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 3,895 kWh less the year's shortfall 2,508 kWh is 1,387 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so nothing discharges.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":2508.122405552002,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 2,508 kWh less the 0 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3894.9999999999454,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":5.4569682106375694e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":3881.06728,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 3,881 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":0.0,"unit":"kWh","rule":"kwh_whole","formula":"No battery in this configuration, so no solar is stored.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":2494.1896855520586,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3881.067280000002,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":-1.8189894035458565e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":2508.122405552002,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":2508.122405552002,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Unit price","value":26.716,"unit":"p/kWh","rule":"pence_1dp","formula":"26.716 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":670.069981867311,"unit":"GBP","rule":"currency_2dp","formula":"2,508 kWh times 26.716 p is \u00a3670.07.","prov":[{"tag":"Engine output","formula_id":"import_kwh_times_flat_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":69.85671,"unit":"p/day","rule":"pence_1dp","formula":"69.85671 p a day on the flat tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":254.97699150000005,"unit":"GBP","rule":"currency_2dp","formula":"69.85671 p a day times 365 days is \u00a3254.98.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":925.046973367311,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3925.05.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":2494.1896855520586,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":299.3027622662468,"unit":"GBP","rule":"currency_2dp","formula":"2,494 kWh times 12.0 p is \u00a3299.30.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_battery_unoptimised_tou","title":"Solar and battery, unoptimised, time of use tariff","note":"An off the shelf clock controller on a time of use tariff. It charges from the grid inside one fixed window, 00:30 to 05:30, every night of the year and always to full, with no seasonal cap and nothing held back for the next day's sun. Solar surplus charges it at any hour there is room. It discharges to the house only outside the window. It reads the clock and never a price.","tariff":"Time of Use","bill":555.5745796963918,"billFormula":"The electricity bought, \u00a3324.02, plus the standing charge, \u00a3231.56, is \u00a3555.57. Nothing sold back to the grid is in this figure.","monthly":46.29788164136598,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":739.9906118036554,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":3895.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":1386.8775944479435,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 3,895 kWh less the year's shortfall 2,508 kWh is 1,387 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":1707.5248710264004,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that served household load, summed over the year.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":800.5975345256024,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 2,478 kWh less the 1,677 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3894.9999999999463,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":5.3660187404602766e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":3881.06728,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 3,881 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":242.81621411768037,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar charged into the pack, measured on the AC side before the charge leg.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":2251.373471434384,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3881.067280000008,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":-7.73070496506989e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":2477.9721233355845,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Into the pack","value":1920.1908029276624,"unit":"kWh","rule":"kwh_whole","formula":"Solar into the battery 243 kWh plus grid into the battery 1,677 kWh is 1,920 kWh, all measured on the AC side.","prov":[{"tag":"Engine output","formula_id":"throughput","source_ref":null,"note":null}],"disclosure":null},{"label":"Out of the pack","value":1707.5248710264004,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that reached household load.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Round trip losses and any change in stored energy","value":212.66593190126196,"unit":"kWh","rule":"kwh_whole","formula":"1,920 kWh in less 1,708 kWh out is 213 kWh. Round trip is 0.889, a 0.9406 charge leg and a 0.9454 discharge leg. The engine does not report a closing state of charge, so the losses and the change in stored energy across the year are stated together rather than split to a tolerance.","prov":[{"tag":"System setting","formula_id":"battery_in_minus_out","source_ref":null,"note":null}],"disclosure":null},{"label":"Grid electricity into the battery","value":1677.374588809982,"unit":"kWh","rule":"kwh_whole","formula":"Energy bought from the grid to charge the pack rather than to serve load in the same half hour.","prov":[{"tag":"Engine output","formula_id":"grid_charge_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Bought inside the window, 00:30 to 05:30","value":2059.358286508661,"unit":"kWh","rule":"kwh_whole","formula":"Grid import in the half hours the cheap rate covers.","prov":[{"tag":"Engine output","formula_id":"import_window_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Window price","value":9.5,"unit":"p/kWh","rule":"pence_1dp","formula":"9.5 p a kWh from 00:30 to 05:30.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_offpeak_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost inside the window","value":195.63903721832278,"unit":"GBP","rule":"currency_2dp","formula":"2,059 kWh times 9.5 p is \u00a3195.64.","prov":[{"tag":"System setting","formula_id":"window_kwh_times_offpeak","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought outside the window","value":418.61383682688495,"unit":"kWh","rule":"kwh_whole","formula":"Grid import in every other half hour of the year.","prov":[{"tag":"Engine output","formula_id":"import_outside_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Outside price","value":30.668,"unit":"p/kWh","rule":"pence_1dp","formula":"30.668 p a kWh outside the window.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_peak_rate","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost outside the window","value":128.38049147806908,"unit":"GBP","rule":"currency_2dp","formula":"419 kWh times 30.668 p is \u00a3128.38.","prov":[{"tag":"System setting","formula_id":"outside_kwh_times_peak","source_ref":null,"note":null}],"disclosure":null},{"label":"Electricity bought","value":324.01952869639183,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3195.64 inside the window plus \u00a3128.38 outside it is \u00a3324.02.","prov":[{"tag":"System setting","formula_id":"window_plus_outside_cost","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against the two priced lines","value":0.0,"unit":"kWh","rule":"kwh_3dp","formula":"The priced import less the two lines above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"import_cost_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge rate","value":63.43974,"unit":"p/day","rule":"pence_1dp","formula":"63.43974 p a day on the time of use tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":231.555051,"unit":"GBP","rule":"currency_2dp","formula":"63.43974 p a day times 365 days is \u00a3231.56.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":555.5745796963918,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3555.57.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":2251.373471434384,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":270.1648165721261,"unit":"GBP","rule":"currency_2dp","formula":"2,251 kWh times 12.0 p is \u00a3270.16.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."},{"label":"Export price","value":12.0,"unit":"p/kWh","rule":"pence_1dp","formula":"12.0 p a kWh, the same price in every half hour.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_export_rate","source_ref":null,"note":null}],"disclosure":null}]},{"id":"solar_battery_gryd_dynamic","title":"Solar and battery, Gryd optimised, dynamic tariff","note":"The same hardware on a half hourly tariff, buying on price instead of on the clock. It charges only when buying now, after round trip losses, beats what discharging later is worth, holds its charge through cheap periods, and never exports from the pack. This is the starting strategy, not a ceiling.","tariff":"Dynamic","bill":485.11876274830104,"billFormula":"The electricity bought, \u00a3243.26, plus the standing charge, \u00a3241.86, is \u00a3485.12. Nothing sold back to the grid is in this figure.","monthly":40.42656356235842,"diffAvail":"measured","diffNote":null,"diff":{"category":"less","abs_value":810.4464287517461,"phrase":"{amount} less per year"},"energy_balance":[{"label":"Annual demand","value":3895.0,"unit":"kWh","rule":"kwh_whole","formula":"The year's electricity use, derived on the demand basis shown above. Every column is priced on this same figure.","prov":[{"tag":"System setting","formula_id":"demand_annual_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar used straight from the roof","value":1386.8775944479435,"unit":"kWh","rule":"kwh_whole","formula":"Annual demand 3,895 kWh less the year's shortfall 2,508 kWh is 1,387 kWh. The shortfall is what the roof could not cover in the half hour it was needed, summed over 17,520 half hours.","prov":[{"tag":"System setting","formula_id":"annual_kwh_minus_shortfall","source_ref":null,"note":null}],"disclosure":null},{"label":"Battery discharge to load","value":1628.9832711768843,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that served household load, summed over the year.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Bought from the grid and used by the home","value":879.1391343751088,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import 1,517 kWh less the 638 kWh that charged the battery.","prov":[{"tag":"System setting","formula_id":"import_minus_grid_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3894.999999999937,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus battery discharge to load, plus the import the home used.","prov":[{"tag":"System setting","formula_id":"demand_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual demand","value":6.320988177321851e-11,"unit":"kWh","rule":"kwh_3dp","formula":"Annual demand less the three terms above. Printed even at zero, because a residual shown only when it is not zero cannot be trusted when it is absent.","prov":[{"tag":"System setting","formula_id":"demand_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual roof output","value":3881.06728,"unit":"kWh","rule":"kwh_whole","formula":"The array's year, 3,881 kWh.","prov":[{"tag":"System setting","formula_id":"pv_kwp_times_annual_yield","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar sent into the battery","value":1193.7838164937082,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar charged into the pack, measured on the AC side before the charge leg.","prov":[{"tag":"Engine output","formula_id":"solar_charge_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Solar exported","value":1300.4058690583536,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property, summed over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"The three above, added","value":3881.0672800000048,"unit":"kWh","rule":"kwh_whole","formula":"Solar used straight from the roof, plus solar sent into the battery, plus solar exported.","prov":[{"tag":"System setting","formula_id":"roof_identity_sum","source_ref":null,"note":null}],"disclosure":null},{"label":"Residual against annual roof output","value":-4.547473508864641e-12,"unit":"kWh","rule":"kwh_3dp","formula":"Annual roof output less the three terms above. Printed even at zero.","prov":[{"tag":"System setting","formula_id":"roof_identity_residual","source_ref":null,"note":null}],"disclosure":null},{"label":"Total grid import","value":1517.2224540576851,"unit":"kWh","rule":"kwh_whole","formula":"Everything bought from the grid over the year, which is the volume the bill is priced on. It is the import the home used plus anything the grid put into the battery.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Into the pack","value":1831.8671361762865,"unit":"kWh","rule":"kwh_whole","formula":"Solar into the battery 1,194 kWh plus grid into the battery 638 kWh is 1,832 kWh, all measured on the AC side.","prov":[{"tag":"Engine output","formula_id":"throughput","source_ref":null,"note":null}],"disclosure":null},{"label":"Out of the pack","value":1628.9832711768843,"unit":"kWh","rule":"kwh_whole","formula":"The battery energy that reached household load.","prov":[{"tag":"Engine output","formula_id":"discharge_to_load_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Round trip losses and any change in stored energy","value":202.88386499940225,"unit":"kWh","rule":"kwh_whole","formula":"1,832 kWh in less 1,629 kWh out is 203 kWh. Round trip is 0.889, a 0.9406 charge leg and a 0.9454 discharge leg. The engine does not report a closing state of charge, so the losses and the change in stored energy across the year are stated together rather than split to a tolerance.","prov":[{"tag":"System setting","formula_id":"battery_in_minus_out","source_ref":null,"note":null}],"disclosure":null},{"label":"Grid electricity into the battery","value":638.0833196825763,"unit":"kWh","rule":"kwh_whole","formula":"Energy bought from the grid to charge the pack rather than to serve load in the same half hour.","prov":[{"tag":"Engine output","formula_id":"grid_charge_kwh","source_ref":null,"note":null}],"disclosure":null}],"bill_build_up":[{"label":"Electricity bought","value":1517.2224540576851,"unit":"kWh","rule":"kwh_whole","formula":"Total grid import over the year.","prov":[{"tag":"Engine output","formula_id":"import_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Cost of the electricity bought","value":243.25965224830105,"unit":"GBP","rule":"currency_2dp","formula":"Grid import in each half hour times that half hour's price, summed over 17,520 half hours of the 2025 Agile region M series.","prov":[{"tag":"Engine output","formula_id":"import_priced_half_hourly","source_ref":null,"note":null}],"disclosure":null},{"label":"Average price achieved","value":16.033222524338694,"unit":"p/kWh","rule":"pence_1dp","formula":"\u00a3243.26 divided by 1,517 kWh is 16.03 p a kWh.","prov":[{"tag":"Published tariff assumption","formula_id":"import_cost_over_import_kwh","source_ref":null,"note":null}],"disclosure":"Derived from this run, not a rate card. A year of half hourly prices cannot be rebuilt from one rate."},{"label":"Standing charge rate","value":66.26277,"unit":"p/day","rule":"pence_1dp","formula":"66.26277 p a day on the dynamic tariff, region M 2025 vintage.","prov":[{"tag":"Published tariff assumption","formula_id":"tariff_standing_charge","source_ref":null,"note":null}],"disclosure":null},{"label":"Standing charge","value":241.8591105,"unit":"GBP","rule":"currency_2dp","formula":"66.26277 p a day times 365 days is \u00a3241.86.","prov":[{"tag":"Engine output","formula_id":"standing_p_times_365","source_ref":null,"note":null}],"disclosure":null},{"label":"Annual bill","value":485.11876274830104,"unit":"GBP","rule":"currency_2dp","formula":"The electricity bought plus the standing charge is \u00a3485.12.","prov":[{"tag":"Engine output","formula_id":"import_plus_standing","source_ref":null,"note":null}],"disclosure":null}],"export":[{"label":"Sold back to the grid","value":1300.4058690583536,"unit":"kWh","rule":"kwh_whole","formula":"Surplus solar that left the property over the year.","prov":[{"tag":"Engine output","formula_id":"export_kwh","source_ref":null,"note":null}],"disclosure":null},{"label":"Paid for what was sold back","value":100.67934648856644,"unit":"GBP","rule":"currency_2dp","formula":"The exported volume priced half hour by half hour on the Agile Outgoing series.","prov":[{"tag":"Engine output","formula_id":"export_rev","source_ref":null,"note":null}],"disclosure":"Paid separately by the supplier, so it is not taken off the annual bill above."}]}],"referenceId":"no_solar_flat","differenceNote":"Every difference is measured against the first column, the same plot with no solar and no battery on the flat tariff. Each column carries its own tariff and the three tariffs carry different standing charges, so a difference is the whole change from moving to that configuration and its tariff together, not the effect of the hardware on its own.","billBasis":{"export_included":false,"summary":"Modelled for self use. Nothing sold back to the grid is included in this figure.","detail":"Bills are modelled for self use: the electricity bought plus the standing charge. Anything sold back to the grid is paid separately by your supplier, so it is left out of the figures shown."},"system":{"pv_kwp":4.0,"inverter_kw":5.0},"battery":{"model_name":"Fox ESS EP6","nominal_kwh":5.76,"usable_kwh":5.184},"site":{"postcode_area":"NG","property_type":"terraced","bedrooms":2,"tenure":"rental","tenure_note":"Recorded for the record. No figure in this response changes with tenure.","ground_floor_area_m2":null,"ground_floor_area_note":null},"versions":{"engine_version":"engine-v2-2026.07.21","data_version":"tariffs-2025.2","api_version":"v1"},"subscription":{"headline":"Gryd subscription fee, indicative","indicative_note":"Indicative only, and not a quote. The fee is half the modelled difference between the first column and the Gryd column, spread over twelve months, so it moves with those two modelled bills and with nothing else. The commercial terms behind it are not settled.","monthly_fee":33.76860119798942,"basis_note":"Both bills are the electricity bought plus the standing charge on the tariff that column is sold on, with nothing sold back to the grid taken off either of them.","exclusion_note":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in.","working":[{"label":"The first column's annual bill","value":1295.5651915000471,"unit":"GBP","rule":"currency_2dp","formula":"The same plot with no solar and no battery on the flat tariff is \u00a31,295.57 a year.","prov":[{"tag":"System setting","formula_id":"reference_column_annual_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The Gryd column's annual bill","value":485.11876274830104,"unit":"GBP","rule":"currency_2dp","formula":"Solar and battery on the dynamic tariff, run on the Gryd strategy, is \u00a3485.12 a year.","prov":[{"tag":"System setting","formula_id":"gryd_column_annual_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The difference between the two","value":810.4464287517461,"unit":"GBP","rule":"currency_2dp","formula":"\u00a31,295.57 less \u00a3485.12 is \u00a3810.45 a year.","prov":[{"tag":"System setting","formula_id":"reference_bill_minus_gryd_bill","source_ref":null,"note":null}],"disclosure":null},{"label":"The share Gryd takes","value":50.0,"unit":"%","rule":"percent_whole","formula":"Gryd takes 50 per cent of that difference and the plot keeps the other 50 per cent.","prov":[{"tag":"System setting","formula_id":"gryd_share_of_difference","source_ref":"docs/platform-calculations-reference.md section 5.6","note":"Mehdi's decision, 2026-08-11. It follows the half clawback in the platform's subscription solver, docs/platform-calculations-reference.md section 5.6, where Gryd takes half of the homeowner's surplus saving."}],"disclosure":null},{"label":"The fee for a year","value":405.22321437587306,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3810.45 times 0.5 is \u00a3405.22 a year.","prov":[{"tag":"System setting","formula_id":"difference_times_share","source_ref":null,"note":null}],"disclosure":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in."},{"label":"The fee a month","value":33.76860119798942,"unit":"GBP","rule":"currency_2dp","formula":"\u00a3405.22 divided by 12 is \u00a333.77 a month.","prov":[{"tag":"System setting","formula_id":"annual_fee_over_12","source_ref":null,"note":null}],"disclosure":"The fee is charged separately and is not taken off any bill on this page. No annual bill in this response has it netted in."}]}}},"tariffs":[{"name":"Flat","internal_id":"Flat","standing_charge_p_per_day":69.85671,"import_rate":{"kind":"flat","flat_rate_p_per_kwh":26.716,"peak_rate_p_per_kwh":null,"offpeak_rate_p_per_kwh":null,"offpeak_slots":null,"dynamic_series_id":null},"export_rate_p_per_kwh":12.0,"period_label":"Region M, 2025 vintage (frozen assumption, pending Gryd confirmation)"},{"name":"Time of Use","internal_id":"ToU","standing_charge_p_per_day":63.43974,"import_rate":{"kind":"tou","flat_rate_p_per_kwh":null,"peak_rate_p_per_kwh":30.668,"offpeak_rate_p_per_kwh":9.5,"offpeak_slots":[2,11],"dynamic_series_id":null},"export_rate_p_per_kwh":12.0,"period_label":"Region M, 2025 vintage (frozen assumption, pending Gryd confirmation)"},{"name":"Dynamic","internal_id":"Dynamic","standing_charge_p_per_day":66.26277,"import_rate":{"kind":"dynamic","flat_rate_p_per_kwh":null,"peak_rate_p_per_kwh":null,"offpeak_rate_p_per_kwh":null,"offpeak_slots":null,"dynamic_series_id":"series-pkl-regionM-2025-agile"},"export_rate_p_per_kwh":12.0,"period_label":"Region M, calendar year 2025 (Octopus Agile half-hourly series)"}],"areas":["DE","LE","LN","NG","NN"],"ranges":{"bedrooms":{"minimum":1.0,"maximum":6.0,"unit":"bedrooms","exclusive_minimum":false},"pv_kwp":{"minimum":0.0,"maximum":20.0,"unit":"kWp","exclusive_minimum":false},"battery_nominal_kwh":{"minimum":2.0,"maximum":20.0,"unit":"kWh","exclusive_minimum":false},"inverter_kw":{"minimum":3.7,"maximum":6.0,"unit":"kW","exclusive_minimum":false},"ev_annual_kwh":{"minimum":0.0,"maximum":10000.0,"unit":"kWh","exclusive_minimum":false},"ground_floor_area_m2":{"minimum":0.0,"maximum":1000.0,"unit":"m2","exclusive_minimum":true},"sap_dper_kwh_per_m2":{"minimum":0.0,"maximum":500.0,"unit":"kWh/m2","exclusive_minimum":true},"sap_floor_area_m2":{"minimum":0.0,"maximum":1000.0,"unit":"m2","exclusive_minimum":true},"sap_unregulated_kwh":{"minimum":0.0,"maximum":15000.0,"unit":"kWh","exclusive_minimum":false},"minimum_annual_demand_kwh":100.0}};
+
+var TENURES = [
+  { id: "private_sale", label: "Private sale" },
+  { id: "rental", label: "Rental" },
+  { id: "social_housing", label: "Social housing" }
+];
+var PROPERTY_TYPES = [
+  { id: "detached", label: "Detached" },
+  { id: "semi_detached", label: "Semi detached" },
+  { id: "terraced", label: "Terraced" },
+  { id: "bungalow", label: "Bungalow" }
+];
+var BASES = [
+  { id: "modelled", label: "Our estimate", hint: "The heat pump ladder for the bedroom count, scaled by the built form." },
+  { id: "sap", label: "From a SAP assessment", hint: "The plot's own delivered energy rate, floor area and unregulated allowance." }
+];
+/* The roof headroom a built form implies, from the Lovable model's own ROOF_CAP
+   table. A site assumption and not a survey. */
+var ROOF_CAP = { detached: 6.5, semi_detached: 5, terraced: 4, bungalow: 5.5 };
+var PACK = { small: 5.76, large: 11.52 };
+var SMALL_PACK_MAX_BEDROOMS = 2;
+var FALLBACK_INVERTER_KW = "5.0";
+var AREAS = SAMPLE.areas;
+var R = SAMPLE.ranges;
+
+var a = {
+  postcode: "", reference: "", tenure: null, propertyType: null, bedrooms: 3,
+  groundFloorAreaM2: "", demandBasis: "modelled",
+  sapDper: "", sapFloorArea: "", sapUnregulated: "",
+  evOn: false, evAnnualKwh: "",
+  pvKwp: "", batteryNominalKwh: "", inverterKw: FALLBACK_INVERTER_KW
+};
+var screen = 1;
+var postcodeLeft = false;
+var systemBasis = null;
+var systemTouched = { pvKwp: false, batteryNominalKwh: false, inverterKw: false };
+var systemReset = { pvKwp: false, batteryNominalKwh: false, inverterKw: false };
+var openWorking = null;
+
+/* ---------- formatting, the rules the app prints by ---------- */
+
+function gbpWhole(v) {
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(Object.is(v, -0) ? 0 : v);
+}
+function gbpPence(v) {
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Object.is(v, -0) ? 0 : v);
+}
+function kwhWhole(v) { return Math.round(v).toLocaleString("en-GB") + " kWh"; }
+function termValue(t) {
+  if (t.unit === "kWh") return kwhWhole(t.value);
+  if (t.unit === "bedrooms") return String(Math.round(t.value));
+  if (t.unit === "ratio") return String(Number(t.value.toFixed(4)));
+  if (t.unit === "m2") return Number(t.value.toFixed(2)).toLocaleString("en-GB") + " m2";
+  if (t.unit === "kWh/m2") return Number(t.value.toFixed(2)).toLocaleString("en-GB") + " kWh/m2";
+  return t.value + " " + t.unit;
+}
+function figureValue(f) {
+  // A residual is float noise, not a quantity. Anything under a microwatt hour
+  // reads as zero rather than as 2.2e-10 kWh.
+  if (f.unit === "kWh" && Math.abs(f.value) < 1e-6) return "0 kWh";
+  if (f.rule === "currency_2dp") return gbpPence(f.value);
+  if (f.rule === "kwh_whole") return kwhWhole(f.value);
+  if (f.rule === "percent_whole") return Number(f.value.toFixed(2)).toLocaleString("en-GB") + "%";
+  if (f.rule === "pence_1dp") return Number(f.value.toFixed(5)).toLocaleString("en-GB", { maximumFractionDigits: 5 }) + " " + f.unit;
+  return f.value + " " + f.unit;
+}
+function provenanceLine(p) {
+  var parts = [p.tag];
+  if (p.formula_id) parts.push("formula " + p.formula_id);
+  if (p.source_ref) parts.push(p.source_ref);
+  if (p.note) parts.push(p.note);
+  return parts.map(function (s) {
+    var c = s.charAt(0);
+    return c >= "a" && c <= "z" ? c.toUpperCase() + s.slice(1) : s;
+  }).join(". ");
+}
+
+/* ---------- bounds and gates, the app's own rules ---------- */
+
+var POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/i;
+function postcodeArea(v) {
+  var m = v.replace(/\s+/g, "").toUpperCase().match(/^[A-Z]{1,2}/);
+  return m ? m[0] : "";
+}
+function postcodeProblem(v) {
+  if (!POSTCODE_RE.test(v.replace(/\s+/g, ""))) return "format";
+  if (AREAS.indexOf(postcodeArea(v)) === -1) return "area";
+  return null;
+}
+var POSTCODE_MESSAGES = {
+  format: "That is not a full UK postcode.",
+  area: "We hold frozen data for region M only, so this site cannot be priced."
+};
+function withinRange(value, range) {
+  var n = Number(value);
+  if (String(value).trim() === "" || !isFinite(n)) return false;
+  if (!range) return true;
+  var aboveMin = range.exclusive_minimum ? n > range.minimum : n >= range.minimum;
+  return aboveMin && n <= range.maximum;
+}
+function rangeWords(range) {
+  if (!range) return null;
+  var unit = range.unit ? " " + range.unit : "";
+  var low = range.minimum.toLocaleString("en-GB");
+  var high = range.maximum.toLocaleString("en-GB");
+  return range.exclusive_minimum ? "over " + low + " and up to " + high + unit
+                                 : "between " + low + " and " + high + unit;
+}
+function num(r, k) { return r[k] === undefined ? null : r[k]; }
+
+function areaProblem() {
+  var typed = a.groundFloorAreaM2.trim();
+  if (typed === "" || withinRange(typed, R.ground_floor_area_m2)) return null;
+  return "Give a floor area " + rangeWords(R.ground_floor_area_m2) + ", or leave it empty.";
+}
+function evComplete() {
+  return !a.evOn || withinRange(a.evAnnualKwh, R.ev_annual_kwh);
+}
+function siteGaps() {
+  var g = [];
+  if (a.postcode.trim() === "" || postcodeProblem(a.postcode)) g.push("a supported site postcode");
+  if (!a.tenure) g.push("the tenure");
+  if (!a.propertyType) g.push("the property type");
+  if (areaProblem()) g.push("a ground floor area inside the published range, or an empty field");
+  return g;
+}
+function usageGaps() {
+  var g = [];
+  if (a.demandBasis === "sap") {
+    if (!withinRange(a.sapDper, R.sap_dper_kwh_per_m2)) g.push("the delivered energy rate");
+    if (!withinRange(a.sapFloorArea, R.sap_floor_area_m2)) g.push("the SAP floor area");
+    if (!withinRange(a.sapUnregulated, R.sap_unregulated_kwh)) g.push("the unregulated energy allowance");
+  }
+  return g;
+}
+/* The car is answered on the confirm page, so it gates the price rather than the
+   way on from the use screen. */
+function evGaps() {
+  return evComplete() ? [] : ["the electric car's extra annual use"];
+}
+function systemGaps() {
+  var g = [];
+  if (!withinRange(a.pvKwp, R.pv_kwp)) g.push("the array size");
+  if (!withinRange(a.batteryNominalKwh, R.battery_nominal_kwh)) g.push("the battery capacity");
+  if (!withinRange(a.inverterKw, R.inverter_kw)) g.push("the inverter size");
+  return g;
+}
+function siteComplete() { return siteGaps().length === 0; }
+function usageComplete() { return usageGaps().length === 0; }
+function readyToPrice() {
+  return systemGaps().length === 0 && evGaps().length === 0 && usageComplete() && siteComplete();
+}
+function suggestedPackKwh(beds) { return beds <= SMALL_PACK_MAX_BEDROOMS ? PACK.small : PACK.large; }
+function roofCapFor(t) { return t ? ROOF_CAP[t] : null; }
+
+/* Arriving at the check screen puts the newly implied figure back in any field
+   whose own answer has moved since the last arrival, typed over or not. */
+function systemArrival() {
+  var basis = { propertyType: a.propertyType, bedrooms: a.bedrooms };
+  var reset = [];
+  var cap = roofCapFor(a.propertyType);
+  if (cap !== null && (systemBasis === null || systemBasis.propertyType !== a.propertyType || a.pvKwp === "")) {
+    if (systemBasis !== null && systemBasis.propertyType !== a.propertyType) reset.push("pvKwp");
+    a.pvKwp = String(cap);
+    systemTouched.pvKwp = false;
+  }
+  var pack = suggestedPackKwh(a.bedrooms);
+  if (systemBasis === null || systemBasis.bedrooms !== a.bedrooms || a.batteryNominalKwh === "") {
+    if (systemBasis !== null && systemBasis.bedrooms !== a.bedrooms) reset.push("batteryNominalKwh");
+    a.batteryNominalKwh = String(pack);
+    systemTouched.batteryNominalKwh = false;
+  }
+  systemReset = { pvKwp: false, batteryNominalKwh: false, inverterKw: false };
+  reset.forEach(function (f) { systemReset[f] = true; });
+  systemBasis = basis;
+}
+
+/* ---------- the sample the result screen renders ---------- */
+
+function sampleKey() {
+  var k = a.propertyType + "_" + a.bedrooms + "bed";
+  var direct = { "detached_4bed": "detached_4bed", "semi_detached_3bed": "semi_3bed", "terraced_2bed": "terraced_2bed" };
+  return direct[k] || null;
+}
+function sampleCase() {
+  return SAMPLE.cases[sampleKey() || "detached_4bed"];
+}
+function sampleIsExact() { return sampleKey() !== null; }
+
+/* ---------- rendering ---------- */
+
+function el(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function radios(host, options, name, current, onPick, withHint) {
+  host.innerHTML = options.map(function (o) {
+    return '<label' + (withHint ? ' class="stacked"' : '') + '><input type="radio" name="' + name + '" value="' + o.id + '"' +
+      (current === o.id ? " checked" : "") + '><span>' + esc(o.label) +
+      (withHint && o.hint ? '<span class="hint">' + esc(o.hint) + "</span>" : "") + "</span></label>";
+  }).join("");
+  host.addEventListener("change", function (e) {
+    if (e.target.name === name) onPick(e.target.value);
+  });
+}
+
+function demandPanelHtml(testid) {
+  var c = sampleCase();
+  var d = c.demand;
+  var total = d.terms[d.terms.length - 1];
+  var head = sampleIsExact()
+    ? ""
+    : '<p class="formula"><b>Sample derivation.</b> The captured set holds a four bedroom detached, a three bedroom semi and a two bedroom terrace. This panel shows the nearest of the three; the live service derives the year from the answers as typed.</p>';
+  var evLine = a.evOn && a.evAnnualKwh.trim() !== ""
+    ? '<p class="formula">Electric car allowance, an assumption. ' + esc(kwhWhole(Number(a.evAnnualKwh))) + ' a year, not yet added to the sample total above.</p>'
+    : "";
+  return '<div class="panel" id="' + testid + '">' +
+    '<span class="cap">Annual demand</span>' +
+    '<p class="fig">' + esc(termValue(total)) + "</p>" +
+    '<p class="formula">' + esc(d.formula) + "</p>" + head +
+    '<dl class="terms">' + d.terms.map(function (t) {
+      return "<div><dt>" + esc(t.label) + "</dt><dd>" + esc(termValue(t)) +
+        '</dd><dd class="calc">' + esc(t.formula) + "</dd></div>";
+    }).join("") + "</dl>" + evLine +
+    d.provenance.map(function (p) { return '<p class="formula">' + esc(provenanceLine(p)) + "</p>"; }).join("") +
+    "</div>";
+}
+
+function labelOf(options, id) {
+  for (var i = 0; i < options.length; i++) if (options[i].id === id) return options[i].label;
+  return "Not answered";
+}
+
+function importDescription(t) {
+  var r = t.import_rate;
+  if (r.kind === "flat") return r.flat_rate_p_per_kwh + " p a kWh, the same price in every half hour";
+  if (r.kind === "tou") return r.offpeak_rate_p_per_kwh + " p a kWh from 00:30 to 05:30, " + r.peak_rate_p_per_kwh + " p a kWh outside it";
+  return "The 2025 Octopus Agile region M series, priced half hour by half hour";
+}
+function exportDescription(t) {
+  if (t.import_rate.kind === "dynamic") return "Agile Outgoing series, half hour by half hour";
+  return t.export_rate_p_per_kwh + " p a kWh";
+}
+
+function setErr(id, message) {
+  var node = el(id);
+  node.hidden = !message;
+  node.textContent = message || "";
+}
+function setBlocked(id, gaps, lead) {
+  var node = el(id);
+  node.hidden = gaps.length === 0;
+  node.textContent = gaps.length ? lead + " " + gaps.join(", ") + "." : "";
+}
+
+function renderStep1() {
+  var raw = a.postcode.trim() === "" ? null : postcodeProblem(a.postcode);
+  var problem = raw === "format" && !postcodeLeft ? null : raw;
+  setErr("postcode-err", problem ? POSTCODE_MESSAGES[problem] : null);
+  el("postcode").setAttribute("aria-invalid", problem ? "true" : "false");
+  setErr("gfa-err", areaProblem());
+  el("gfa").setAttribute("aria-invalid", areaProblem() ? "true" : "false");
+  el("beds-value").textContent = a.bedrooms;
+  el("beds-down").disabled = a.bedrooms <= R.bedrooms.minimum;
+  el("beds-up").disabled = a.bedrooms >= R.bedrooms.maximum;
+  setBlocked("blocked1", siteGaps(), "Still needed:");
+  el("go1").disabled = !siteComplete();
+}
+
+function renderStep2() {
+  var sap = a.demandBasis === "sap";
+  el("sap-fields").hidden = !sap;
+  el("modelled-note").hidden = sap;
+  el("demand-panel").innerHTML = demandPanelHtml("dev-demand");
+  setBlocked("blocked2", usageGaps(), "Still needed:");
+  el("go2").disabled = !usageComplete();
+}
+
+function renderStep3() {
+  var pvRange = R.pv_kwp, batRange = R.battery_nominal_kwh, invRange = R.inverter_kw;
+  var pvBad = !withinRange(a.pvKwp, pvRange);
+  var batBad = !withinRange(a.batteryNominalKwh, batRange);
+  var invBad = !withinRange(a.inverterKw, invRange);
+
+  el("echo-site").innerHTML = [
+    ["Postcode area", postcodeArea(a.postcode) || "Not answered"],
+    ["Plot or house type reference", a.reference.trim() || "Not given"],
+    ["Tenure", labelOf(TENURES, a.tenure)],
+    ["Property type", labelOf(PROPERTY_TYPES, a.propertyType)],
+    ["Bedrooms", String(a.bedrooms)],
+    ["Ground floor area", a.groundFloorAreaM2.trim() ? a.groundFloorAreaM2.trim() + " m2" : "Not given"]
+  ].map(function (row) { return "<div><dt>" + esc(row[0]) + "</dt><dd>" + esc(row[1]) + "</dd></div>"; }).join("");
+
+  el("demand-panel-check").innerHTML = demandPanelHtml("dev-check-demand");
+
+  el("ev-field").hidden = !a.evOn;
+  var evBad = !evComplete();
+  setErr("ev-err", evBad ? "Give the year's extra use in kWh, or turn the car off." : null);
+  el("ev-kwh").setAttribute("aria-invalid", evBad ? "true" : "false");
+
+  var cap = roofCapFor(a.propertyType);
+  var builtForm = labelOf(PROPERTY_TYPES, a.propertyType).toLowerCase();
+  var pvBounds = "The field itself accepts " + pvRange.minimum + " to " + pvRange.maximum + " kWp.";
+  el("pv-help").textContent = cap === null
+    ? "Between " + pvRange.minimum + " and " + pvRange.maximum + " kWp."
+    : systemReset.pvKwp
+      ? "The property type changed, so this was reset to " + cap + " kWp, the roof headroom for a " + builtForm + ". Type over it again if the plot has its own figure. " + pvBounds
+      : !systemTouched.pvKwp
+        ? "The roof headroom for a " + builtForm + " is " + cap + " kWp, which is what this field starts at. A site assumption, not a survey. " + pvBounds
+        : "The roof headroom for a " + builtForm + " is " + cap + " kWp, a site assumption rather than a survey. This field has been typed over, and the figure in it is the one that gets priced. " + pvBounds;
+
+  var pack = suggestedPackKwh(a.bedrooms);
+  var batBounds = batRange.minimum + " to " + batRange.maximum + " kWh. A capacity that matches a pack Gryd stocks is named on the result; anything else is described neutrally.";
+  el("batt-help").textContent = systemReset.batteryNominalKwh
+    ? "The bedroom count changed, so this was reset to " + pack + " kWh, the pack that count suggests. Type over it again if the plot is getting a different one. " + batBounds
+    : !systemTouched.batteryNominalKwh
+      ? "Nominal capacity. The bedroom count prefills it, " + pack + " kWh here, and decides nothing: the service prices whatever is typed. " + batBounds
+      : "Nominal capacity. The bedroom count suggests " + pack + " kWh. This field has been typed over, and the service prices the figure in it. " + batBounds;
+
+  var invBounds = "The field accepts " + invRange.minimum + " to " + invRange.maximum + " kW, the range the model was validated across.";
+  el("inv-help").textContent = !systemTouched.inverterKw
+    ? FALLBACK_INVERTER_KW + " kW is the size the model was validated on, which is what this field starts at. " + invBounds
+    : FALLBACK_INVERTER_KW + " kW is the size the model was validated on. This field has been typed over, and the service prices the figure in it. " + invBounds;
+
+  setErr("pv-err", pvBad ? "Give an array size between " + pvRange.minimum + " and " + pvRange.maximum + " kWp." : null);
+  setErr("batt-err", batBad ? "Give a capacity between " + batRange.minimum + " and " + batRange.maximum + " kWh." : null);
+  setErr("inv-err", invBad ? "Outside the validated range, " + invRange.minimum + " to " + invRange.maximum + " kW." : null);
+  el("pv-kwp").setAttribute("aria-invalid", pvBad ? "true" : "false");
+  el("batt-kwh").setAttribute("aria-invalid", batBad ? "true" : "false");
+  el("inv-kw").setAttribute("aria-invalid", invBad ? "true" : "false");
+  el("pv-kwp").value = a.pvKwp;
+  el("batt-kwh").value = a.batteryNominalKwh;
+  el("inv-kw").value = a.inverterKw;
+
+  el("tariff-rows").innerHTML = SAMPLE.tariffs.map(function (t) {
+    return "<tr><th scope=\"row\">" + esc(t.name) + "</th><td>" + esc(importDescription(t)) +
+      "</td><td>" + esc(t.standing_charge_p_per_day) + " p a day</td><td>" + esc(exportDescription(t)) + "</td></tr>";
+  }).join("");
+  el("tariff-note").textContent = SAMPLE.tariffs.map(function (t) { return t.name + ": " + t.period_label + ". "; }).join("") +
+    "Nothing sold back to the grid is taken off any bill; the export line is reported beside it.";
+
+  setBlocked("blocked3", systemGaps().concat(evGaps(), usageGaps(), siteGaps()), "Nothing is priced until this is settled:");
+  el("go3").disabled = !readyToPrice();
+}
+
+function renderResults() {
+  var c = sampleCase();
+  el("bill-basis").textContent = c.billBasis.summary;
+  el("sample-note").textContent = sampleIsExact()
+    ? "Every figure below is a captured run of the frozen engine for a " + a.bedrooms + " bedroom " +
+      labelOf(PROPERTY_TYPES, a.propertyType).toLowerCase() + " in area NG on the modelled basis, at " +
+      c.request.pv_kwp + " kWp and " + c.request.battery_nominal_kwh + " kWh. It is not a run of the answers typed above."
+    : "The captured set holds three plots: a four bedroom detached, a three bedroom semi and a two bedroom terrace. The nearest of the three is shown; it is not a run of the answers typed above.";
+
+  el("pricedon").innerHTML = [
+    a.reference.trim() ? ["Plot or house type reference", a.reference.trim()] : null,
+    ["Annual demand", termValue(c.demand.terms[c.demand.terms.length - 1])],
+    ["Array", c.system.pv_kwp + " kWp"],
+    ["Battery", c.battery.model_name + ", " + c.battery.nominal_kwh + " kWh nominal"],
+    ["Inverter", c.system.inverter_kw + " kW"],
+    ["Postcode area", c.site.postcode_area]
+  ].filter(Boolean).map(function (row) {
+    return "<div><dt>" + esc(row[0]) + "</dt><dd>" + esc(row[1]) + "</dd></div>";
+  }).join("");
+
+  el("cols").innerHTML = c.columns.map(function (col) {
+    var isRef = col.id === c.referenceId;
+    var diff;
+    if (isRef) {
+      diff = '<span>The column the other three are measured against</span>';
+    } else if (col.diffAvail === "measured" && col.diff) {
+      var phrase = col.diff.category === "none" ? col.diff.phrase : col.diff.phrase.replace("{amount}", gbpWhole(col.diff.abs_value));
+      diff = "<span>" + esc(phrase) + "</span>";
+    } else {
+      diff = "<span>" + esc(col.diffNote) + "</span>";
+    }
+    return '<div class="col' + (isRef ? " ref" : "") + '">' +
+      "<h3>" + esc(col.title) + "</h3>" +
+      '<p class="strategy">' + esc(col.note) + "</p>" +
+      '<p class="tar"><span class="cap">Tariff</span>' + esc(col.tariff) + "</p>" +
+      '<p class="bill"><span class="cap">Annual bill</span><span class="amt">' + esc(gbpWhole(col.bill)) + "</span></p>" +
+      '<p class="diff' + (!isRef && col.diff && col.diff.category === "more" ? " more" : "") + '">' + diff + "</p>" +
+      '<div class="foot"><p class="month"><b>' + esc(gbpWhole(col.monthly)) + "</b> a month, a twelfth of the year rather than a bill any supplier issues.</p>" +
+      '<button type="button" class="linkbtn" data-col="' + col.id + '" aria-expanded="' + (openWorking === col.id) + '">' +
+      (openWorking === col.id ? "Close the working" : "Open the working") + "</button></div></div>";
+  }).join("");
+
+  el("diff-note").textContent = c.differenceNote;
+  renderChart(c);
+  renderWorking(c);
+
+  var s = c.subscription;
+  el("subs").innerHTML = '<span class="cap" style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--warm-grey)">Charged separately</span>' +
+    "<h3>" + esc(s.headline) + "</h3>" +
+    "<p>Applies to the " + esc(c.columns[3].title) + " column only.</p>" +
+    "<p>" + esc(s.indicative_note) + "</p>" +
+    '<p class="fee">' + esc(gbpPence(s.monthly_fee)) + "</p>" +
+    "<p>" + esc(s.basis_note) + "</p>" +
+    '<dl class="rows">' + s.working.map(function (f) {
+      return "<div><dt>" + esc(f.label) + "</dt><dd>" + esc(figureValue(f)) + '</dd><dd class="calc">' + esc(f.formula) + "</dd></div>";
+    }).join("") + "</dl>" +
+    "<p>" + esc(s.exclusion_note) + "</p>";
+
+  el("vers").textContent = "Engine " + c.versions.engine_version + ", tariff data " + c.versions.data_version +
+    ", API " + c.versions.api_version + ". Modelled figures, not a quote. Nothing is saved and no account is kept.";
+}
+
+/* A bar a column, drawn by hand. No chart library: four bars and four labels do
+   not need one, and the page must stay one file. */
+function renderChart(c) {
+  /* A title sits above its own bar rather than beside it: the longest of the four
+     runs to 46 characters and a left gutter wide enough for it leaves the bars
+     too short to compare. */
+  var W = 900, rowH = 68, padR = 90, top = 6;
+  var H = top + c.columns.length * rowH + 6;
+  var max = Math.max.apply(null, c.columns.map(function (x) { return x.bill; }));
+  var bars = c.columns.map(function (col, i) {
+    var y = top + i * rowH;
+    var w = Math.round((col.bill / max) * (W - padR));
+    var gryd = col.id === "solar_battery_gryd_dynamic";
+    return '<text class="lbl" x="0" y="' + (y + 14) + '">' + esc(col.title) + "</text>" +
+      '<rect class="bar' + (gryd ? " gryd" : "") + '" x="0" y="' + (y + 24) + '" width="' + w + '" height="22" rx="6"></rect>' +
+      '<text class="amt" x="' + (w + 12) + '" y="' + (y + 40) + '">' + esc(gbpWhole(col.bill)) + "</text>";
+  }).join("");
+  el("chart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Annual bill by column. ' +
+    esc(c.columns.map(function (x) { return x.title + ", " + gbpWhole(x.bill); }).join("; ")) + '">' + bars + "</svg>";
+}
+
+function figRow(f) {
+  return '<details class="frow"><summary><span class="fl">' + esc(f.label) + '</span><span class="fv">' +
+    esc(figureValue(f)) + '</span></summary><div class="fbody"><p><b>Formula. </b>' + esc(f.formula) + "</p>" +
+    f.prov.map(function (pv) { return "<p><b>Where it came from. </b>" + esc(provenanceLine(pv)) + "</p>"; }).join("") +
+    (f.disclosure ? "<p><b>Note. </b>" + esc(f.disclosure) + "</p>" : "") + "</div></details>";
+}
+function block(title, note, figures) {
+  return "<h4>" + esc(title) + '</h4><p class="bnote">' + esc(note) + '</p><div class="frows">' +
+    figures.map(figRow).join("") + "</div>";
+}
+
+/* The working, in the three blocks the service returns and in its order: the
+   energy balance and its residuals, the bill build up, and the export line that
+   sits outside the bill and is never taken off it. */
+function renderWorking(c) {
+  var host = el("working");
+  if (!openWorking) { host.hidden = true; host.innerHTML = ""; return; }
+  var col = null;
+  for (var i = 0; i < c.columns.length; i++) if (c.columns[i].id === openWorking) col = c.columns[i];
+  if (!col) { host.hidden = true; host.innerHTML = ""; return; }
+  host.hidden = false;
+  host.innerHTML = '<span class="cap">The working</span>' +
+    "<h3 tabindex=\"-1\" id=\"working-head\">" + esc(col.title) + "</h3>" +
+    '<p class="bnote">' + esc(col.note) + "</p>" +
+    block("Energy balance",
+      "Two identities and their residuals, in kWh. Demand is what the roof served directly plus what the battery discharged plus the import the home used. Roof output is what it served directly plus what it stored plus what it exported.",
+      col.energy_balance) +
+    block("Bill build up", c.billBasis.detail, col.bill_build_up) +
+    block("Sold back to the grid", "Outside the bill above, and never taken off it.", col.export) +
+    '<button type="button" class="linkbtn" id="close-working">Close the working</button>';
+  var close = el("close-working");
+  if (close) close.addEventListener("click", function () {
+    openWorking = null; renderResults();
+    var again = el("cols").querySelector("[data-col]");
+    if (again) again.focus();
+  });
+  var h = el("working-head");
+  if (h) h.focus();
+}
+
+/* ---------- screens ---------- */
+
+function show(n) {
+  screen = n;
+  [1, 2, 3, 4].forEach(function (i) {
+    el("step" + i).classList.toggle("on", i === n);
+  });
+  var items = el("steps").children;
+  for (var i = 0; i < items.length; i++) {
+    var s = i + 1;
+    items[i].classList.toggle("done", s < n);
+    if (s === n) items[i].setAttribute("aria-current", "step");
+    else items[i].removeAttribute("aria-current");
+  }
+  render();
+  var head = el("step" + n).querySelector("h2");
+  if (head) { head.setAttribute("tabindex", "-1"); head.focus(); }
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function render() {
+  if (screen === 1) renderStep1();
+  if (screen === 2) renderStep2();
+  if (screen === 3) renderStep3();
+  if (screen === 4) renderResults();
+}
+
+/* Any answer change drops the priced screen, exactly as the app does: a figure
+   never sits beside a changed answer. */
+function changed() {
+  if (screen === 4) { show(3); return; }
+  render();
+}
+
+/* ---------- wiring ---------- */
+
+radios(el("tenure"), TENURES, "tenure", a.tenure, function (v) { a.tenure = v; changed(); });
+radios(el("property"), PROPERTY_TYPES, "property", a.propertyType, function (v) { a.propertyType = v; changed(); });
+radios(el("basis"), BASES, "basis", a.demandBasis, function (v) { a.demandBasis = v; changed(); }, true);
+
+el("postcode").addEventListener("input", function (e) { a.postcode = e.target.value; changed(); });
+el("postcode").addEventListener("blur", function (e) {
+  postcodeLeft = true;
+  a.postcode = e.target.value.trim().toUpperCase();
+  e.target.value = a.postcode;
+  changed();
+});
+el("reference").addEventListener("input", function (e) { a.reference = e.target.value; changed(); });
+el("gfa").addEventListener("input", function (e) { a.groundFloorAreaM2 = e.target.value; changed(); });
+el("beds-down").addEventListener("click", function () {
+  a.bedrooms = Math.max(R.bedrooms.minimum, a.bedrooms - 1); changed();
+});
+el("beds-up").addEventListener("click", function () {
+  a.bedrooms = Math.min(R.bedrooms.maximum, a.bedrooms + 1); changed();
+});
+el("sap-dper").addEventListener("input", function (e) { a.sapDper = e.target.value; changed(); });
+el("sap-area").addEventListener("input", function (e) { a.sapFloorArea = e.target.value; changed(); });
+el("sap-unreg").addEventListener("input", function (e) { a.sapUnregulated = e.target.value; changed(); });
+el("ev-on").addEventListener("change", function (e) {
+  a.evOn = e.target.checked;
+  if (!a.evOn) { a.evAnnualKwh = ""; el("ev-kwh").value = ""; }
+  changed();
+});
+el("ev-kwh").addEventListener("input", function (e) { a.evAnnualKwh = e.target.value; changed(); });
+
+function touch(field) { systemTouched[field] = true; systemReset[field] = false; }
+el("pv-kwp").addEventListener("input", function (e) { a.pvKwp = e.target.value; touch("pvKwp"); changed(); });
+el("batt-kwh").addEventListener("input", function (e) { a.batteryNominalKwh = e.target.value; touch("batteryNominalKwh"); changed(); });
+el("inv-kw").addEventListener("input", function (e) { a.inverterKw = e.target.value; touch("inverterKw"); changed(); });
+
+el("go1").addEventListener("click", function () { if (siteComplete()) show(2); });
+el("go2").addEventListener("click", function () { if (usageComplete()) { systemArrival(); show(3); } });
+el("back2").addEventListener("click", function () { show(1); });
+el("go3").addEventListener("click", function () { if (readyToPrice()) { openWorking = null; show(4); } });
+el("back3").addEventListener("click", function () { show(2); });
+el("back4").addEventListener("click", function () { show(3); });
+el("restart").addEventListener("click", function () { window.location.reload(); });
+
+el("cols").addEventListener("click", function (e) {
+  var id = e.target.getAttribute && e.target.getAttribute("data-col");
+  if (!id) return;
+  openWorking = openWorking === id ? null : id;
+  renderResults();
+  var again = el("cols").querySelector('[data-col="' + id + '"]');
+  if (again) again.focus();
+});
+
+show(1);
+</script>
+
+</body>
+</html>

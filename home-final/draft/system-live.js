@@ -1,4 +1,4 @@
-/* Ambient life over the system film, v4.
+/* Ambient life over the system film.
 
    One rule decides everything in here: nothing is drawn that is not already
    lit in the frame. There are no wires, no vehicles and no invented network.

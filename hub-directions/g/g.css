@@ -77,16 +77,6 @@
   color: var(--paper);
   background: linear-gradient(to bottom, rgba(30, 12, 8, 0.42), rgba(30, 12, 8, 0.58));
 }
-.g-card .plate .mark {
-  height: 28px;
-  width: auto;
-  aspect-ratio: auto;
-  object-fit: contain;
-  align-self: center;
-  flex: none;
-  opacity: 0.92;
-  margin-bottom: 16px;
-}
 .g-card .plate .over {
   font-family: "Borna", sans-serif;
   font-weight: 500;
@@ -264,15 +254,6 @@
 }
 .n-row .ext.own { background: var(--flare); color: #ffffff; }
 
-.g-close .alt { margin: 22px auto 0; font-size: 14px; line-height: 1.7; color: var(--warm-grey); }
-.g-close .alt a {
-  color: var(--ember); display: inline-block; line-height: 1.4;
-  padding: 2px 6px; margin: 0 8px;
-}
-/* the pair wraps onto its own lines below 520, so the leading is what has to
-   hold the two pointer targets apart there */
-@media (max-width: 520px) { .g-close .alt { line-height: 3.2; } }
-
 /* ---------- centred pagination ---------- */
 
 .g-pager {
@@ -356,16 +337,6 @@
   padding: 0 clamp(28px, 7vw, 96px);
   color: var(--paper);
   background: linear-gradient(to right, rgba(30, 12, 8, 0.66), rgba(30, 12, 8, 0.24));
-}
-.g-hero .plate .mark {
-  height: 28px;
-  width: auto;
-  aspect-ratio: auto;
-  object-fit: contain;
-  align-self: flex-start;
-  flex: none;
-  opacity: 0.92;
-  margin-bottom: 16px;
 }
 .g-hero .plate h1 {
   font-size: clamp(30px, 4.4vw, 58px);
@@ -487,7 +458,12 @@
 .g-spec dt { color: var(--warm-grey); }
 .g-spec dd { margin: 0; text-align: right; font-weight: 500; }
 
-.g-return { margin-top: 44px; }
+/* .g-body p sets a margin shorthand that outweighs a bare .g-return, which is
+   why the link used to sit flush against the spec table. */
+.g-body p.g-return, .g-return {
+  margin-top: var(--sec-pad);
+  margin-bottom: var(--label-gap);
+}
 
 .g-share { text-align: center; margin-top: 84px; }
 .g-share h3 { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 17px; letter-spacing: 0; }
@@ -544,3 +520,32 @@
   .n-row .head { font-size: 19px; }
   .n-row .ext { order: 5; justify-self: start; }
 }
+
+/* Comparison tables. The corpus carries seven column tables that no draft page
+   had a pattern for, so this is the one new block: the measure's type scale,
+   the figure's break-out width, and its own horizontal scroll so the page body
+   never scrolls sideways. */
+.g-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.g-table table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 720px;
+  font-size: 14px;
+  text-align: left;
+}
+.g-table th, .g-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--stone-mid);
+  vertical-align: top;
+  line-height: 1.4;
+}
+.g-table thead th {
+  font-weight: 500;
+  color: var(--warm-grey);
+  border-bottom-color: var(--flare);
+  white-space: nowrap;
+}
+.g-table tbody td:first-child { font-weight: 500; }

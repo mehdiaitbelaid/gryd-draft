@@ -27,8 +27,8 @@
   window.grydPageFade = true;
 
   var GROUND = '#F8F6F2';
-  var OUT = 180;
-  var IN = 220;
+  var OUT = 220;
+  var IN = 320;
   var KEY = 'gryd-page-fade';
   var root = document.documentElement;
 
@@ -42,10 +42,11 @@
   st.id = 'gryd-page-fade-css';
   st.textContent =
     'html{background:' + GROUND + '}' +
-    'body{transition:opacity ' + OUT + 'ms ease}' +
+    'body{transition:opacity ' + OUT + 'ms cubic-bezier(.4,0,1,1)}' +
     'html.gryd-fade-out body{opacity:0}' +
     'html.gryd-fade-in body{opacity:0;transition:none}' +
-    'html.gryd-fade-in-live body{opacity:1;transition:opacity ' + IN + 'ms ease}';
+    'html.gryd-fade-in-live body{opacity:1;transition:opacity ' + IN +
+      'ms cubic-bezier(0,0,.2,1)}';
   (document.head || root).appendChild(st);
 
   /* ---------------------------------------------------------- the fade in */
@@ -55,18 +56,54 @@
     if (arriving) sessionStorage.removeItem(KEY);
   } catch (e) {}
   if (arriving) {
-    root.classList.add('gryd-fade-in');
+    /* gryd-arriving is the homepage cover's cue. The cover is a cold load's
+       first paint guard, and a reader who clicked here from another page of
+       this site has already watched the ground come up: a pulsing mark laid on
+       top of that is a second arrival over the first, and it is what left a
+       mark sitting still in the middle of the page while the body underneath it
+       was held at nothing. */
+    root.classList.add('gryd-fade-in', 'gryd-arriving');
+
+    var started = false;
     var up = function () {
+      if (started) return;
+      started = true;
       requestAnimationFrame(function () {
         root.classList.add('gryd-fade-in-live');
         setTimeout(function () {
-          root.classList.remove('gryd-fade-in', 'gryd-fade-in-live');
+          root.classList.remove('gryd-fade-in', 'gryd-fade-in-live',
+                                'gryd-arriving');
         }, IN + 60);
       });
     };
-    if (document.readyState === 'complete') up();
-    else addEventListener('load', up);
-    /* a load event that never comes must not leave the page invisible */
+
+    /* The old gate was the load event, and on the homepage that event does not
+       arrive for seconds: the failsafe was doing all the work and the fade in
+       started a second and a half after the page it was fading in had painted.
+       What the fade actually needs is a body to fade and the sheets that were
+       already requested, so it waits for those and for nothing else. A page
+       whose sheets are slower than the cap fades up regardless, which is the
+       same bargain the cover makes. */
+    var CAP = 600;
+    var t0 = Date.now();
+    var ready = function () {
+      if (!document.body) return false;
+      if (Date.now() - t0 >= CAP) return true;
+      var links = document.querySelectorAll('link[rel="stylesheet"]');
+      for (var i = 0; i < links.length; i++) {
+        var loaded = false;
+        try { loaded = !!links[i].sheet; } catch (e) { loaded = true; }
+        if (!loaded) return false;
+      }
+      return true;
+    };
+    var poll = function () {
+      if (started) return;
+      if (ready()) up();
+      else requestAnimationFrame(poll);
+    };
+    requestAnimationFrame(poll);
+    /* a page that never gets a body must still not stay invisible */
     setTimeout(up, 1200);
   }
 
@@ -109,7 +146,8 @@
   /* ------------------------------------------------------------ coming back */
   addEventListener('pageshow', function (e) {
     if (!e.persisted) return;
-    root.classList.remove('gryd-fade-out', 'gryd-fade-in', 'gryd-fade-in-live');
+    root.classList.remove('gryd-fade-out', 'gryd-fade-in', 'gryd-fade-in-live',
+                          'gryd-arriving');
     try { sessionStorage.removeItem(KEY); } catch (x) {}
   });
   /* a same document history move (a hash back) is not a navigation either */
