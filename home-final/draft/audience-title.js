@@ -13,6 +13,18 @@
   var compactHeight = 0;
 
   function measure() {
+    // the capsule the nav retracts into is fixed at the top centre, so the
+    // compact label has to start below its bottom edge rather than at a
+    // hardcoded inset. Below the nav breakpoint the capsule is not rendered
+    // and the stylesheet's own narrow rule takes over.
+    var tab = document.querySelector('.dnav-tab');
+    if (tab) {
+      var cap = tab.getBoundingClientRect();
+      if (cap.height > 0) {
+        sec.style.setProperty('--aud-nav-clear', Math.ceil(cap.bottom) + 'px');
+      }
+    }
+
     var was = sec.classList.contains('is-audience-compact');
     sec.classList.add('is-audience-measuring');
     sec.classList.remove('is-audience-compact');
