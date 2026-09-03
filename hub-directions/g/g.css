@@ -402,8 +402,8 @@
 /* Header actions, sharing the button row's spacing rather than setting their own. */
 .g-actions { display: flex; flex-wrap: wrap; gap: 14px; }
 .g-mast .g-actions { justify-content: center; }
-/* only the PDF shows the source line, and it draws it from the attribute. */
-.print-url { display: none; }
+/* the PDF's opener and its closing plate; the screen page has its own. */
+.p-open, .p-end { display: none; }
 .g-byline {
   display: flex;
   align-items: center;

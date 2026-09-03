@@ -1,9 +1,25 @@
-/* Print sheet for the hub PDFs built by _build_hub.py.
-   This is a document, not the web page shrunk: one A4 text block at reading
-   size, the cover as a plate at the top of page one, the title block under it,
-   and no element tall enough to push itself onto a page of its own. The running
-   footer is drawn by Chromium's own footer template, not from here, because
-   Chromium ignores @page margin boxes. */
+/* The Gryd document sheet. Every hub PDF is printed through this.
+
+   Designed as a document rather than a screenshot of the page: a designed
+   opener, one measured text block, plates for the things that are tabular or
+   quoted, and a running header and footer. Palette is the brand's, taken off
+   the site's own tokens: nothing on the page is a neutral grey, so secondary
+   text and every hairline is a tint of the ink or the accent.
+
+   The running header and footer are drawn by Chromium's own templates in
+   _build_hub.py, because Chromium ignores @page margin boxes. */
+
+:root {
+  --ink: #5A2D23;          /* body, in the Red 110 to Molten Ember family */
+  --ink-soft: #7A554C;     /* captions, dates, table heads: a tint of the ink */
+  --ink-faint: #A9918A;    /* hairlines, still the ink, never a grey */
+  --plate: #F3ECE6;        /* the site's warm plate */
+  --page: #F8F6F2;         /* the site's paper */
+  --accent: #FF5532;
+}
+
+/* The canvas, so the margins are paper too rather than the printer's white. */
+html { background: var(--page); }
 
 .nav,
 nav.dnav,
@@ -16,7 +32,9 @@ footer,
 .g-filter,
 .g-return,
 .g-actions,
-.g-byline .face,
+.g-title,
+.g-byline,
+.g-mast,
 .g-hero .plate {
   display: none !important;
 }
@@ -24,83 +42,157 @@ footer,
 .g-page { padding-top: 0; }
 
 body {
-  background: var(--paper);
-  font-size: 11pt;
-  line-height: 1.45;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 10.5pt;
+  line-height: 1.5;
   orphans: 3;
   widows: 3;
 }
 
-/* 18mm margins leave 174mm of A4, and the text block is all of it. */
-.wrap { max-width: none; padding: 0; }
+/* The sheet carries the side margins itself, so the ground reaches the edge. */
+.wrap { max-width: none; padding: 0 18mm; }
 .g-measure { max-width: none; margin: 0; }
 
 /* ---------- page one ---------- */
 
-.g-hero {
-  border-radius: 4pt;
-  margin-bottom: 14pt;
+.p-open { display: block; margin-bottom: 10pt; }
+.p-open .p-mark {
+  width: 26mm;          /* the brand pack's 18mm print minimum with room over */
+  height: auto;
+  margin-bottom: 16pt;
 }
-.g-hero > img, .g-hero > video {
-  aspect-ratio: 2.6;
-  max-height: 64mm;
-  object-fit: cover;
+/* The site's eyebrow, dash and all, inherited from tokens.css. */
+.p-open .eyebrow { color: var(--ink-soft); }
+.p-open h1 {
+  font-family: "Borna", "DM Sans", sans-serif;
+  font-weight: 500;
+  font-size: 32pt;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 10pt 0 0;
+  color: var(--ink);
+}
+.p-open h1 .flare { color: var(--accent); }
+.p-open .p-stand {
+  font-weight: 500;
+  font-size: 12.5pt;
+  line-height: 1.4;
+  margin: 12pt 0 0;
+  color: var(--ink);
+  max-width: 46em;
+}
+.p-open .p-meta {
+  margin: 14pt 0 0;
+  font-size: 8pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.p-open .p-meta .when::before { content: " / "; }
+.p-open .p-rule {
+  height: 2pt;
+  background: var(--accent);
+  width: 100%;
+  margin-top: 14pt;
 }
 
-.g-title { margin-top: 0; }
-.g-title .g-pill { font-size: 8pt; padding: 3pt 7pt; }
-.g-title h2 {
-  font-size: 19pt;
-  line-height: 1.1;
-  margin-top: 8pt;
+/* The cover reads as a band under the title, on the site's plate radius. */
+.g-hero {
+  border-radius: 5mm;
+  overflow: hidden;
+  margin: 14pt 0 18pt;
+  background: var(--plate);
 }
-.g-byline {
-  margin-top: 8pt;
-  gap: 6pt;
-  font-size: 9.5pt;
-  color: var(--warm-grey);
+.g-hero > img, .g-hero > video {
+  width: 100%;
+  height: 70mm;
+  aspect-ratio: auto;
+  object-fit: cover;
+  display: block;
 }
-.g-byline .who { color: var(--red110); }
-.g-byline br { display: none; }
-.g-byline .when::before { content: " · "; }
 
 /* ---------- body ---------- */
 
-.g-body { margin-top: 14pt; font-size: 11pt; }
-.g-body p { margin: 0 0 7pt; }
-.g-body h3 { font-size: 13.5pt; margin: 13pt 0 5pt; }
-.g-body h4 { font-size: 11pt; margin: 10pt 0 3pt; }
-.g-body .lead-in { font-size: 12pt; line-height: 1.4; }
-.g-body ul { margin: 0 0 9pt; padding-left: 14pt; }
-.g-body li { margin-bottom: 3pt; }
+.g-body { margin-top: 0; font-size: 10.5pt; color: var(--ink); }
+.g-body p { margin: 0 0 8pt; }
+.g-body.two-col { columns: 2; column-gap: 8mm; }
+/* A figure, a table or a fact plate runs the full block even in two columns. */
+.g-body.two-col .g-break,
+.g-body.two-col .g-table,
+.g-body.two-col .factlist { column-span: all; }
 
-/* A heading stays with what it introduces, and nothing here is allowed to
-   break across a page and leave half of itself behind. */
+/* The section heading takes the site's eyebrow dash above it. */
+.g-body h3 {
+  font-family: "Borna", sans-serif;
+  font-size: 14pt;
+  line-height: 1.16;
+  margin: 12pt 0 6pt;
+  /* A margin is dropped at a page break and padding is not, so the heading
+     that opens a page still clears the top of the text block. */
+  padding-top: 5pt;
+  color: var(--ink);
+}
+.g-body h3::before {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 7pt;
+}
+.g-body h4 {
+  font-family: "Borna", sans-serif;
+  font-size: 11pt;
+  margin: 11pt 0 3pt;
+  color: var(--ink);
+}
+.g-body .lead-in { font-size: 12pt; line-height: 1.4; color: var(--ink); }
+.g-body ul { margin: 0 0 8pt; padding-left: 14pt; }
+.g-body li { margin-bottom: 3pt; }
+.g-body a { color: var(--ink); }
+
 h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
 .g-body li, .g-body ul, .g-body ol, figure, blockquote, .g-numbers, .g-spec div,
-.g-table, .n-row, .n-year {
+.factlist, .n-row, .n-year, .p-end {
   break-inside: avoid;
 }
+/* A long table breaks across pages rather than leaving a page half empty, but
+   never mid row, and the head repeats on the continuation. */
+.g-table tr { break-inside: avoid; }
+.g-table thead { display: table-header-group; }
 
-/* A pull quote runs in the column with a rule beside it, the same as on the
-   page. It never gets a page to itself, so it is not allowed to start one. */
+/* ---------- quotes ---------- */
+
 .g-body blockquote {
   margin: 12pt 0;
-  padding-left: 10pt;
-  border-left: 2pt solid var(--flare);
-  font-size: 13pt;
+  padding: 10pt 12pt;
+  background: var(--plate);
+  border-left: 2.5pt solid var(--accent);
+  border-radius: 0 3mm 3mm 0;
+  font-family: "Borna", sans-serif;
+  font-size: 12.5pt;
   line-height: 1.2;
+  color: var(--ink);
   break-before: avoid;
 }
-.g-body blockquote cite { margin-top: 5pt; font-size: 9pt; }
+.g-body blockquote cite {
+  display: block;
+  margin-top: 6pt;
+  font-family: "DM Sans", sans-serif;
+  font-size: 8pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
 
 /* ---------- figures ---------- */
 
 .g-break {
   width: 100%;
-  margin: 10pt 0;
-  transform: none;
+  margin: 12pt 0;
   margin-left: 0;
+  transform: none;
   text-align: center;
 }
 .g-break img {
@@ -108,64 +200,132 @@ h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
   width: auto;
   max-width: 100%;
   margin: 0 auto;
-  border-radius: 4pt;
+  border-radius: 4mm;
 }
-.g-break figcaption { margin-top: 5pt; font-size: 8.5pt; }
-.g-figures { gap: 8pt; }
-.g-figures img { max-height: 46mm; border-radius: 3pt; }
+.g-break figcaption {
+  margin-top: 6pt;
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+.g-figures { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8pt; }
+.g-figures img { max-height: 40mm; aspect-ratio: 1.2; object-fit: cover; border-radius: 3mm; }
 
-/* ---------- fact blocks ---------- */
+/* ---------- plates: facts, numbers, tables ---------- */
 
-/* Key details and key outcomes read as a block of pairs, two to a line, rather
-   than one fact per line down a third of a page. */
+.factlist {
+  columns: 2;
+  column-gap: 8mm;
+  background: var(--plate);
+  border-radius: 4mm;
+  padding: 10pt 12pt;
+  margin: 10pt 0 12pt;
+  font-size: 9.5pt;
+}
+.g-body .factlist p, .g-body .factlist li { margin: 0 0 4pt; break-inside: avoid; }
+.factlist ul, ul.factlist { padding-left: 12pt; }
+
 .g-numbers {
+  background: var(--plate);
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8pt 16pt;
+  gap: 10pt 16pt;
   padding: 12pt 14pt;
-  border-radius: 6pt;
+  border-radius: 4mm;
   margin: 12pt 0;
 }
-.g-numbers .n { font-size: 15pt; }
-.g-numbers .l { margin-top: 2pt; font-size: 8.5pt; line-height: 1.3; }
+.g-numbers .n { font-family: "Borna", sans-serif; font-size: 16pt; color: var(--ink); }
+.g-numbers .n em { color: var(--accent); }
+.g-numbers .l { margin-top: 3pt; font-size: 8pt; line-height: 1.3; color: var(--ink-soft); }
 
 .g-spec {
   columns: 2;
-  column-gap: 16pt;
+  column-gap: 8mm;
+  background: var(--plate);
+  border-radius: 4mm;
+  padding: 10pt 12pt;
   margin: 12pt 0;
 }
-.g-spec div { padding: 4pt 0; font-size: 9.5pt; gap: 10pt; }
+.g-spec div {
+  padding: 4pt 0;
+  font-size: 9.5pt;
+  gap: 10pt;
+  border-bottom: 0.5pt solid var(--ink-faint);
+}
+.g-spec dt { color: var(--ink-soft); }
+.g-spec dd { color: var(--ink); }
 
-.g-table table { min-width: 0; font-size: 8.5pt; }
-.g-table th, .g-table td { padding: 4pt 6pt; }
+.g-table {
+  background: var(--plate);
+  border-radius: 4mm;
+  /* The top of a block that lands on a page boundary can be shaved, so the
+     plate keeps a little padding there for it to lose. */
+  padding: 10pt 12pt 8pt;
+  margin: 12pt 0;
+  overflow: visible;
+}
+.g-table table { min-width: 0; width: 100%; font-size: 8.5pt; color: var(--ink); }
+.g-table th, .g-table td {
+  padding: 5pt 6pt;
+  border-bottom: 0.5pt solid var(--ink-faint);
+  vertical-align: top;
+}
+.g-table thead th {
+  font-size: 7.5pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ink-soft);
+  border-bottom: 1.5pt solid var(--accent);
+  white-space: normal;
+}
+.g-table tbody tr:last-child td { border-bottom: 0; }
+.g-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 
-/* ---------- listings ---------- */
+/* ---------- news list ---------- */
 
-.g-mast { padding: 0 0 12pt; }
-.g-mast h1 { font-size: 22pt; margin-top: 8pt; }
-.g-mast .stand { font-size: 10pt; margin-top: 8pt; }
-.n-row { padding: 10pt 0; gap: 10pt; grid-template-columns: 96px 110px 130px minmax(0, 1fr) auto; }
-.n-row .head { font-size: 11pt; }
-.n-row .line { font-size: 9pt; margin-top: 4pt; }
-.n-row .when, .n-row .outlet { font-size: 9pt; }
+.n-list { border-top: 0.5pt solid var(--ink-faint); }
+.n-year {
+  font-size: 8pt;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  padding: 12pt 0 4pt;
+}
+.n-row {
+  grid-template-columns: 26mm 24mm minmax(0, 1fr);
+  gap: 8pt 10pt;
+  padding: 9pt 0;
+  border-bottom: 0.5pt solid var(--ink-faint);
+  color: var(--ink);
+}
+.n-row .cover { border-radius: 2mm; }
+.n-row .cover > img { aspect-ratio: 1.5; }
+.n-row .head { font-size: 10.5pt; color: var(--ink); }
+.n-row .line { font-size: 8.5pt; margin-top: 3pt; color: var(--ink-soft); }
+.n-row .when, .n-row .outlet { font-size: 8pt; color: var(--ink-soft); }
 .n-row .ext { display: none; }
 
-/* ---------- the source line, last page ---------- */
+/* ---------- closing plate ---------- */
 
-.print-url { display: block; margin-top: 14pt; font-size: 9pt; color: var(--warm-grey); }
-.print-url::after { content: attr(data-url); }
-
-/* Runs of short label and value lines, and short bullet lists, set two to a
-   line rather than one per line down the page. */
-.factlist {
-  columns: 2;
-  column-gap: 16pt;
-  margin: 0 0 9pt;
+.p-end {
+  display: block;
+  background: var(--plate);
+  border-left: 2.5pt solid var(--accent);
+  border-radius: 0 4mm 4mm 0;
+  padding: 12pt 14pt;
+  margin-top: 18pt;
+  font-size: 9.5pt;
+  color: var(--ink);
 }
-.g-body .factlist p, .g-body .factlist li { margin: 0 0 3pt; break-inside: avoid; }
-
-/* The PDF page is about 794 CSS pixels wide, so g.css's 900px breakpoint is
-   live and the print sheet would otherwise inherit the phone layout. */
-.g-figures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.g-figures img { max-height: 40mm; aspect-ratio: 1.2; object-fit: cover; }
-.g-break { width: 100%; margin-left: 0; transform: none; }
-.g-hero .plate { display: none !important; }
+.p-end p { margin: 0; }
+.p-end .ask { margin-top: 7pt; }
+.p-end .lead, .p-end .ask {
+  font-weight: 500;
+}
+.p-end .lead::after, .p-end .ask::after {
+  content: attr(data-url);
+  display: block;
+  font-weight: 400;
+  font-size: 9pt;
+  color: var(--ink-soft);
+  margin-top: 2pt;
+}
