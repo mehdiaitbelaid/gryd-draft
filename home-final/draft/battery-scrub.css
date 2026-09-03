@@ -19,48 +19,55 @@
    band to fall across. The height is stated rather than measured, so the page
    does not gain height after load. */
 .d-batt { position: relative; height: 340vh; }
-/* The card is a plain sticky block, not a flex box centring a short plate in a
-   screen. Centring was what put roughly 400px of empty paper between the
-   audience band and this one: the plate was 494px in a 900px card, so half the
-   difference sat above it and read as a hole in the page rather than as the
-   section rhythm. The plate now starts at the track's own top, which makes the
-   distance from the band above exactly that band's --sec-pad and nothing
-   else. */
-.d-batt .pin-card { position: sticky; top: 0; min-height: 100vh; }
+/* The card is a plain sticky block, not a flex box centring the plate in a
+   screen, and the plate is its own content height rather than a screen of its
+   own. Both of those have been tried and both were wrong in the same way: a
+   centred plate put about 200px of empty paper above it, on top of the band
+   above's own 96px, and a plate stretched to the viewport was a large empty
+   ground with a small amount of type in the middle of it.
+
+   What is left is a plate the size of what is on it, sitting a fixed distance
+   below the band above. Fixed matters: a centring offset is half of whatever
+   the window's height leaves over, so the join would move with the window,
+   and the gate below could only ever be true at one screen size. */
+.d-batt .pin-card {
+  position: sticky; top: 0; min-height: 100vh;
+  /* The join. Half a --sec-pad here, on top of the audience band's own full
+     one, puts the two bands one and a half --sec-pad apart: 144px at 1440.
+     96px on its own read as too tight and the old 299px read as a hole.
+
+     It sits on the card rather than on the track because a sticky offset is
+     measured from the window, not from its parent's padding box: this moves
+     where the plate starts on the page without moving where it is held. */
+  padding-top: calc(var(--sec-pad) * 0.5);
+}
 .d-batt .pin-card > .wrap { width: 100%; }
 
 /* The plate the band stands on. It stops at the content column rather than
    running to the window, so the band sits on the same edges as every other
-   section, and it holds the screen while it is pinned rather than floating in
-   the middle of one.
+   section.
 
-   The top and bottom padding is the nav's clearance. The pill's own box ends
-   at 72px, so 88px puts the plate's first line clear of it with air to spare,
-   and the same figure below keeps the contents optically centred in the
-   screen. The band's own words are then centred in what the nav leaves. */
+   Its own 48px of padding is what clears the nav while the band is held. The
+   pill's box ends at 72px and the plate is pinned at 48px, so the first line
+   on it starts at 96px, clear of the pill with air to spare. */
 .d-batt .band-plate {
   background: var(--stonelight);
   border-radius: var(--radius-panel);
-  box-sizing: border-box;
-  min-height: 100vh;
-  display: grid; align-content: center;
-  padding: 88px clamp(24px, 2.2vw, 32px);
+  padding: 48px clamp(28px, 3.2vw, 48px);
 }
-/* The clip takes the larger share, but only just: at the section heading size
-   the copy column needs a measure it can set 50px type in, and a column under
-   about 460px breaks the headline into a stack of two word lines. The split is
-   the narrowest that still leaves the square card over 560px. */
 .d-batt .band-grid {
-  display: grid; grid-template-columns: 0.92fr 1.08fr;
-  gap: 40px; align-items: center;
+  display: grid; grid-template-columns: 0.88fr 1.12fr;
+  gap: 54px; align-items: center;
 }
 
 /* The copy ---------------------------------------------------------------- */
 .d-batt .steps { position: relative; }
-/* The headline carries h2.sec-head, so its size, measure and label gap are the
-   page's shared section heading rule rather than a size invented here. Only the
-   colour is stated, because the plate is not paper. */
-.d-batt .band-intro h2 { color: var(--red110); }
+.d-batt .band-intro h2 {
+  font-size: clamp(28px, 2.9vw, 40px);
+  color: var(--red110);
+  max-width: 17ch;
+  margin-top: var(--label-gap);
+}
 /* the label here matches every other section label rather than being set in
    the ember; the dash before it is already the flare and carries the colour */
 .d-batt .eyebrow { color: var(--warm-grey); }
@@ -84,31 +91,24 @@
    they cross and no step is laid out below the fold of its own block. */
 .d-batt .steps-stack {
   display: grid; align-content: start;
-  min-height: 170px; margin-top: 34px;
+  min-height: 132px; margin-top: 30px;
 }
 .d-batt .steps-stack .step { grid-area: 1 / 1; }
 .d-batt .step { opacity: var(--o, 0); transform: translateY(var(--y, 18px)); }
-/* The step labels and their lines are the audience band's list sizes, so the
-   two bands read at the same weight down the page. */
 .d-batt .step h3 {
   font-family: var(--font-display); font-weight: 500;
-  font-size: clamp(30px, 3.2vw, 36px); letter-spacing: -.03em; line-height: 1.05;
+  font-size: clamp(23px, 2.1vw, 29px); letter-spacing: -.03em; line-height: 1;
   color: var(--red110); margin: 0; max-width: 16ch;
 }
 .d-batt .step p {
-  margin: 14px 0 0; max-width: 34ch;
-  font-size: 17px; line-height: 1.55; color: var(--ink-soft);
+  margin: 12px 0 0; max-width: 34ch;
+  font-size: 15.5px; line-height: 1.5; color: var(--ink-soft);
 }
 
 /* The clip ---------------------------------------------------------------- */
-/* The clip is square, and the card with it. The clay frame was 16 by 10 with
-   the house sitting small in the middle of it; cropped square the house fills
-   the card, the lit windows and the wall unit are legible, and enough of the
-   shadow is kept for the light to read. The crop is in the file rather than in
-   object-fit, so nothing is thrown away at paint time. */
 .d-batt .visual {
   position: relative; overflow: hidden;
-  border-radius: 18px; aspect-ratio: 1 / 1; min-height: 560px;
+  border-radius: 18px; aspect-ratio: 16 / 10;
   background: var(--paper); border: 1px solid var(--stone-mid);
 }
 .d-batt .visual .poster,
@@ -156,9 +156,12 @@
    the picture is the evening still. */
 @media (prefers-reduced-motion: reduce) {
   .d-batt { height: auto; }
-  .d-batt .pin-card { position: static; min-height: 0; padding: var(--sec-pad) 0; }
-  .d-batt .band-plate { min-height: 0; display: block; padding: 40px clamp(24px, 3vw, 40px); }
-  .d-batt .visual { min-height: 0; }
+  /* unpinned the card carries the join itself, so the two bands stay one and
+     a half --sec-pad apart here too */
+  .d-batt .pin-card {
+    position: static; min-height: 0;
+    padding: calc(var(--sec-pad) * 0.5) 0 var(--sec-pad);
+  }
   .d-batt .steps-stack { display: block; min-height: 0; }
   .d-batt .steps-stack .step { grid-area: auto; opacity: 1; transform: none; margin-top: 26px; }
   .d-batt .rail i::after { transform: scaleX(1); }
@@ -173,9 +176,13 @@
    collapses to the copy and the evening still. */
 @media (max-width: 900px) {
   .d-batt { height: auto; }
-  .d-batt .pin-card { position: static; min-height: 0; padding: var(--sec-pad) 0; }
-  .d-batt .band-plate { min-height: 0; display: block; padding: 34px 24px; }
-  .d-batt .visual { min-height: 0; }
+  /* unpinned the card carries the join itself, so the two bands stay one and
+     a half --sec-pad apart here too */
+  .d-batt .pin-card {
+    position: static; min-height: 0;
+    padding: calc(var(--sec-pad) * 0.5) 0 var(--sec-pad);
+  }
+  .d-batt .band-plate { padding: 34px 24px; }
   .d-batt .band-grid { grid-template-columns: 1fr; gap: 34px; }
   .d-batt .steps-stack { display: block; min-height: 0; }
   .d-batt .steps-stack .step { grid-area: auto; opacity: 1; transform: none; margin-top: 26px; }
