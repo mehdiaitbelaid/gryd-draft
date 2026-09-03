@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tools, Gryd</title>
-<meta name="description" content="The two Gryd tools live at launch: the site assessment and the Future Homes Standard readiness checker.">
+<meta name="description" content="The three Gryd tools live at launch: the site assessment, the Future Homes Standard readiness checker, and the Council Solar Index.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/tokens.css">
 <link rel="stylesheet" href="g.css">
 <style>
-  /* Two tools, so the three column listing grid would leave a hole. The pair sits
-     on its own two column grid at the listing's gutter. Battery modelling came
-     off the page on Scott's call of 3 September and is not listed here.
+  /* Three tools, so the run sits on the listing's own three column grid at the
+     listing's gutter. Battery modelling came off the page on Scott's call of
+     3 September and is not listed here.
 
      The covers carry no photograph on purpose: a tool is not a project or an
      article, and a stock rooftop under a calculator would read as a case study.
@@ -23,7 +23,7 @@
 
   .t-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 32px;
     align-items: start;
   }
@@ -122,8 +122,8 @@
 
   <header class="g-mast">
     <span class="eyebrow">Tools</span>
-    <h1>Two tools. Each answers a question before you commit a plot.</h1>
-    <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard.</p>
+    <h1>Three tools. Each answers a question before you commit a plot.</h1>
+    <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.</p>
   </header>
 
   <div class="t-grid">
@@ -159,13 +159,28 @@
       <span class="go">Open the checker &rarr;</span>
     </a>
 
+    <a class="t-card" href="council-solar-index.html">
+      <span class="t-cover">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3.5a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25z"/>
+          <path d="M3.5 16h25M16 3.5c3.2 3.4 4.8 7.6 4.8 12.5S19.2 25.1 16 28.5c-3.2-3.4-4.8-7.6-4.8-12.5S12.8 6.9 16 3.5z"/>
+        </svg>
+        <span class="over">Council Solar Index</span>
+      </span>
+      <span class="g-pill">Council housing</span>
+      <h2>See how far council housing has got with rooftop solar</h2>
+      <p class="dek">Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.</p>
+      <p class="facts"><span>UK wide</span><span>2025 and 2026 returns</span></p>
+      <span class="go">Open the map &rarr;</span>
+    </a>
+
   </div>
 
   <p class="t-note">Battery modelling and a grid constraint check are still in design. Each is listed here once it is ready to be used rather than looked at.</p>
 
   <div class="g-close">
     <h2>Not sure which one you need?</h2>
-    <p>Send us the scheme. We will run both and come back with the numbers.</p>
+    <p>Send us the scheme. We will run the ones that apply and come back with the numbers.</p>
     <a class="btn" href="request-site-assessment.html">Request a site assessment</a>
   </div>
 

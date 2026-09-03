@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Council Solar Index, Gryd tools</title>
+<meta name="description" content="Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="g.css">
+<link rel="stylesheet" href="council-solar-index.css">
+</head>
+<body>
+
+<!-- the shared pill nav, the same one every other page in the tree carries -->
+<script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="csi-page">
+<div class="wrap">
+
+  <header class="csi-mast">
+    <span class="eyebrow">Gryd &middot; Council Housing</span>
+    <h1>The Gryd Council Housing Solar Index</h1>
+    <p class="stand">Click a country to drill into regions, then a region to see individual local authorities. Toggle between solar uptake and EPC ratings, and compare 2025 vs 2026 reported figures.</p>
+  </header>
+
+  <div class="csi-bar">
+    <div class="csi-ctrls">
+      <div class="csi-ctrl">
+        <span class="eyebrow">Metric</span>
+        <div class="csi-seg" id="csiMetric" role="radiogroup" aria-label="Metric">
+          <button type="button" role="radio" aria-checked="true" data-value="pctSolar">% with solar</button>
+          <button type="button" role="radio" aria-checked="false" data-value="pctEpcDPlus">% EPC D or worse</button>
+        </div>
+      </div>
+      <div class="csi-ctrl">
+        <span class="eyebrow">Reported year</span>
+        <div class="csi-seg" id="csiYear" role="radiogroup" aria-label="Reported year">
+          <button type="button" role="radio" aria-checked="false" data-value="2025">2025</button>
+          <button type="button" role="radio" aria-checked="true" data-value="2026">2026</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="csi-stage">
+
+    <div class="csi-map">
+      <div class="canvas" id="csiCanvas"></div>
+      <p class="csi-state" id="csiLoading">Loading map…</p>
+      <p class="csi-state bad" id="csiFailed" hidden></p>
+
+      <div class="csi-over">
+        <div class="csi-crumbs">
+          <div class="csi-plate">
+            <nav id="csiCrumbs" aria-label="Breadcrumb"></nav>
+            <div class="csi-viewing" id="csiViewing"></div>
+          </div>
+          <button type="button" class="csi-reset" id="csiReset" hidden>&larr; Reset to UK</button>
+        </div>
+
+        <details class="csi-legend csi-plate" open>
+          <summary><span id="csiLegendTitle">Council Homes With Solar</span></summary>
+          <div class="keys" id="csiLegendKeys"></div>
+        </details>
+      </div>
+    </div>
+
+    <aside class="csi-rail">
+      <span class="eyebrow">Insights</span>
+      <div class="scope" id="csiScope">United Kingdom</div>
+      <div class="rows" id="csiRows"></div>
+      <p class="basis">Based on 2026 council reports (2025 where noted)</p>
+    </aside>
+
+  </div>
+
+  <details class="csi-method">
+    <summary>Methodology &amp; caveats</summary>
+    <div class="body">
+      <p>Figures come from Gryd's Freedom of Information returns to UK local authorities for 2025 and 2026. Each council was asked for total council-owned homes, homes with rooftop solar, and homes rated EPC D or worse.</p>
+      <p>Authorities that transferred their stock to housing associations or ALMOs may report low or zero figures. EPC coverage varies; some councils only hold ratings for a sub-set of their stock.</p>
+      <p>Region and country totals are summed from raw counts in the returns above. The Northern Ireland Housing Executive return is treated as the single NI rollup. Boundaries: <span id="csiBoundary"></span>.</p>
+    </div>
+  </details>
+
+  <div class="g-close">
+    <h2>Want the same read on your own stock?</h2>
+    <p>Send us the addresses. We come back with what the roofs carry and what it is worth.</p>
+    <a class="btn" href="request-site-assessment.html">Request a site assessment</a>
+  </div>
+
+</div>
+</div>
+
+<div class="csi-tip" id="csiTip" role="tooltip" hidden></div>
+
+<!-- the canonical footer, generated from the homepage's own -->
+<script src="../../home-final/assets/site-footer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
+<script src="council-solar-index.js"></script>
+
+</body>
+</html>
