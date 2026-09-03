@@ -903,6 +903,50 @@
     });
   }
 
+  /* The methodology plate. Same measured height accordion as the homepage FAQ
+     in home-ui.js: set the panel to its scroll height, then let CSS carry it,
+     and hand the height back to auto once the transition lands so later reflow
+     is not pinned to a stale pixel value. */
+  function initMethod() {
+    var btn = $("csiMethodBtn");
+    var panel = $("csiMethodPanel");
+    var plate = btn && btn.closest(".csi-method");
+    if (!btn || !panel || !plate) return;
+    var reduced = window.matchMedia
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    panel.style.height = "0px";
+    panel.addEventListener("transitionend", function (e) {
+      if (e.propertyName === "height" && btn.getAttribute("aria-expanded") === "true") {
+        panel.style.height = "auto";
+      }
+    });
+
+    btn.addEventListener("click", function () {
+      var open = btn.getAttribute("aria-expanded") !== "true";
+      btn.setAttribute("aria-expanded", String(open));
+      plate.classList.toggle("is-open", open);
+      if (reduced) {
+        // No transition to ride, so transitionend never fires and the panel
+        // would stay pinned at a pixel height.
+        panel.style.height = open ? "auto" : "0px";
+        return;
+      }
+      if (open) {
+        panel.style.height = panel.scrollHeight + "px";
+      } else {
+        panel.style.height = panel.scrollHeight + "px";
+        requestAnimationFrame(function () { panel.style.height = "0px"; });
+      }
+    });
+
+    // An open panel sitting at auto needs no help; one pinned to a pixel height
+    // would keep a stale measurement after the text reflows.
+    window.addEventListener("resize", function () {
+      if (btn.getAttribute("aria-expanded") === "true") panel.style.height = "auto";
+    });
+  }
+
   function wireChrome() {
     el.segMetric.addEventListener("click", function (e) {
       var b = e.target.closest("button");
@@ -944,6 +988,7 @@
     el.rows = $("csiRows");
     el.boundaryNote = $("csiBoundary");
     wireChrome();
+    initMethod();
 
     Promise.all([
       fetch(DATA + "metrics.json").then(function (r) { if (!r.ok) throw new Error("Failed to load metrics"); return r.json(); }),

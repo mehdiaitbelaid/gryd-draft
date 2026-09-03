@@ -379,31 +379,72 @@
 .csi-state[hidden] { display: none; }
 .csi-state.bad { color: var(--ember); }
 
+/* The same accordion the FAQ wears, so the two feel identical: a measured
+   height transition on .34s cubic-bezier(.22,.61,.36,1) and the corner chevron
+   turning 45 to 225 degrees. Lifted from faq.css rather than reinvented. Two
+   things are added here, because this is one plate rather than a hairline
+   stack: the body rises 8px as it fades in, and the plate's own bottom padding
+   eases with the height so the closed pill does not jump on the first frame. */
+
 .csi-method {
   margin-top: 32px;
   background: var(--stonelight);
   border-radius: var(--radius-panel);
   padding: 26px 30px;
+  transition: padding-bottom .34s cubic-bezier(.22,.61,.36,1);
 }
-.csi-method summary {
+.csi-method.is-open { padding-bottom: 32px; }
+
+.csi-method-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: none;
+  border: 0;
+  padding: 0;
   cursor: pointer;
-  list-style: none;
+  text-align: left;
+  font: inherit;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--warm-grey);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
-.csi-method summary::-webkit-details-marker { display: none; }
-.csi-method summary::after { content: "\2304"; font-size: 16px; line-height: 1; }
-.csi-method[open] summary::after { content: "\2303"; }
-.csi-method summary:hover { color: var(--red110); }
-.csi-method .body { max-width: 74ch; }
+.csi-method-q:hover { color: var(--red110); }
+.csi-method-q:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
+.csi-method .chev {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-right: 2px solid var(--flare);
+  border-bottom: 2px solid var(--flare);
+  transform: rotate(45deg);
+  transform-origin: 60% 60%;
+  transition: transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.csi-method-q[aria-expanded="true"] .chev { transform: rotate(225deg); }
+
+.csi-method-a {
+  overflow: hidden;
+  height: 0;
+  transition: height .34s cubic-bezier(.22,.61,.36,1);
+}
+.csi-method .body {
+  max-width: 74ch;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .34s cubic-bezier(.22,.61,.36,1),
+              transform .34s cubic-bezier(.22,.61,.36,1);
+}
+.csi-method-q[aria-expanded="true"] + .csi-method-a .body { opacity: 1; transform: none; }
 .csi-method .body p { margin: 16px 0 0; font-size: 15px; line-height: 1.6; color: #6B4A3E; }
+
+@media (prefers-reduced-motion: reduce) {
+  .csi-method, .csi-method-a, .csi-method .body, .csi-method .chev { transition: none; }
+}
 
 @media (max-width: 1080px) {
   .csi-stage { grid-template-columns: minmax(0, 1fr); }

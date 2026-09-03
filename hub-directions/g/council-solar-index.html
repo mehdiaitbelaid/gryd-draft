@@ -85,14 +85,20 @@
 
   </div>
 
-  <details class="csi-method">
-    <summary>Methodology &amp; caveats</summary>
+  <div class="csi-method">
+    <button class="csi-method-q" type="button" id="csiMethodBtn"
+            aria-expanded="false" aria-controls="csiMethodPanel">
+      <span>Methodology &amp; caveats</span>
+      <span class="chev" aria-hidden="true"></span>
+    </button>
+    <div class="csi-method-a" id="csiMethodPanel" role="region" aria-labelledby="csiMethodBtn">
     <div class="body">
       <p>Figures come from Gryd's Freedom of Information returns to UK local authorities for 2025 and 2026. Each council was asked for total council-owned homes, homes with rooftop solar, and homes rated EPC D or worse.</p>
       <p>Authorities that transferred their stock to housing associations or ALMOs may report low or zero figures. EPC coverage varies; some councils only hold ratings for a sub-set of their stock.</p>
       <p>Region and country totals are summed from raw counts in the returns above. The Northern Ireland Housing Executive return is treated as the single NI rollup. Boundaries: <span id="csiBoundary"></span>.</p>
     </div>
-  </details>
+    </div>
+  </div>
 
   <div class="g-close">
     <h2>Want the same read on your own stock?</h2>
