@@ -124,7 +124,9 @@
 .f-tiles {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  /* 16px is the site's standing clearance between things that light up under a
+     pointer, and these five sit side by side */
+  gap: 16px;
   max-width: 620px;
 }
 .f-tile {
@@ -317,35 +319,125 @@
   font-weight: 500;
   margin-bottom: 6px;
 }
-[hidden] { display: none !important; }
+
+/* The flow confirms on one screen. Every answer is already known by the time
+   the reader gets here, so the receipt is a two column ledger at reading size
+   rather than a page to scroll: at 1440x900 the whole state, nav included,
+   fits the viewport and the page has no scroll of its own. */
+.sa-done.fit { padding: 0 0 24px; }
+.sa-done.fit h2 { font-size: clamp(30px, 3.2vw, 42px); max-width: 22ch; }
+.sa-done.fit .stand { font-size: 16px; line-height: 1.5; max-width: 68ch; margin-top: 12px; }
+.sa-done.fit .receipts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+  margin-top: 26px;
+}
+.sa-done.fit .receipt { margin-top: 0; }
+.sa-done.fit .f-rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 34px;
+}
+.sa-done.fit .f-row {
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 14px;
+  padding: 9px 0 8px;
+  align-items: baseline;
+}
+.sa-done.fit .f-lab { font-size: 11px; letter-spacing: 0.12em; padding-top: 0; }
+.sa-done.fit .a-val { font-size: 15px; }
+.sa-done.fit .f-returns li { padding: 9px 0; font-size: 15px; grid-template-columns: 34px minmax(0, 1fr); }
 
 
+/* ------------------------------------------------- the tool page, column and rail */
+/* The first stage asks three questions and has to be readable without a
+   scroll, so the masthead on this page is set a step down from the display
+   size the marketing pages use and gives the stage the rest of the screen. */
+.sa-tool .sa-mast { padding-bottom: 40px; }
+.sa-tool .sa-mast h1 { font-size: clamp(34px, 3.8vw, 52px); max-width: 20ch; }
+.sa-tool .sa-mast .stand { font-size: 17px; max-width: 62ch; }
+.sa-tool .a-block .f-row { padding: 18px 0 16px; }
 
-/* the explainer page, same rows on the hub's reading measure */
-.x-measure { max-width: 760px; }
-.x-hero {
-  border-radius: var(--radius-panel);
-  overflow: hidden;
+
+.a-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 64px;
+  align-items: start;
+}
+.a-rail {
+  position: sticky;
+  top: 132px;
   background: var(--stonelight);
-  margin-bottom: var(--sec-pad);
+  border-radius: var(--radius-panel);
+  padding: 30px 28px 12px;
 }
-.x-hero img { width: 100%; height: 340px; object-fit: cover; }
-.x-body p { font-size: 18px; line-height: 1.65; color: var(--ink-soft); max-width: 62ch; }
-.x-body h2 { font-size: clamp(26px, 2.6vw, 36px); margin-top: var(--sec-pad); }
-.x-body h2 + p { margin-top: var(--head-gap); }
-.x-cta { margin-top: var(--sec-pad); }
+.a-rail h2 {
+  font-size: 24px;
+  margin: var(--label-gap) 0 18px;
+}
+.a-rail dl { margin: 0; border-top: 1px solid var(--stone-mid); }
+.a-rail .r-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--stone-mid);
+}
+.a-rail dt {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+  flex: none;
+}
+.a-rail dd {
+  margin: 0;
+  font-family: "Borna", sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: 17px;
+  text-align: right;
+  color: var(--red110);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.a-rail dd.empty { color: var(--stone-mid); }
+.a-rail .r-note { font-size: 13px; color: var(--warm-grey); padding: 16px 0 18px; }
+
+.a-block + .a-block { margin-top: var(--sec-pad); }
+.a-block > .eyebrow { margin-bottom: 6px; }
+
+/* ------------------------------------------------------ the flow, three stages */
+/* The flow is a task screen, not a page to browse. Each stage and the
+   confirmation hold the viewport on their own, so the site footer stands down
+   for the whole page: it is written into the markup rather than switched off
+   in script, which would race the footer's own injection. */
+body.sa-flow > footer { display: none; }
 
 
-/* -------------------------------------------------------- E, one question at a time */
-
-.e-col { max-width: 820px; margin: 0 auto; min-height: 62vh; }
+.e-col { max-width: 900px; }
 .e-prog {
-  height: 2px;
-  background: var(--stone-mid);
-  position: relative;
-  margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 34px;
 }
-.e-prog i {
+.e-seg .s-lab {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--stone-mid);
+  margin-bottom: 10px;
+}
+.e-seg.done .s-lab { color: var(--warm-grey); }
+.e-seg.on .s-lab { color: var(--red110); }
+.e-seg .s-bar { display: block; height: 2px; background: var(--stone-mid); position: relative; }
+.e-seg .s-bar i {
   position: absolute;
   inset: 0 auto 0 0;
   display: block;
@@ -354,25 +446,20 @@
   background: var(--flare);
   transition: width .4s cubic-bezier(.22,.61,.36,1);
 }
-/* the way back to the explainer, quiet enough not to compete with the question */
-.e-aside { margin: 0 0 22px; font-size: 13px; }
-.e-aside a { color: var(--warm-grey); text-decoration: none; border-bottom: 1px solid var(--stone-mid); }
-.e-aside a:hover { color: var(--red110); }
 
-.e-ledger { border-top: 1px solid var(--stone-mid); margin-bottom: 52px; }
+.e-ledger { border-top: 1px solid var(--stone-mid); margin-bottom: 30px; }
 .e-ledger:empty { border-top: 0; margin-bottom: 0; }
 .e-ledger .l-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 20px;
-  padding: 12px 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--stone-mid);
-  font-size: 15px;
 }
 .e-ledger .l-row .k {
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  font-size: 11px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--warm-grey);
 }
@@ -380,16 +467,22 @@
   font-family: "Borna", sans-serif;
   font-weight: 500;
   letter-spacing: -0.02em;
-  font-size: 17px;
+  font-size: 15px;
   color: var(--red110);
   text-align: right;
 }
-.e-q h2 { font-size: clamp(34px, 4.4vw, 60px); max-width: 16ch; margin-top: var(--label-gap); }
-.e-q .lede { font-size: 17px; color: var(--ink-soft); margin: var(--head-gap) 0 0; max-width: 50ch; }
-.e-q .f-in { margin-top: 40px; }
-.e-q .f-text { font-size: clamp(28px, 3.2vw, 40px); }
-.e-q .f-tiles { max-width: 100%; }
-.e-nav { display: flex; align-items: center; gap: 26px; margin-top: 46px; }
+
+.e-stage > .eyebrow { margin-bottom: 6px; }
+.e-stage .f-row { padding: 13px 0 12px; }
+/* stage three carries the heavy fields, so they run tighter here than on the
+   tool page and the whole stage stays close to one screen */
+.e-stage .f-drop .inner { padding: 18px 20px; }
+.e-stage .f-drop .d-line { font-size: 19px; margin-top: 10px; }
+.e-stage .f-area { min-height: 64px; }
+.e-stage .f-tiles { max-width: 460px; gap: 16px; }
+.e-stage .f-hint { margin-top: 6px; }
+.e-stage .f-text { font-size: 22px; }
+.e-nav { display: flex; align-items: center; gap: 26px; margin-top: 30px; }
 .e-back {
   font: inherit;
   font-size: 14px;
@@ -408,8 +501,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+[hidden] { display: none !important; }
+
+
+
+
 /* ------------------------------------------------------------------ narrow screens */
 
+@media (max-width: 1080px) {
+  .a-cols { grid-template-columns: minmax(0, 1fr); gap: 44px; }
+  .a-rail { position: static; }
+}
 @media (max-width: 760px) {
   .f-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .f-lab { padding-top: 0; }
@@ -418,5 +520,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .f-tile img, .f-tile::after, .e-prog i { transition: none; }
+  .f-tile img, .f-tile::after, .e-seg .s-bar i { transition: none; }
 }

@@ -116,54 +116,80 @@
       ev.preventDefault();
       form.hidden = true;
       done.hidden = false;
+      /* the fit confirmation holds the whole screen, footer included, so the
+         reader has nothing to scroll past to read it */
       window.scrollTo(0, 0);
     });
   }
 
-  /* ------------------------------------------------- E, one question at a time */
+  /* ----------------------------------------------- the flow, three stages */
+  /* Every question in a stage is on screen together, so the reader answers a
+     short screen rather than a queue. Finished stages collapse into the ledger
+     above and fill their segment of the dash. */
 
-  var eCol = doc.querySelector("[data-one-at-a-time]");
-  if (eCol) {
-    var qs = all(".e-q", eCol);
-    var ledger = eCol.querySelector(".e-ledger");
-    var fill = eCol.querySelector(".e-prog i");
+  var col = doc.querySelector("[data-staged]");
+  if (col) {
+
+    var stages = all(".e-stage", col);
+    var ledger = col.querySelector(".e-ledger");
+    var segs = all(".e-seg", col);
     var at = 0;
 
+    function keysIn(stage) {
+      return all("[data-key], [data-tile-group], [data-seg], [data-drop]", stage)
+        .map(function (el) {
+          return el.getAttribute("data-key") || el.getAttribute("data-tile-group") ||
+                 el.getAttribute("data-seg") || el.getAttribute("data-drop");
+        }).filter(Boolean);
+    }
+
+    function labelFor(key) {
+      var el = col.querySelector('[data-key="' + key + '"], [data-tile-group="' + key +
+                                 '"], [data-seg="' + key + '"], [data-drop="' + key + '"]');
+      var row = el && el.closest(".f-row");
+      var lab = row && row.querySelector(".f-lab");
+      return lab ? lab.textContent : key;
+    }
+
     function show(i) {
-      at = Math.max(0, Math.min(qs.length - 1, i));
-      qs.forEach(function (q, n) { q.hidden = n !== at; });
-      if (fill) { fill.style.width = ((at + 1) / qs.length * 100).toFixed(1) + "%"; }
+      at = Math.max(0, Math.min(stages.length - 1, i));
+      stages.forEach(function (s, n) { s.hidden = n !== at; });
+      segs.forEach(function (seg, n) {
+        var bar = seg.querySelector("i");
+        if (bar) { bar.style.width = n < at ? "100%" : (n === at ? "50%" : "0%"); }
+        seg.classList.toggle("on", n === at);
+        seg.classList.toggle("done", n < at);
+      });
       writeLedger();
-      var first = qs[at].querySelector(".f-text, .f-area, .f-tile, .seg");
+      var first = stages[at].querySelector(".f-text, .f-area, .f-tile, .seg");
       if (first && first.focus) { first.focus({ preventScroll: true }); }
+      window.scrollTo(0, 0);
     }
 
     function writeLedger() {
       if (!ledger) { return; }
       ledger.innerHTML = "";
-      qs.slice(0, at).forEach(function (q) {
-        var name = q.getAttribute("data-ledger") || "";
-        var key = q.getAttribute("data-ledger-key");
-        var v = key ? values[key] : "";
-        if (!v) { v = "Skipped"; }
-        var row = doc.createElement("div");
-        row.className = "l-row";
-        var k = doc.createElement("span");
-        k.className = "k";
-        k.textContent = name;
-        var val = doc.createElement("span");
-        val.className = "v";
-        val.textContent = v;
-        row.appendChild(k);
-        row.appendChild(val);
-        ledger.appendChild(row);
+      stages.slice(0, at).forEach(function (stage) {
+        keysIn(stage).forEach(function (key) {
+          var row = doc.createElement("div");
+          row.className = "l-row";
+          var k = doc.createElement("span");
+          k.className = "k";
+          k.textContent = labelFor(key);
+          var v = doc.createElement("span");
+          v.className = "v";
+          v.textContent = values[key] || "Skipped";
+          row.appendChild(k);
+          row.appendChild(v);
+          ledger.appendChild(row);
+        });
       });
     }
 
-    all("[data-next]", eCol).forEach(function (b) {
+    all("[data-next]", col).forEach(function (b) {
       b.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1); });
     });
-    all("[data-back]", eCol).forEach(function (b) {
+    all("[data-back]", col).forEach(function (b) {
       b.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1); });
     });
     show(0);
