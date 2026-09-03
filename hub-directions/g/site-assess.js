@@ -122,36 +122,18 @@
     });
   }
 
-  /* ----------------------------------------------- the flow, three stages */
-  /* Every question in a stage is on screen together, so the reader answers a
-     short screen rather than a queue. Finished stages collapse into the ledger
-     above and fill their segment of the dash. */
+  /* ------------------------------------------------------- the three stages */
+  /* Both pages run the same gate: one stage on screen, every question in it
+     visible at once, nothing from a later stage rendered before its turn. The
+     rail beside it keeps the answers already given. */
 
   var col = doc.querySelector("[data-staged]");
   if (col) {
-
     var stages = all(".e-stage", col);
-    var ledger = col.querySelector(".e-ledger");
     var segs = all(".e-seg", col);
     var at = 0;
 
-    function keysIn(stage) {
-      return all("[data-key], [data-tile-group], [data-seg], [data-drop]", stage)
-        .map(function (el) {
-          return el.getAttribute("data-key") || el.getAttribute("data-tile-group") ||
-                 el.getAttribute("data-seg") || el.getAttribute("data-drop");
-        }).filter(Boolean);
-    }
-
-    function labelFor(key) {
-      var el = col.querySelector('[data-key="' + key + '"], [data-tile-group="' + key +
-                                 '"], [data-seg="' + key + '"], [data-drop="' + key + '"]');
-      var row = el && el.closest(".f-row");
-      var lab = row && row.querySelector(".f-lab");
-      return lab ? lab.textContent : key;
-    }
-
-    function show(i) {
+    function show(i, moved) {
       at = Math.max(0, Math.min(stages.length - 1, i));
       stages.forEach(function (s, n) { s.hidden = n !== at; });
       segs.forEach(function (seg, n) {
@@ -160,37 +142,23 @@
         seg.classList.toggle("on", n === at);
         seg.classList.toggle("done", n < at);
       });
-      writeLedger();
+      doc.body.classList.toggle("past-first", at > 0);
       var first = stages[at].querySelector(".f-text, .f-area, .f-tile, .seg");
       if (first && first.focus) { first.focus({ preventScroll: true }); }
-      window.scrollTo(0, 0);
-    }
-
-    function writeLedger() {
-      if (!ledger) { return; }
-      ledger.innerHTML = "";
-      stages.slice(0, at).forEach(function (stage) {
-        keysIn(stage).forEach(function (key) {
-          var row = doc.createElement("div");
-          row.className = "l-row";
-          var k = doc.createElement("span");
-          k.className = "k";
-          k.textContent = labelFor(key);
-          var v = doc.createElement("span");
-          v.className = "v";
-          v.textContent = values[key] || "Skipped";
-          row.appendChild(k);
-          row.appendChild(v);
-          ledger.appendChild(row);
-        });
-      });
+      /* the reader asked for the next stage, so put it under the nav rather
+         than leaving them where the last one ended. Not on the first paint,
+         which would throw away the headline band. */
+      if (moved) {
+        var top = stages[at].getBoundingClientRect().top + window.scrollY;
+        window.scrollTo(0, Math.max(0, Math.round(top - 132)));
+      }
     }
 
     all("[data-next]", col).forEach(function (b) {
-      b.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1); });
+      b.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });
     });
     all("[data-back]", col).forEach(function (b) {
-      b.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1); });
+      b.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true); });
     });
     show(0);
   }

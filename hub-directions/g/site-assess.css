@@ -265,8 +265,8 @@
   color: var(--warm-grey);
 }
 .f-consent {
-  margin: 16px 0 0;
-  font-size: 13px;
+  margin: 14px 0 0;
+  font-size: 12px;
   line-height: 1.55;
   color: var(--warm-grey);
   max-width: 54ch;
@@ -351,44 +351,38 @@
 .sa-done.fit .f-returns li { padding: 9px 0; font-size: 15px; grid-template-columns: 34px minmax(0, 1fr); }
 
 
-/* ------------------------------------------------- the tool page, column and rail */
-/* The first stage asks three questions and has to be readable without a
-   scroll, so the masthead on this page is set a step down from the display
-   size the marketing pages use and gives the stage the rest of the screen. */
-.sa-tool .sa-mast { padding-bottom: 40px; }
-.sa-tool .sa-mast h1 { font-size: clamp(34px, 3.8vw, 52px); max-width: 20ch; }
-.sa-tool .sa-mast .stand { font-size: 17px; max-width: 62ch; }
-.sa-tool .a-block .f-row { padding: 18px 0 16px; }
-
+/* --------------------------------------------------- the staged form and its rail */
+/* Both pages run the same three stages: the questions down the content column,
+   a warm plate rail beside them that fills as the answers come in. One stage is
+   on screen at a time and it is sized to hold the viewport rather than sit in a
+   band of paper, so the fields are set at the site's larger input size and the
+   rows carry the height that goes with it. */
 
 .a-cols {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 64px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 56px;
+  align-items: stretch;
 }
+.a-col { min-width: 0; }
 .a-rail {
-  position: sticky;
-  top: 132px;
   background: var(--stonelight);
   border-radius: var(--radius-panel);
-  padding: 30px 28px 12px;
+  padding: 20px 24px 16px;
+  align-self: stretch;
 }
-.a-rail h2 {
-  font-size: 24px;
-  margin: var(--label-gap) 0 18px;
-}
+.a-rail h2 { font-size: 19px; margin: 6px 0 10px; }
 .a-rail dl { margin: 0; border-top: 1px solid var(--stone-mid); }
 .a-rail .r-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 14px;
-  padding: 13px 0;
+  padding: 5px 0;
   border-bottom: 1px solid var(--stone-mid);
 }
 .a-rail dt {
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--warm-grey);
@@ -399,32 +393,79 @@
   font-family: "Borna", sans-serif;
   font-weight: 500;
   letter-spacing: -0.02em;
-  font-size: 17px;
+  font-size: 15px;
   text-align: right;
   color: var(--red110);
   min-width: 0;
   overflow-wrap: anywhere;
 }
 .a-rail dd.empty { color: var(--stone-mid); }
-.a-rail .r-note { font-size: 13px; color: var(--warm-grey); padding: 16px 0 18px; }
+.a-rail .r-head {
+  margin: 18px 0 0;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+}
+.a-rail .f-returns li { padding: 5px 0; font-size: 13px; grid-template-columns: 26px minmax(0, 1fr); }
+.a-rail .r-note { font-size: 12px; color: var(--warm-grey); padding: 10px 0 0; margin: 0; }
 
-.a-block + .a-block { margin-top: var(--sec-pad); }
+/* the stage itself */
 .a-block > .eyebrow { margin-bottom: 6px; }
+.a-block .f-row { padding: 18px 0 16px; }
+.a-block .f-text { font-size: clamp(26px, 2.1vw, 30px); }
+.a-block .f-area { font-size: 20px; min-height: 76px; }
+.a-block .f-lab { padding-top: 16px; }
+.e-nav { display: flex; align-items: center; gap: 26px; margin-top: 22px; }
+.e-stage[data-stage="2"] .e-nav { margin-top: 14px; }
+.e-stage[data-stage="2"] .f-consent { margin-top: 10px; }
+.e-back {
+  font: inherit;
+  font-size: 14px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--warm-grey);
+}
+.e-back:hover { color: var(--red110); }
+.e-count {
+  margin-left: auto;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--warm-grey);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The tool page keeps its headline band, set a step down from the marketing
+   pages so the whole stage still lands on the first screen. Like the flow it is
+   a task page, so the site footer stands down while a stage is open. */
+body.sa-tool > footer { display: none; }
+body.sa-tool .sa { padding-top: 104px; }
+.sa-tool .sa-mast { padding-bottom: 22px; }
+.sa-tool .sa-mast h1 { font-size: clamp(26px, 2.5vw, 34px); max-width: 22ch; margin-top: 6px; }
+.sa-tool .sa-mast .stand { font-size: 15px; max-width: 70ch; margin-top: 10px; }
+/* once the reader is past the first stage the band has done its work, so it
+   collapses to the headline and gives the height back to the questions */
+.sa-tool.past-first .sa-mast .stand { display: none; }
+.sa-tool.past-first .sa-mast { padding-bottom: 16px; }
+.sa-tool.past-first .sa-mast h1 { font-size: clamp(22px, 2vw, 27px); }
 
 /* ------------------------------------------------------ the flow, three stages */
 /* The flow is a task screen, not a page to browse. Each stage and the
    confirmation hold the viewport on their own, so the site footer stands down
-   for the whole page: it is written into the markup rather than switched off
-   in script, which would race the footer's own injection. */
+   for the whole page: it is written into the markup rather than switched off in
+   script, which would race the footer's own injection. */
 body.sa-flow > footer { display: none; }
+body.sa-flow .sa { padding-top: 104px; }
 
-
-.e-col { max-width: 900px; }
 .e-prog {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
-  margin-bottom: 34px;
+  margin-bottom: 30px;
 }
 .e-seg .s-lab {
   display: block;
@@ -447,59 +488,23 @@ body.sa-flow > footer { display: none; }
   transition: width .4s cubic-bezier(.22,.61,.36,1);
 }
 
-.e-ledger { border-top: 1px solid var(--stone-mid); margin-bottom: 30px; }
-.e-ledger:empty { border-top: 0; margin-bottom: 0; }
-.e-ledger .l-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 20px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--stone-mid);
-}
-.e-ledger .l-row .k {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--warm-grey);
-}
-.e-ledger .l-row .v {
-  font-family: "Borna", sans-serif;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  font-size: 15px;
-  color: var(--red110);
-  text-align: right;
-}
-
-.e-stage > .eyebrow { margin-bottom: 6px; }
-.e-stage .f-row { padding: 13px 0 12px; }
-/* stage three carries the heavy fields, so they run tighter here than on the
-   tool page and the whole stage stays close to one screen */
-.e-stage .f-drop .inner { padding: 18px 20px; }
-.e-stage .f-drop .d-line { font-size: 19px; margin-top: 10px; }
-.e-stage .f-area { min-height: 64px; }
-.e-stage .f-tiles { max-width: 460px; gap: 16px; }
-.e-stage .f-hint { margin-top: 6px; }
-.e-stage .f-text { font-size: 22px; }
-.e-nav { display: flex; align-items: center; gap: 26px; margin-top: 30px; }
-.e-back {
-  font: inherit;
-  font-size: 14px;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  color: var(--warm-grey);
-}
-.e-back:hover { color: var(--red110); }
-.e-count {
-  margin-left: auto;
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  color: var(--warm-grey);
-  font-variant-numeric: tabular-nums;
-}
+/* stage three carries the tiles, the drop zone and the free text, and it has to
+   stand on one screen with them all open, so those three run tighter than the
+   text rows above them */
+.e-stage[data-stage="2"] .f-row { padding: 6px 0 5px; }
+.e-stage[data-stage="2"] .f-lab { padding-top: 8px; }
+.e-stage[data-stage="2"] .f-tiles { max-width: 380px; gap: 16px; }
+.e-stage[data-stage="2"] .f-tile { padding-bottom: 8px; }
+.e-stage[data-stage="2"] .t-name { font-size: 9px; line-height: 1.2; overflow-wrap: anywhere; }
+.e-stage[data-stage="2"] .sa-sec-head { font-size: clamp(20px, 1.9vw, 24px); margin-top: 4px; }
+.e-stage[data-stage="2"] .f-hint { font-size: 12px; margin-top: 3px; }
+.e-stage[data-stage="2"] .f-seg .seg { padding-top: 6px; padding-bottom: 6px; }
+.e-stage[data-stage="2"] .f-drop { padding: 6px; }
+.e-stage[data-stage="2"] .f-drop .inner { padding: 8px 12px; }
+.e-stage[data-stage="2"] .f-drop .d-line { font-size: 15px; margin-top: 4px; }
+.e-stage[data-stage="2"] .f-drop .d-sub { display: none; }
+.e-stage[data-stage="2"] .f-area { min-height: 28px; font-size: 16px; }
+.e-stage[data-stage="2"] .f-hint { margin-top: 4px; }
 
 [hidden] { display: none !important; }
 
