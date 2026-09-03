@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battery modelling prototypes</title>
+<meta name="description" content="Five layout prototypes of the battery modelling tool page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../g.css">
+<link rel="stylesheet" href="proto-battery.css">
+</head>
+<body>
+
+<!-- the shared pill nav, resolved from its own src so the extra folder depth costs nothing -->
+<script src="../../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="g-page p-page">
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="eyebrow">Prototypes</span>
+    <h1>Five layouts for the battery modelling tool.</h1>
+    <p class="stand">Same inputs, same sample house, same figures. Only the layout and the feel change. The worked case throughout is a three bedroom detached house with a heat pump and an electric car.</p>
+  </header>
+
+  <div class="x-grid">
+    <a class="x-card" href="a.html">
+      <span class="letter">A</span>
+      <h2>Form left, results right</h2>
+      <p>The hub article layout. Inputs hold a sticky left column and the three result cards build up alongside as the reader scrolls.</p>
+      <span class="go">Open prototype A &rarr;</span>
+    </a>
+    <a class="x-card" href="b.html">
+      <span class="letter">B</span>
+      <h2>Three steps, then a results band</h2>
+      <p>The FAQ page rhythm. Location, house and tariff sit as three short steps across one row, and the results land in a full width band underneath.</p>
+      <span class="go">Open prototype B &rarr;</span>
+    </a>
+    <a class="x-card" href="c.html">
+      <span class="letter">C</span>
+      <h2>Comparison table first</h2>
+      <p>Inputs collapse into a single top bar so the dense table starts at the first screen, three systems as columns, one row per question.</p>
+      <span class="go">Open prototype C &rarr;</span>
+    </a>
+    <a class="x-card" href="d.html">
+      <span class="letter">D</span>
+      <h2>Editorial, receipt working</h2>
+      <p>The annual saving set large per system, with the kilowatt hours and pounds behind it printed as a monospace receipt.</p>
+      <span class="go">Open prototype D &rarr;</span>
+    </a>
+    <a class="x-card" href="e.html">
+      <span class="letter">E</span>
+      <h2>Dashboard with a sticky strip</h2>
+      <p>Inputs stay on screen in a fixed strip and the three systems read as one board, with import and export drawn on a shared scale.</p>
+      <span class="go">Open prototype E &rarr;</span>
+    </a>
+  </div>
+
+  <div style="margin-top:var(--sec-pad)">
+    <span class="sec-label">Sizing set by bedrooms</span>
+    <div class="c-table">
+      <table>
+        <thead><tr><th scope="col">Bedrooms</th><th scope="col">Optimal array</th><th scope="col">Inverter</th><th scope="col">Battery</th><th scope="col">FHS array</th><th scope="col">Additional build cost, optimal</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">1</th><td>8 kWp</td><td>3.68 kW</td><td>5 kWh</td><td>5 kWp</td><td class="tbc">To be confirmed</td></tr>
+          <tr><th scope="row">2</th><td>12 kWp</td><td>5 kW</td><td>5 kWh</td><td>6 kWp</td><td class="tbc">To be confirmed</td></tr>
+          <tr><th scope="row">3</th><td>16 kWp</td><td>6 kW</td><td>10 kWh</td><td>8 kWp</td><td>&pound;10,000</td></tr>
+          <tr><th scope="row">4</th><td>20 kWp</td><td>8 kW</td><td>10 kWh</td><td>10 kWp</td><td class="tbc">To be confirmed</td></tr>
+          <tr><th scope="row">5</th><td>24 kWp</td><td>10 kW</td><td>10 kWh</td><td>12 kWp</td><td class="tbc">To be confirmed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="p-note">Every figure on this page is a sample output, engine result pending. Nothing here is calculated in the browser. The bill counts electricity bought only; export earnings are paid separately and are never netted into a bill. Build cost is costed for the three bedroom case; other bedroom counts read as to be confirmed until they are costed.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- the canonical footer, the same script every other page in the tree carries -->
+<script src="../../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>

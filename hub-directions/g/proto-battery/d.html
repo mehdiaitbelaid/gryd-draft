@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battery modelling, prototype D</title>
+<meta name="description" content="One headline saving per system with the working set as a receipt.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../g.css">
+<link rel="stylesheet" href="proto-battery.css">
+</head>
+<body>
+
+<!-- the shared pill nav, resolved from its own src so the extra folder depth costs nothing -->
+<script src="../../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="g-page p-page">
+<div class="wrap">
+
+  <header class="g-mast">
+    <span class="eyebrow">Prototype D</span>
+    <h1>The number first. The working right beside it.</h1>
+    <p class="stand">One saving per system, set large, with the kilowatt hours and the pounds that produced it printed alongside.</p>
+  </header>
+
+  <span class="sec-label">House selection</span>
+  <dl class="echo row"><div><dt>Property type</dt><dd>Detached</dd></div><div><dt>Bedrooms</dt><dd>3</dd></div><div><dt>Electric car</dt><dd>8,000 miles a year</dd></div><div><dt>Postcode</dt><dd>SN12 6ZQ</dd></div><div><dt>Tariff</dt><dd>Flat, import 26.5p, export 5p</dd></div><div><dt>Annual demand</dt><dd>6,996 kWh</dd></div></dl>
+  <p style="margin:22px 0 0"><span class="sample-flag">Sample output, engine result pending</span></p>
+
+  <section class="d-item">
+    <div class="d-head">
+      <div>
+        <span class="kicker">Part L</span>
+        <h2>Heat pump only</h2>
+        <p>A heat pump and nothing else. The house buys every kilowatt hour it uses.</p>
+        <div class="d-big">Reference<span class="unit">the year every other column is measured against</span></div>
+      </div>
+      <dl class="d-receipt">
+        <div><dt>Air source heat pump</dt><dd>fitted</dd></div><div><dt>Solar array</dt><dd>none</dd></div><div><dt>Battery</dt><dd>none</dd></div><div><dt>Annual demand</dt><dd>6,996 kWh</dd></div><div><dt>Import at 26.5p</dt><dd>6,996 kWh</dd></div><div><dt>Export at 5p</dt><dd>0 kWh</dd></div>
+        <span class="rule"></span>
+        <div class="sum"><dt>Additional build cost</dt><dd>&pound;1,750</dd></div><div class="sum"><dt>Annual bill</dt><dd>&pound;1,854</dd></div><div class="sum"><dt>Export earnings</dt><dd>&pound;0</dd></div>
+      </dl>
+    </div>
+  </section>
+  <section class="d-item">
+    <div class="d-head">
+      <div>
+        <span class="kicker">Future Homes Standard</span>
+        <h2>Heat pump and panels</h2>
+        <p>The array the standard asks for. Everything the roof makes and the house cannot use goes out to the grid.</p>
+        <div class="d-big">&pound;541<span class="unit">off the annual bill</span></div>
+      </div>
+      <dl class="d-receipt">
+        <div><dt>Air source heat pump</dt><dd>fitted</dd></div><div><dt>Solar array</dt><dd>8 kWp</dd></div><div><dt>Inverter</dt><dd>6 kW</dd></div><div><dt>Generation</dt><dd>6,800 kWh</dd></div><div><dt>Import at 26.5p</dt><dd>4,955 kWh</dd></div><div><dt>Export at 5p</dt><dd>1,920 kWh</dd></div>
+        <span class="rule"></span>
+        <div class="sum"><dt>Additional build cost</dt><dd>&pound;4,150</dd></div><div class="sum"><dt>Annual bill</dt><dd>&pound;1,313</dd></div><div class="sum"><dt>Export earnings</dt><dd>&pound;96</dd></div>
+      </dl>
+    </div>
+  </section>
+  <section class="d-item">
+    <div class="d-head">
+      <div>
+        <span class="kicker">Optimal system</span>
+        <h2>Heat pump, panels and battery</h2>
+        <p>The array the roof can carry, with a battery holding the middle of the day until the evening.</p>
+        <div class="d-big">&pound;1,240<span class="unit">off the annual bill</span></div>
+      </div>
+      <dl class="d-receipt">
+        <div><dt>Air source heat pump</dt><dd>fitted</dd></div><div><dt>Solar array</dt><dd>16 kWp</dd></div><div><dt>Inverter</dt><dd>6 kW</dd></div><div><dt>Battery</dt><dd>10 kWh</dd></div><div><dt>Generation</dt><dd>13,600 kWh</dd></div><div><dt>Import at 26.5p</dt><dd>2,317 kWh</dd></div><div><dt>Export at 5p</dt><dd>6,340 kWh</dd></div>
+        <span class="rule"></span>
+        <div class="sum"><dt>Additional build cost</dt><dd>&pound;10,000</dd></div><div class="sum"><dt>Annual bill</dt><dd>&pound;614</dd></div><div class="sum"><dt>Export earnings</dt><dd>&pound;317</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <p class="p-note">Every figure on this page is a sample output, engine result pending. Nothing here is calculated in the browser. The bill counts electricity bought only; export earnings are paid separately and are never netted into a bill. Build cost is costed for the three bedroom case; other bedroom counts read as to be confirmed until they are costed.</p>
+
+  <div class="g-close">
+    <h2>Want this run across a whole scheme?</h2>
+    <p>Send the house type schedule and we will price every type on the site.</p>
+    <a class="btn" href="../site-assessment.html">Request a site assessment</a>
+  </div>
+
+</div>
+</div>
+
+<!-- the canonical footer, the same script every other page in the tree carries -->
+<script src="../../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>
