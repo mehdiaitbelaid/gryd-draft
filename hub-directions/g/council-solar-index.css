@@ -75,7 +75,8 @@
 }
 
 .csi-map {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-panel);
   overflow: hidden;
   background: var(--paper);
@@ -83,7 +84,16 @@
   height: 660px;
   min-width: 0;
 }
+/* The map itself. The key sits under this box rather than over it. */
+.csi-frame { position: relative; flex: 1 1 auto; min-height: 0; }
 .csi-map .canvas { position: absolute; inset: 0; }
+/* The canvas takes focus on a click and the browser paints its ring over the
+   map. The controls above keep their own visible ring. */
+.csi-frame, .csi-map .canvas, .csi-map canvas { outline: none; }
+.csi-frame:focus, .csi-map .canvas:focus, .csi-map canvas:focus,
+.csi-frame:focus-visible, .csi-map .canvas:focus-visible, .csi-map canvas:focus-visible {
+  outline: none;
+}
 .csi-map .maplibregl-ctrl-group {
   border-radius: 999px;
   overflow: hidden;
@@ -109,6 +119,8 @@
 }
 
 .csi-crumbs { position: absolute; left: 16px; top: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+/* One line: the trail and what it is showing sit on the same row. */
+.csi-crumbs .csi-plate { display: flex; align-items: center; gap: 12px; padding: 9px 14px; }
 .csi-crumbs nav { display: flex; align-items: center; gap: 8px; font-size: 14px; }
 .csi-crumbs nav button {
   font: inherit;
@@ -124,11 +136,13 @@
 .csi-crumbs nav .sep { color: var(--stone-mid); }
 .csi-crumbs nav .now { font-weight: 500; }
 .csi-viewing {
-  margin-top: 6px;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--warm-grey);
+  white-space: nowrap;
+  padding-left: 12px;
+  border-left: 1px solid var(--stone-mid);
 }
 .csi-reset {
   font: inherit;
@@ -144,28 +158,38 @@
 .csi-reset:hover { background: var(--stonelight); }
 .csi-reset[hidden] { display: none; }
 
-.csi-legend { position: absolute; left: 16px; bottom: 16px; width: 244px; }
-.csi-legend summary {
-  cursor: pointer;
-  list-style: none;
+/* ---------- key, under the map ---------- */
+
+/* The bins and the two status swatches sit on one row, the title above them.
+   All three on one line needs about 950px and the map column has 780. */
+.csi-key {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px 18px 14px;
+  border-top: 1px solid var(--stone-mid);
+  background: var(--paper);
+}
+.csi-key .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 28px;
+  flex-wrap: wrap;
+}
+.csi-key .cap {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--warm-grey);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  white-space: nowrap;
 }
-.csi-legend summary::-webkit-details-marker { display: none; }
-.csi-legend summary::after { content: "\2304"; font-size: 14px; line-height: 1; }
-.csi-legend[open] summary::after { content: "\2303"; }
-.csi-legend summary:hover { color: var(--red110); }
-.csi-legend .keys { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
-.csi-legend .key { display: flex; align-items: center; gap: 9px; font-size: 13px; }
-.csi-legend .key i { width: 20px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
-.csi-legend .key.rule { margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--stone-mid); }
+.csi-key .keys { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.csi-key .key { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; white-space: nowrap; }
+.csi-key .key i { width: 18px; height: 11px; border-radius: 3px; display: inline-block; flex: none; }
+.csi-key .status { color: var(--warm-grey); }
 
 .csi-method-map { position: absolute; right: 16px; bottom: 40px; max-width: 330px; }
 
@@ -388,7 +412,11 @@
 }
 @media (max-width: 760px) {
   .csi-page { padding-top: 110px; }
-  .csi-map { height: 460px; }
-  .csi-legend { width: 200px; }
+  .csi-map { height: 520px; }
+  .csi-key { gap: 10px 16px; padding: 12px 14px; }
+  .csi-key .keys { gap: 10px; }
+  .csi-key .key { font-size: 12px; }
   .csi-bar { align-items: flex-start; }
+  .csi-crumbs .csi-plate { flex-wrap: wrap; gap: 4px 10px; }
+  .csi-viewing { padding-left: 0; border-left: 0; }
 }

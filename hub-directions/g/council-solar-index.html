@@ -49,23 +49,30 @@
   <div class="csi-stage">
 
     <div class="csi-map">
-      <div class="canvas" id="csiCanvas"></div>
-      <p class="csi-state" id="csiLoading">Loading map…</p>
-      <p class="csi-state bad" id="csiFailed" hidden></p>
+      <div class="csi-frame">
+        <div class="canvas" id="csiCanvas"></div>
+        <p class="csi-state" id="csiLoading">Loading map…</p>
+        <p class="csi-state bad" id="csiFailed" hidden></p>
 
-      <div class="csi-over">
-        <div class="csi-crumbs">
-          <div class="csi-plate">
-            <nav id="csiCrumbs" aria-label="Breadcrumb"></nav>
-            <div class="csi-viewing" id="csiViewing"></div>
+        <div class="csi-over">
+          <div class="csi-crumbs">
+            <div class="csi-plate">
+              <nav id="csiCrumbs" aria-label="Breadcrumb"></nav>
+              <span class="csi-viewing" id="csiViewing"></span>
+            </div>
+            <button type="button" class="csi-reset" id="csiReset" hidden>&larr; Reset to UK</button>
           </div>
-          <button type="button" class="csi-reset" id="csiReset" hidden>&larr; Reset to UK</button>
         </div>
+      </div>
 
-        <details class="csi-legend csi-plate" open>
-          <summary><span id="csiLegendTitle">Council Homes With Solar</span></summary>
-          <div class="keys" id="csiLegendKeys"></div>
-        </details>
+      <!-- the key sits under the map, not over it: at UK extent the overlay
+           covered the south west and Wales -->
+      <div class="csi-key">
+        <span class="cap" id="csiLegendTitle">Council Homes With Solar</span>
+        <div class="row">
+          <span class="keys" id="csiLegendKeys"></span>
+          <span class="keys status" id="csiLegendStatus"></span>
+        </div>
       </div>
     </div>
 

@@ -748,12 +748,12 @@
   function renderLegend() {
     el.legendTitle.textContent = state.metric === "pctSolar"
       ? "Council Homes With Solar" : METRIC_LONG[state.metric];
-    var h = binLabels(state.metric).map(function (b) {
+    el.legendKeys.innerHTML = binLabels(state.metric).map(function (b) {
       return '<span class="key"><i style="background:' + b.color + '"></i><span>' + esc(b.label) + "</span></span>";
     }).join("");
-    h += '<span class="key rule"><i style="background:' + NODATA_FILL + '"></i><span>No data reported</span></span>';
-    h += '<span class="key"><i style="background:' + NO_STOCK_FILL + '"></i><span>No housing stock</span></span>';
-    el.legendKeys.innerHTML = h;
+    el.legendStatus.innerHTML =
+      '<span class="key"><i style="background:' + NODATA_FILL + '"></i><span>No data reported</span></span>' +
+      '<span class="key"><i style="background:' + NO_STOCK_FILL + '"></i><span>No housing stock</span></span>';
   }
 
   function renderInsights() {
@@ -939,6 +939,7 @@
     el.reset = $("csiReset");
     el.legendTitle = $("csiLegendTitle");
     el.legendKeys = $("csiLegendKeys");
+    el.legendStatus = $("csiLegendStatus");
     el.scope = $("csiScope");
     el.rows = $("csiRows");
     el.boundaryNote = $("csiBoundary");
