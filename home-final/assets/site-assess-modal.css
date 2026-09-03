@@ -1,0 +1,239 @@
+/* The site assessment popup. Hand written, injected on every page by
+   site-nav.js alongside site-assess-modal.js.
+
+   The modal is the quick way in: the same three stages and the same twelve
+   questions as hub-directions/g/site-assessment.html, at the site's body sizes
+   rather than the page's display sizes, in a plate the reader can close. It
+   carries its own palette so it does not depend on tokens.css being on the
+   page, and every class is prefixed sam- so it cannot meet the assessment
+   page's own rules on the one page that loads both. */
+
+.sam {
+  --sam-paper: #F8F6F2;
+  --sam-plate: #EFEAE3;
+  --sam-ink: #4E251B;
+  --sam-grey: #8A776E;
+  --sam-line: #D8CFC5;
+  --sam-flare: #FF5532;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(40, 18, 12, .46);
+  opacity: 0;
+  transition: opacity .22s ease;
+  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--sam-ink);
+}
+.sam.open { opacity: 1; }
+.sam[hidden] { display: none; }
+
+.sam-box {
+  position: relative;
+  width: min(880px, 100%);
+  max-height: min(640px, calc(100vh - 48px));
+  background: var(--sam-paper);
+  border-radius: 28px;
+  padding: 26px 34px 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(40, 18, 12, .22);
+  transform: translateY(10px) scale(.985);
+  transition: transform .22s cubic-bezier(.22,.61,.36,1);
+}
+.sam.open .sam-box { transform: none; }
+
+/* ------------------------------------------------------------------ the dash */
+
+.sam-prog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0 46px 16px 0; }
+.sam-seg .s-lab {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--sam-grey);
+  margin-bottom: 5px;
+}
+.sam-seg.on .s-lab, .sam-seg.done .s-lab { color: var(--sam-ink); }
+.sam-seg .s-bar { display: block; height: 2px; background: var(--sam-line); }
+.sam-seg .s-bar i { display: block; height: 100%; width: 0; background: var(--sam-flare); transition: width .3s ease; }
+
+.sam-close {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sam-plate);
+  color: var(--sam-ink);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.sam-close:hover { background: var(--sam-flare); color: #fff; }
+.sam-close:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
+
+/* ------------------------------------------------------------- one stage */
+
+.sam-body { overflow: auto; flex: 1 1 auto; min-height: 0; padding-right: 4px; }
+.sam-pane[hidden] { display: none; }
+.sam-eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--sam-grey);
+  margin-bottom: 6px;
+}
+/* the site's eyebrow dash, the one line the popup keeps */
+.sam-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 1.5px;
+  background: var(--sam-flare);
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.sam-pane h2 { font-size: 20px; line-height: 1.2; margin: 0 0 12px; font-weight: 500; }
+.sam-pane h2 .flare { color: var(--sam-flare); }
+
+.sam-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; align-items: start; padding: 9px 0; }
+.sam-lab {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--sam-grey);
+  padding-top: 10px;
+}
+.sam-hint { font-size: 12px; color: var(--sam-grey); margin: 5px 0 0; }
+
+.sam input[type="text"], .sam input[type="email"], .sam input[type="tel"],
+.sam input[type="number"], .sam input[type="date"], .sam textarea {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  background: transparent;
+  color: var(--sam-ink);
+  border: 0;
+  border-bottom: 1px solid var(--sam-line);
+  border-radius: 0;
+  padding: 6px 0 7px;
+  transition: border-color .2s ease;
+}
+.sam textarea { min-height: 54px; resize: vertical; }
+.sam input:focus, .sam textarea:focus { outline: 0; border-bottom-color: var(--sam-flare); }
+.sam ::placeholder { color: var(--sam-grey); opacity: .8; }
+
+/* the clay tiles, the page's own art at the popup's size */
+.sam-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* 16px is the site's standing clearance between things that light up under a pointer */
+  gap: 16px; max-width: 400px; }
+.sam-tile {
+  font: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0 0 10px;
+  margin: 0;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  color: var(--sam-grey);
+}
+.sam-tile img { width: 100%; height: auto; display: block; filter: saturate(.35) opacity(.55); transition: filter .25s ease, transform .25s ease; }
+.sam-tile .t-name { display: block; margin-top: 1px; font-size: 9px; letter-spacing: .07em; text-transform: uppercase; }
+.sam-tile::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: var(--sam-flare);
+  transform: translateX(-50%);
+  transition: width .25s cubic-bezier(.22,.61,.36,1);
+}
+.sam-tile:hover img { filter: saturate(.7) opacity(.85); }
+.sam-tile[aria-pressed="true"] { color: var(--sam-ink); }
+.sam-tile[aria-pressed="true"] img { filter: none; transform: translateY(-2px); }
+.sam-tile[aria-pressed="true"]::after { width: 20px; }
+.sam-tile:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
+
+.sam-seg-group { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--sam-line); }
+.sam-opt {
+  font: inherit;
+  font-size: 13px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 7px 13px 8px;
+  cursor: pointer;
+  color: var(--sam-grey);
+  white-space: nowrap;
+}
+.sam-opt:first-child { padding-left: 0; }
+.sam-opt:hover { color: var(--sam-ink); }
+.sam-opt[aria-pressed="true"] { color: var(--sam-ink); border-bottom-color: var(--sam-flare); }
+.sam-opt:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 2px; }
+
+.sam-drop {
+  background: var(--sam-plate);
+  border-radius: 16px;
+  padding: 9px;
+  cursor: pointer;
+  display: block;
+}
+.sam-drop .inner {
+  border: 1px dashed var(--sam-line);
+  border-radius: 9px;
+  padding: 11px 14px;
+  transition: border-color .2s ease;
+}
+.sam-drop .d-line { margin: 0; font-size: 14px; }
+.sam-drop .d-sub { margin: 2px 0 0; font-size: 12px; color: var(--sam-grey); }
+.sam-drop.is-over .inner, .sam-drop:hover .inner, .sam-drop.has-file .inner { border-color: var(--sam-flare); }
+.sam-drop:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
+
+/* ------------------------------------------------------------------ the nav */
+
+.sam-nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; flex: none; }
+.sam-go {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sam-flare);
+  color: #fff;
+  padding: 11px 24px;
+  cursor: pointer;
+}
+.sam-go:hover { background: #E8431F; }
+.sam-back { font: inherit; font-size: 13px; background: transparent; border: 0; color: var(--sam-grey); cursor: pointer; padding: 0; }
+.sam-back:hover { color: var(--sam-ink); }
+.sam-count { margin-left: auto; font-size: 11px; letter-spacing: .08em; color: var(--sam-grey); }
+.sam-go:focus-visible, .sam-back:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
+.sam-consent { margin: 8px 0 0; font-size: 11px; color: var(--sam-grey); max-width: 62ch; }
+
+/* --------------------------------------------------------- the confirmation */
+
+.sam-done h2 { font-size: 24px; margin-bottom: 8px; }
+.sam-done .stand { font-size: 14px; color: var(--sam-grey); margin: 0 0 16px; max-width: 62ch; }
+.sam-returns { margin: 0; padding: 0; list-style: none; max-width: 520px; }
+.sam-returns li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 9px 0; font-size: 14px; }
+.sam-returns .n { font-size: 10px; letter-spacing: .1em; color: var(--sam-flare); }
+
+@media (max-width: 720px) {
+  .sam { padding: 12px; }
+  .sam-box { padding: 22px 20px 20px; border-radius: 22px; }
+  .sam-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .sam-lab { padding-top: 0; }
+  .sam-tiles { max-width: none; }
+}

@@ -88,6 +88,21 @@
     document.head.appendChild(link);
   }
 
+  /* The site assessment popup, on every page the nav is on. The nav's own call
+     to action and every other Request button keep their href, so the click is
+     only intercepted where this script is running. */
+  if (!document.querySelector('link[data-assess-modal]')) {
+    var mcss = document.createElement('link');
+    mcss.rel = 'stylesheet';
+    mcss.href = new URL('site-assess-modal.css', me.src).href;
+    mcss.setAttribute('data-assess-modal', '');
+    document.head.appendChild(mcss);
+    var mjs = document.createElement('script');
+    mjs.src = new URL('site-assess-modal.js', me.src).href;
+    mjs.setAttribute('data-assess-modal', '');
+    document.head.appendChild(mjs);
+  }
+
   /* The emblem and the logotype, as symbols, because the pill draws both with
      a use. insertAdjacentHTML parses in the html context, which is what puts
      the svg in the svg namespace; an innerHTML on a div would not. */
