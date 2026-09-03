@@ -603,13 +603,16 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   transition: opacity .24s, max-height .24s, margin .24s;
 }
 .a-ben.is-audience-compact .aud-head { background: var(--paper); }
+/* the bar spans the window, the sentence inside it does not: the inner box
+   keeps .wrap's own column, so the label starts on the same left edge as every
+   other section at every width rather than drifting out to the viewport as the
+   window grows */
 .a-ben.is-audience-compact .aud-head__inner {
-  max-width: none;
-  padding: calc(var(--aud-nav-clear) + var(--aud-compact-gap)) 40px
+  padding: calc(var(--aud-nav-clear) + var(--aud-compact-gap)) var(--gutter)
            clamp(22px, 1.88vw, 27px);
 }
 .a-ben.is-audience-compact .aud-head .sec-head {
-  max-width: none; font-size: 17px; line-height: 22px;
+  max-width: none; font-size: 26px; line-height: 32px;
   letter-spacing: .005em; white-space: nowrap;
 }
 .a-ben.is-audience-compact .aud-head .lede {
@@ -694,7 +697,12 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 }
 
 @media (max-width: 900px) {
-  .a-ben.is-audience-compact .aud-head__inner { padding: 78px 20px 18px; }
+  .a-ben.is-audience-compact .aud-head__inner {
+    padding: 78px var(--gutter) 18px;
+  }
+  /* the sentence is one line and must not be cut, so at phone widths it comes
+     back down rather than running off the column */
+  .a-ben.is-audience-compact .aud-head .sec-head { font-size: 17px; line-height: 22px; }
   .a-ben .aud-paths { grid-template-columns: 1fr; gap: 52px; }
 }
 
