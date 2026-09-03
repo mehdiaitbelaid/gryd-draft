@@ -45,24 +45,60 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 32px;
-  align-items: start;
+  /* Dense so a card can drop back into a slot the feature cell left open, and
+     stretch so a card that spans rows fills them instead of ending short. */
+  grid-auto-flow: dense;
+  align-items: stretch;
 }
-.g-card { text-decoration: none; display: block; min-width: 0; }
+.g-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+}
 .g-card .cover {
   position: relative;
   border-radius: var(--radius-panel);
   overflow: hidden;
   background: var(--stonelight);
 }
-/* Direct child only, so the photo rules never reach the logomark inside the plate. */
-.g-card .cover > img {
+/* The cover photo, whether it sits in the box directly or inside a <picture>.
+   Scoped so the rules never reach the logomark inside the plate. */
+.g-card .cover > img,
+.g-card .cover > picture > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   aspect-ratio: 1.41;
+  display: block;
 }
+.g-card .cover > picture { display: block; }
+
 .g-card.feat { grid-column: span 2; grid-row: span 2; }
-.g-card.feat .cover > img { aspect-ratio: 1.13; }
+/* The feature spans two rows, so its height is set by the two cards beside it,
+   not by its own ratio. The cover takes whatever height the text leaves, which
+   is what closes the gap that used to open under it. */
+.g-card.feat .cover { flex: 1 1 auto; min-height: 0; }
+.g-card.feat .cover > picture,
+.g-card.feat .cover > img {
+  position: absolute;
+  inset: 0;
+}
+.g-card.feat .cover > img,
+.g-card.feat .cover > picture > img {
+  aspect-ratio: auto;
+  height: 100%;
+}
+.g-card.feat .cover { min-height: 340px; }
+
+/* The closing card of a run takes the slots left over so the last row is full.
+   Wider box, wider crop, so its height still sits with the rest of the grid. */
+.g-card.wide2 { grid-column: span 2; }
+.g-card.wide3 { grid-column: span 3; }
+.g-card.wide2 .cover > img, .g-card.wide2 .cover > picture > img { aspect-ratio: 2.75; }
+.g-card.wide3 .cover > img, .g-card.wide3 .cover > picture > img { aspect-ratio: 4.2; }
+.g-card.wide2 h2, .g-card.wide3 h2 { max-width: 40ch; }
 
 /* Type set into the artwork, the one device that makes these covers read as a set. */
 .g-card .plate {
@@ -94,6 +130,10 @@
   line-height: 1.45;
 }
 .g-card.feat .plate .sub { font-size: 15px; margin-top: 16px; }
+
+/* The card is a flex column, which would otherwise stretch the pill to the full
+   card width. It stays a pill. */
+.g-card > .g-pill { align-self: flex-start; }
 
 .g-pill {
   display: inline-block;
@@ -493,8 +533,16 @@
 @media (max-width: 900px) {
   .g-page { padding-top: 108px; }
   .g-grid { grid-template-columns: 1fr; gap: 40px; }
-  .g-card.feat { grid-column: auto; grid-row: auto; }
+  .g-card.feat, .g-card.wide2, .g-card.wide3 { grid-column: auto; grid-row: auto; }
   .g-card .cover img, .g-card.feat .cover img { aspect-ratio: 1.3; }
+  /* One column, so nothing spans and every cover goes back to the same box. */
+  .g-card.feat .cover { min-height: 0; }
+  .g-card.feat .cover > picture, .g-card.feat .cover > img { position: static; }
+  .g-card.feat .cover > img, .g-card.feat .cover > picture > img,
+  .g-card.wide2 .cover > picture > img, .g-card.wide3 .cover > picture > img {
+    aspect-ratio: 1.3;
+    height: auto;
+  }
   .g-card.feat h2 { font-size: 27px; }
   .g-numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 30px 24px; }
   .g-figures { grid-template-columns: 1fr; }
