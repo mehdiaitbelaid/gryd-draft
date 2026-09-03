@@ -34,6 +34,13 @@
   --sec-pad: 96px;
   --label-gap: 20px;
   --head-gap: 22px;
+  /* A category pill is a label, so pill to title runs on the same rhythm the
+     masthead already uses between its eyebrow and its heading. */
+  --pill-gap: 26px;
+  /* One outer spacing for every button and button like link on the site. The
+     group rule below carries it when buttons sit side by side. */
+  --btn-gap-top: 32px;
+  --btn-gap-bottom: 20px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -145,6 +152,11 @@ h1, h2, h3, h4, .display {
   color: #ffffff;
 }
 .btn.ghost { background: transparent; color: var(--red110); box-shadow: inset 0 0 0 1px var(--stone-mid); }
+/* One spacing rule for every button, so no page sets its own. A row of buttons
+   moves the spacing onto the row and the buttons inside it sit flush. */
+.btn { margin-top: var(--btn-gap-top); margin-bottom: var(--btn-gap-bottom); }
+.btns { margin-top: var(--btn-gap-top); margin-bottom: var(--btn-gap-bottom); }
+.btns .btn { margin-top: 0; margin-bottom: 0; }
 
 .foot {
   padding: 64px 0 72px;

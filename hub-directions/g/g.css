@@ -147,7 +147,7 @@
   font-weight: 500;
 }
 .g-card h2 {
-  margin-top: 26px;
+  margin-top: var(--pill-gap);
   font-size: 25px;
   line-height: 1.12;
   max-width: 22ch;
@@ -354,7 +354,9 @@
   text-align: center;
 }
 .g-close h2 { font-size: clamp(30px, 4vw, 48px); max-width: 20ch; margin: 0 auto; }
-.g-close p { max-width: 54ch; margin: 20px auto 30px; color: #6B4A3E; }
+/* The button carries its own gap from this paragraph, so the paragraph stops
+   at the text. */
+.g-close p { max-width: 54ch; margin: 20px auto 0; color: #6B4A3E; }
 
 /* ---------- detail page ---------- */
 
@@ -394,7 +396,12 @@
 .g-measure { max-width: 660px; margin: 0 auto; }
 
 .g-title { margin-top: 56px; }
-.g-title h2 { font-size: clamp(32px, 3.6vw, 46px); }
+/* The pill is inline, so the heading's own top margin is the pill to title gap. */
+.g-title h2 { font-size: clamp(32px, 3.6vw, 46px); margin-top: var(--pill-gap); }
+
+/* Header actions, sharing the button row's spacing rather than setting their own. */
+.g-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.g-mast .g-actions { justify-content: center; }
 .g-byline {
   display: flex;
   align-items: center;
@@ -500,9 +507,11 @@
 
 /* .g-body p sets a margin shorthand that outweighs a bare .g-return, which is
    why the link used to sit flush against the spec table. */
+/* The break above the return link is section rhythm; the button's own top
+   margin makes up the rest of it, so the two together still read as --sec-pad. */
 .g-body p.g-return, .g-return {
-  margin-top: var(--sec-pad);
-  margin-bottom: var(--label-gap);
+  margin-top: calc(var(--sec-pad) - var(--btn-gap-top));
+  margin-bottom: 0;
 }
 
 .g-share { text-align: center; margin-top: 84px; }

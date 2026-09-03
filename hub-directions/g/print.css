@@ -1,0 +1,55 @@
+/* Print sheet for the hub PDFs built by _build_hub.py.
+   Drops the site chrome and everything that only works as a live page, keeps
+   the cover, the header and the body, and leaves the palette and the fonts
+   alone so the PDF reads as the same document. */
+
+.nav,
+nav.dnav,
+footer,
+.foot,
+.g-close,
+.g-share,
+.g-more,
+.g-pager,
+.g-filter,
+.g-return,
+.g-actions {
+  display: none !important;
+}
+
+.g-page { padding-top: 0; }
+
+body {
+  background: var(--paper);
+  font-size: 12pt;
+}
+
+.wrap { max-width: none; padding: 0; }
+
+/* A4 less the 18mm margins is 174mm of column, so the reading measure stops
+   being a pixel width and becomes the page. */
+.g-measure { max-width: none; margin: 0; }
+
+.g-hero { border-radius: 0; }
+.g-hero > img { aspect-ratio: 2.2; }
+.g-hero .plate h1 { font-size: 26pt; }
+.g-hero .plate .stand { font-size: 11pt; }
+
+.g-title { margin-top: 20pt; }
+.g-title h2 { font-size: 22pt; }
+.g-body { font-size: 11pt; margin-top: 18pt; }
+.g-body h3 { font-size: 15pt; }
+.g-body h4 { font-size: 12pt; }
+.g-body .lead-in { font-size: 13pt; }
+
+/* Break out figures have nothing to break out of on paper. */
+.g-break { width: 100%; margin-left: 0; transform: none; }
+
+.g-mast { padding-bottom: 24pt; }
+.g-mast h1 { font-size: 28pt; }
+.g-mast .stand { font-size: 11pt; }
+
+.n-row { break-inside: avoid; }
+.g-numbers, .g-table, blockquote, figure { break-inside: avoid; }
+h1, h2, h3, h4 { break-after: avoid; }
+img { break-inside: avoid; }
