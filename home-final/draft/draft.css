@@ -354,9 +354,60 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 
 /* The beads are decoration on a route that is already drawn, so without motion
    they are simply not there rather than parked mid arc. */
+/* Mehdi, 3 September: the map was reading small against the band it closes.
+   one.css splits this row 1.05 to 0.95 with a 48px gutter, which gave the
+   drawing 575px of the 1144px column at 1440. It now takes 707, about a fifth
+   more, and the gutter gives up eight of those pixels.
+
+   Nothing inside the drawing is repositioned to suit it. The pin layer sits on
+   percentages of .map-fig and the arc overlay is a 0 to 100 viewBox stretched
+   over the same box, so the pins, the arcs and the travelling beads all scale
+   with it and stay on their towns. The column edges do not move: this is a
+   different share of the same 148 to 1292, not a wider band.
+
+   The call to action keeps its place and its type; its column narrows to 397,
+   which is still wider than the button and above the heading's own wrap.
+
+   Held above 900 on purpose. one.css stacks this row into one column below
+   that, and a two class rule here would outrank that media block at every width
+   and leave a phone with two columns of 156px. */
+@media (min-width: 901px) {
+  .a-map .grid-map { grid-template-columns: 1.28fr 0.72fr; gap: 40px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .map-beads .map-bead { display: none; }
   .map-beads .map-curve { opacity: .5; }
+}
+
+/* ------------------------------------------------------ soft railed edges */
+/* Mehdi's rule of 3 September: anything that travels sideways and meets the
+   content column has to dissolve at that border rather than be clipped by it.
+   A quote cut through "ero In Developments", or a press mark sheared down the
+   middle, reads as a clipping bug however faint the sliced part is.
+
+   The column stays where Scott put it. This does not widen a rail or move an
+   edge; it changes what the last eighth of the rail does before it gets there.
+   One class rather than a copy per section, so a rail added later gets the
+   behaviour by carrying it.
+
+   The first and last two percent are held fully clear rather than left on the
+   ramp. A gradient that starts at nought still paints the outermost pixels at a
+   few percent, and a few percent of a letter is still a letter sitting on the
+   border; the flat run makes the column's own edge paper, exactly.
+
+   Without motion nothing travels, so there is no edge to soften and a mask
+   would only grey whichever items happen to be sitting at the ends. */
+.rail-soft {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 2%,
+                                      #000 13%, #000 87%,
+                                      transparent 98%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, transparent 2%,
+                              #000 13%, #000 87%,
+                              transparent 98%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rail-soft { -webkit-mask-image: none; mask-image: none; }
 }
 
 /* The trust band keeps its quiet language: no cards, no boxes, text and marks
@@ -372,10 +423,6 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   width: calc(100% - 56px);
   max-width: calc(var(--measure) - 56px);
   overflow: hidden;
-  /* one.css fades this rail at 5 and 95 percent. The column is the edge now, so
-     the inherited mask is cleared rather than replaced. */
-  -webkit-mask-image: none;
-  mask-image: none;
 }
 .a-quotes .q-track { animation: quote-drift 78s linear infinite; }
 @media (max-width: 820px) {
