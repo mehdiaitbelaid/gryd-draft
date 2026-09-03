@@ -560,7 +560,7 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
    Entry is a plain fade with the lines drawing under it: the row hairlines
    extend from nothing to the column width and the title dash draws left to
    right. Under the pointer a row lifts 2px with its tick filling solid, and the
-   plate takes the panel shadow with a 1.5 percent zoom.
+   plate zooms 1.5 percent, with no shadow behind it.
    draft/audience.js owns the observer and the delay maths and marks the html
    element js-aud, so the rest state below is only ever hidden once the script
    that can reveal it is running. Reduced motion lands every state at once. */
@@ -632,8 +632,6 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 /* the plate never enters on a zoom. The band already reads larger than its
    neighbours and a zoom entry makes that worse, so the photograph sits at its
    own size from first paint and only the pointer touches it. */
-.a-ben .aud-shot { transition: box-shadow .4s cubic-bezier(.4,0,.6,1); }
-.a-ben .aud-path:hover .aud-shot { box-shadow: var(--panel-shadow); }
 .a-ben .aud-shot img {
   display: block; width: 100%; height: 100%; object-fit: cover;
   transform: none;
@@ -696,6 +694,35 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   border-right-color: var(--paper); border-bottom-color: var(--paper);
 }
 
+/* --------------------------------------------- the two columns share rows */
+/* Each row's height used to follow its own text, so the hairline after a two
+   line point in one column sat above the hairline after a one line point in the
+   other and the ladders drifted apart down the band. The band is one grid now:
+   the plate, the name, the dash and the five points are eight shared row
+   tracks, each sized to the taller of the pair, and both columns are laid on
+   them through subgrid. The plate, the name and the dash sit at the start of
+   their track rather than stretching, so a taller neighbour cannot pull a
+   photograph off its 4 to 3 frame.
+   Below the two column breakpoint there is nothing to align, and where subgrid
+   is missing the columns fall back to the flex stack they had. */
+@media (min-width: 901px) {
+  @supports (grid-template-rows: subgrid) {
+    .a-ben .aud-paths {
+      grid-template-rows: auto auto auto repeat(5, auto);
+      column-gap: 40px; row-gap: 0;
+    }
+    .a-ben .aud-path {
+      display: grid; grid-template-rows: subgrid; grid-row: span 8;
+    }
+    .a-ben .aud-shot, .a-ben .aud-path h3, .a-ben .aud-keyline {
+      align-self: start;
+    }
+    .a-ben .aud-path .ticks {
+      display: grid; grid-template-rows: subgrid; grid-row: span 5;
+    }
+  }
+}
+
 @media (max-width: 900px) {
   .a-ben.is-audience-compact .aud-head__inner {
     padding: 78px var(--gutter) 18px;
@@ -710,13 +737,12 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   .a-ben .aud-head__inner, .a-ben .aud-head .sec-head,
   .a-ben .aud-head .lede { transition: none; }
   .a-ben .aud-shot img, .a-ben .aud-keyline { transition: none; }
-  .a-ben .aud-shot, .js-aud .a-ben .aud-path,
+  .js-aud .a-ben .aud-path,
   .a-ben .aud-path .ticks li, .a-ben .aud-path .ticks li::before,
   .a-ben .aud-path .tick, .a-ben .aud-path .tick::after { transition: none; }
   .js-aud .a-ben .aud-path { opacity: 1; }
   .js-aud .a-ben .aud-path .ticks li::before { transform: scaleX(1); }
   .js-aud .a-ben .aud-path .tick::after { clip-path: none; }
-  .a-ben .aud-path:hover .aud-shot { box-shadow: none; }
   .a-ben .aud-path:hover .aud-shot img { transform: none; }
   .a-ben .aud-path .ticks li:hover { transform: none; }
   .a-ben .aud-path.in:hover .aud-keyline { transform: scaleX(var(--aud-key)); }
