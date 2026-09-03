@@ -45,14 +45,13 @@
    and the answer is display type in the right, so the page reads as a list of
    answers rather than a stack of controls. */
 
-.f-rows { border-top: 1px solid var(--stone-mid); }
+.f-rows { }
 .f-row {
   display: grid;
   grid-template-columns: 208px minmax(0, 1fr);
   gap: 28px;
   align-items: start;
   padding: 24px 0 22px;
-  border-bottom: 1px solid var(--stone-mid);
 }
 .f-lab {
   font-size: 12px;
@@ -197,7 +196,6 @@
   white-space: nowrap;
   transition: color .2s ease, border-color .2s ease;
 }
-.f-seg .seg + .seg { box-shadow: inset 1px 0 0 var(--stone-mid); }
 .f-seg .seg:first-child { padding-left: 0; }
 .f-seg .seg:hover { color: var(--red110); }
 .f-seg .seg[aria-pressed="true"] { color: var(--red110); border-bottom-color: var(--flare); }
@@ -275,9 +273,8 @@
 
 /* -------------------------------------------------------------- the four returns */
 
-.f-returns { border-top: 1px solid var(--stone-mid); margin: 0; padding: 0; list-style: none; }
+.f-returns { margin: 0; padding: 0; list-style: none; }
 .f-returns li {
-  border-bottom: 1px solid var(--stone-mid);
   padding: 18px 0;
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr);
@@ -364,6 +361,21 @@
   gap: 56px;
   align-items: stretch;
 }
+/* stage one has no rail to fill: three questions, the full column, and the
+   height under the headline to sit in */
+.a-cols.first { grid-template-columns: minmax(0, 1fr); }
+.a-cols.first .a-rail { display: none; }
+.a-cols.first .a-col {
+  min-height: var(--first-fill, 520px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.a-cols.first .f-row { grid-template-columns: 240px minmax(0, 1fr); padding: 20px 0 18px; }
+.a-cols.first .f-text { font-size: clamp(28px, 2.7vw, 38px); }
+.a-cols.first .f-lab { font-size: 13px; padding-top: 16px; }
+.a-cols.first .f-tiles { max-width: 620px; gap: 20px; }
+.a-cols.first .f-hint { font-size: 15px; }
 .a-col { min-width: 0; }
 .a-rail {
   background: var(--stonelight);
@@ -372,14 +384,13 @@
   align-self: stretch;
 }
 .a-rail h2 { font-size: 19px; margin: 6px 0 10px; }
-.a-rail dl { margin: 0; border-top: 1px solid var(--stone-mid); }
+.a-rail dl { margin: 0; }
 .a-rail .r-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 14px;
   padding: 5px 0;
-  border-bottom: 1px solid var(--stone-mid);
 }
 .a-rail dt {
   font-size: 11px;

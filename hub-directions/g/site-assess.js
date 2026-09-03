@@ -143,6 +143,8 @@
         seg.classList.toggle("done", n < at);
       });
       doc.body.classList.toggle("past-first", at > 0);
+      col.classList.toggle("first", at === 0);
+      if (at === 0) { fitFirst(); }
       var first = stages[at].querySelector(".f-text, .f-area, .f-tile, .seg");
       if (first && first.focus) { first.focus({ preventScroll: true }); }
       /* the reader asked for the next stage, so put it under the nav rather
@@ -153,6 +155,15 @@
         window.scrollTo(0, Math.max(0, Math.round(top - 132)));
       }
     }
+
+    /* the first stage is centred in whatever the headline and the nav leave,
+       measured rather than guessed so it never pushes the page into a scroll */
+    function fitFirst() {
+      var top = col.getBoundingClientRect().top + window.scrollY;
+      var room = window.innerHeight - top - 40;
+      col.style.setProperty("--first-fill", Math.max(360, Math.round(room)) + "px");
+    }
+    window.addEventListener("resize", function () { if (at === 0) { fitFirst(); } });
 
     all("[data-next]", col).forEach(function (b) {
       b.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });
