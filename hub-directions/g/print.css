@@ -1,7 +1,9 @@
 /* Print sheet for the hub PDFs built by _build_hub.py.
-   Drops the site chrome and everything that only works as a live page, keeps
-   the cover, the header and the body, and leaves the palette and the fonts
-   alone so the PDF reads as the same document. */
+   This is a document, not the web page shrunk: one A4 text block at reading
+   size, the cover as a plate at the top of page one, the title block under it,
+   and no element tall enough to push itself onto a page of its own. The running
+   footer is drawn by Chromium's own footer template, not from here, because
+   Chromium ignores @page margin boxes. */
 
 .nav,
 nav.dnav,
@@ -13,7 +15,9 @@ footer,
 .g-pager,
 .g-filter,
 .g-return,
-.g-actions {
+.g-actions,
+.g-byline .face,
+.g-hero .plate {
   display: none !important;
 }
 
@@ -21,35 +25,147 @@ footer,
 
 body {
   background: var(--paper);
-  font-size: 12pt;
+  font-size: 11pt;
+  line-height: 1.45;
+  orphans: 3;
+  widows: 3;
 }
 
+/* 18mm margins leave 174mm of A4, and the text block is all of it. */
 .wrap { max-width: none; padding: 0; }
-
-/* A4 less the 18mm margins is 174mm of column, so the reading measure stops
-   being a pixel width and becomes the page. */
 .g-measure { max-width: none; margin: 0; }
 
-.g-hero { border-radius: 0; }
-.g-hero > img { aspect-ratio: 2.2; }
-.g-hero .plate h1 { font-size: 26pt; }
-.g-hero .plate .stand { font-size: 11pt; }
+/* ---------- page one ---------- */
 
-.g-title { margin-top: 20pt; }
-.g-title h2 { font-size: 22pt; }
-.g-body { font-size: 11pt; margin-top: 18pt; }
-.g-body h3 { font-size: 15pt; }
-.g-body h4 { font-size: 12pt; }
-.g-body .lead-in { font-size: 13pt; }
+.g-hero {
+  border-radius: 4pt;
+  margin-bottom: 14pt;
+}
+.g-hero > img, .g-hero > video {
+  aspect-ratio: 2.6;
+  max-height: 64mm;
+  object-fit: cover;
+}
 
-/* Break out figures have nothing to break out of on paper. */
+.g-title { margin-top: 0; }
+.g-title .g-pill { font-size: 8pt; padding: 3pt 7pt; }
+.g-title h2 {
+  font-size: 19pt;
+  line-height: 1.1;
+  margin-top: 8pt;
+}
+.g-byline {
+  margin-top: 8pt;
+  gap: 6pt;
+  font-size: 9.5pt;
+  color: var(--warm-grey);
+}
+.g-byline .who { color: var(--red110); }
+.g-byline br { display: none; }
+.g-byline .when::before { content: " · "; }
+
+/* ---------- body ---------- */
+
+.g-body { margin-top: 14pt; font-size: 11pt; }
+.g-body p { margin: 0 0 7pt; }
+.g-body h3 { font-size: 13.5pt; margin: 13pt 0 5pt; }
+.g-body h4 { font-size: 11pt; margin: 10pt 0 3pt; }
+.g-body .lead-in { font-size: 12pt; line-height: 1.4; }
+.g-body ul { margin: 0 0 9pt; padding-left: 14pt; }
+.g-body li { margin-bottom: 3pt; }
+
+/* A heading stays with what it introduces, and nothing here is allowed to
+   break across a page and leave half of itself behind. */
+h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
+.g-body li, .g-body ul, .g-body ol, figure, blockquote, .g-numbers, .g-spec div,
+.g-table, .n-row, .n-year {
+  break-inside: avoid;
+}
+
+/* A pull quote runs in the column with a rule beside it, the same as on the
+   page. It never gets a page to itself, so it is not allowed to start one. */
+.g-body blockquote {
+  margin: 12pt 0;
+  padding-left: 10pt;
+  border-left: 2pt solid var(--flare);
+  font-size: 13pt;
+  line-height: 1.2;
+  break-before: avoid;
+}
+.g-body blockquote cite { margin-top: 5pt; font-size: 9pt; }
+
+/* ---------- figures ---------- */
+
+.g-break {
+  width: 100%;
+  margin: 10pt 0;
+  transform: none;
+  margin-left: 0;
+  text-align: center;
+}
+.g-break img {
+  max-height: 72mm;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 4pt;
+}
+.g-break figcaption { margin-top: 5pt; font-size: 8.5pt; }
+.g-figures { gap: 8pt; }
+.g-figures img { max-height: 46mm; border-radius: 3pt; }
+
+/* ---------- fact blocks ---------- */
+
+/* Key details and key outcomes read as a block of pairs, two to a line, rather
+   than one fact per line down a third of a page. */
+.g-numbers {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8pt 16pt;
+  padding: 12pt 14pt;
+  border-radius: 6pt;
+  margin: 12pt 0;
+}
+.g-numbers .n { font-size: 15pt; }
+.g-numbers .l { margin-top: 2pt; font-size: 8.5pt; line-height: 1.3; }
+
+.g-spec {
+  columns: 2;
+  column-gap: 16pt;
+  margin: 12pt 0;
+}
+.g-spec div { padding: 4pt 0; font-size: 9.5pt; gap: 10pt; }
+
+.g-table table { min-width: 0; font-size: 8.5pt; }
+.g-table th, .g-table td { padding: 4pt 6pt; }
+
+/* ---------- listings ---------- */
+
+.g-mast { padding: 0 0 12pt; }
+.g-mast h1 { font-size: 22pt; margin-top: 8pt; }
+.g-mast .stand { font-size: 10pt; margin-top: 8pt; }
+.n-row { padding: 10pt 0; gap: 10pt; grid-template-columns: 96px 110px 130px minmax(0, 1fr) auto; }
+.n-row .head { font-size: 11pt; }
+.n-row .line { font-size: 9pt; margin-top: 4pt; }
+.n-row .when, .n-row .outlet { font-size: 9pt; }
+.n-row .ext { display: none; }
+
+/* ---------- the source line, last page ---------- */
+
+.print-url { display: block; margin-top: 14pt; font-size: 9pt; color: var(--warm-grey); }
+.print-url::after { content: attr(data-url); }
+
+/* Runs of short label and value lines, and short bullet lists, set two to a
+   line rather than one per line down the page. */
+.factlist {
+  columns: 2;
+  column-gap: 16pt;
+  margin: 0 0 9pt;
+}
+.g-body .factlist p, .g-body .factlist li { margin: 0 0 3pt; break-inside: avoid; }
+
+/* The PDF page is about 794 CSS pixels wide, so g.css's 900px breakpoint is
+   live and the print sheet would otherwise inherit the phone layout. */
+.g-figures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g-figures img { max-height: 40mm; aspect-ratio: 1.2; object-fit: cover; }
 .g-break { width: 100%; margin-left: 0; transform: none; }
-
-.g-mast { padding-bottom: 24pt; }
-.g-mast h1 { font-size: 28pt; }
-.g-mast .stand { font-size: 11pt; }
-
-.n-row { break-inside: avoid; }
-.g-numbers, .g-table, blockquote, figure { break-inside: avoid; }
-h1, h2, h3, h4 { break-after: avoid; }
-img { break-inside: avoid; }
+.g-hero .plate { display: none !important; }
