@@ -552,12 +552,18 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 }
 
 /* ----------------------------------------- developers and homeowners paths */
-/* The split path chooser from proto-audience/1, approved 1 September. Two
-   halves of one band, a photograph each on the panel radius, the audience name
-   at section head size, and a flare keyline that grows to 84px as the path
-   arrives and to the full column under the pointer. Entry runs on the page's
-   own [data-reveal] hook, so without motion home-ui lands the .in state at once
-   and only the transitions are switched off below. */
+/* The split path chooser from proto-audience/1, approved 1 September, carrying
+   the hover led motion of proto-audience/d picked on 3 September. Two halves of
+   one band, a photograph each on the panel radius, the audience name at the
+   battery band's heading size, and a flare keyline that draws to 84px as the
+   path arrives and runs the full column under the pointer.
+   Entry is a plain fade with the lines drawing under it: the row hairlines
+   extend from nothing to the column width and the title dash draws left to
+   right. Under the pointer a row lifts 2px with its tick filling solid, and the
+   plate takes the panel shadow with a 1.5 percent zoom.
+   draft/audience.js owns the observer and the delay maths and marks the html
+   element js-aud, so the rest state below is only ever hidden once the script
+   that can reveal it is running. Reduced motion lands every state at once. */
 .a-ben .aud-head { max-width: 60ch; }
 /* the band's own lede sits at the standing readability bar rather than at
    the 18px the shared .lede carries */
@@ -620,23 +626,72 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   border-radius: var(--radius-panel); overflow: hidden;
   aspect-ratio: 4 / 3; background: var(--stonelight);
 }
+/* the plate never enters on a zoom. The band already reads larger than its
+   neighbours and a zoom entry makes that worse, so the photograph sits at its
+   own size from first paint and only the pointer touches it. */
+.a-ben .aud-shot { transition: box-shadow .4s cubic-bezier(.4,0,.6,1); }
+.a-ben .aud-path:hover .aud-shot { box-shadow: var(--panel-shadow); }
 .a-ben .aud-shot img {
   display: block; width: 100%; height: 100%; object-fit: cover;
-  transform: scale(1.06);
-  transition: transform 1.2s cubic-bezier(.22,.61,.36,1);
+  transform: none;
+  transition: transform .5s cubic-bezier(.22,.61,.36,1);
 }
-.a-ben .aud-path.in .aud-shot img { transform: scale(1); }
-.a-ben .aud-path:hover .aud-shot img { transform: scale(1.03); }
-.a-ben .aud-path h3 { font-size: clamp(30px, 3.2vw, 44px); margin: 30px 0 0; }
+.a-ben .aud-path:hover .aud-shot img { transform: scale(1.015); }
+.a-ben .aud-path h3 { font-size: clamp(30px, 3.2vw, 36px); margin: 30px 0 0; }
+/* the dash is drawn rather than widened, so entry and hover both run on the
+   compositor. --aud-key is the resting 84px as a fraction of the column, and
+   audience.js rewrites it whenever the column is remeasured. */
 .a-ben .aud-keyline {
-  height: 2px; width: 0; margin-top: 18px; background: var(--flare);
-  transition: width .8s cubic-bezier(.22,.61,.36,1) .15s;
+  height: 2px; width: 100%; margin-top: 18px; background: var(--flare);
+  transform-origin: left center; transform: scaleX(0);
+  --aud-key: .15;
+  transition: transform .62s cubic-bezier(.22,.61,.36,1) var(--d, 0ms);
 }
-.a-ben .aud-path.in .aud-keyline { width: 84px; }
-.a-ben .aud-path:hover .aud-keyline { width: 100%; }
+.a-ben .aud-path.in .aud-keyline { transform: scaleX(var(--aud-key)); }
+.a-ben .aud-path.in:hover .aud-keyline { transform: scaleX(1); }
 .a-ben .aud-path .ticks { margin-top: 24px; }
-/* the standing readability bar rather than the prototype's inherited 15.5px */
-.a-ben .aud-path .ticks li { font-size: 20px; line-height: 1.55; padding: 16px 0; }
+/* the site body size. 20px made the points compete with the band lede. */
+.a-ben .aud-path .ticks li { font-size: 17px; line-height: 1.55; padding: 16px 0; }
+
+/* --------------------------------------------------------- entry and hover */
+/* the band fades in as one plate per column, with the lines drawing under it */
+.js-aud .a-ben .aud-path {
+  opacity: 0;
+  transition: opacity .55s cubic-bezier(.4,0,.6,1) var(--d, 0ms);
+}
+.js-aud .a-ben .aud-path.in { opacity: 1; }
+
+/* the row hairline extends from nothing rather than arriving whole, so the
+   border one.css draws is handed to a scalable layer of its own */
+.a-ben .aud-path .ticks li {
+  position: relative; border-top-color: transparent;
+  transition: transform .28s cubic-bezier(.22,.61,.36,1);
+}
+.a-ben .aud-path .ticks li::before {
+  content: ""; position: absolute; top: -1px; left: 0; right: 0; height: 1px;
+  background: var(--stone-mid); transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform .55s cubic-bezier(.22,.61,.36,1) var(--d, 0ms);
+}
+.js-aud .a-ben .aud-path .ticks li::before { transform: scaleX(0); }
+.js-aud .a-ben .aud-path .ticks li.in::before { transform: scaleX(1); }
+.a-ben .aud-path .ticks li:first-child::before { display: none; }
+
+/* the tick wipes along its own stroke as its row lands */
+.a-ben .aud-path .tick::after {
+  transition: clip-path .38s cubic-bezier(.22,.61,.36,1) var(--d, 0ms),
+              border-color .28s cubic-bezier(.4,0,.6,1);
+}
+.js-aud .a-ben .aud-path .tick::after { clip-path: inset(0 0 100% 0); }
+.js-aud .a-ben .aud-path .ticks li.in .tick::after { clip-path: inset(0 0 0 0); }
+
+/* under the pointer the row lifts and its tick fills solid */
+.a-ben .aud-path .tick { transition: background-color .28s cubic-bezier(.4,0,.6,1); }
+.a-ben .aud-path .ticks li:hover { transform: translate3d(0, -2px, 0); }
+.a-ben .aud-path .ticks li:hover .tick { background-color: var(--flare); }
+.a-ben .aud-path .ticks li:hover .tick::after {
+  border-right-color: var(--paper); border-bottom-color: var(--paper);
+}
 
 @media (max-width: 900px) {
   .a-ben.is-audience-compact .aud-head__inner { padding: 78px 20px 18px; }
@@ -647,7 +702,16 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   .a-ben .aud-head__inner, .a-ben .aud-head .sec-head,
   .a-ben .aud-head .lede { transition: none; }
   .a-ben .aud-shot img, .a-ben .aud-keyline { transition: none; }
-  .a-ben .aud-path:hover .aud-shot img { transform: scale(1); }
+  .a-ben .aud-shot, .js-aud .a-ben .aud-path,
+  .a-ben .aud-path .ticks li, .a-ben .aud-path .ticks li::before,
+  .a-ben .aud-path .tick, .a-ben .aud-path .tick::after { transition: none; }
+  .js-aud .a-ben .aud-path { opacity: 1; }
+  .js-aud .a-ben .aud-path .ticks li::before { transform: scaleX(1); }
+  .js-aud .a-ben .aud-path .tick::after { clip-path: none; }
+  .a-ben .aud-path:hover .aud-shot { box-shadow: none; }
+  .a-ben .aud-path:hover .aud-shot img { transform: none; }
+  .a-ben .aud-path .ticks li:hover { transform: none; }
+  .a-ben .aud-path.in:hover .aud-keyline { transform: scaleX(var(--aud-key)); }
 }
 
 
