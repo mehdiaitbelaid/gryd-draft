@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A, one page request, Gryd site assessment</title>
+<meta name="description" content="Prototype A. The whole request on one page, with a summary card that fills as the fields are answered.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../g.css">
+<link rel="stylesheet" href="proto-assess.css">
+</head>
+<body>
+
+<script src="../../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="pa-page">
+<div class="wrap">
+
+  <div id="paForm">
+
+  <!-- Heading, standfirst, every contact label, every placeholder, the submit
+       and the consent line are get-started.gryd.energy's own words. Only the
+       site questions it never asks are written here. -->
+  <header class="pa-mast">
+    <span class="pa-flag"><b>Prototype</b> nothing is sent and no figure is calculated</span>
+    <span class="eyebrow">No obligation &middot; Free site assessment</span>
+    <h1>Tell us about your scheme.</h1>
+    <p class="stand">With just a site plan and house type information we can show you exactly what Gryd could deliver for your project, including build cost and homeowner bill savings.</p>
+  </header>
+
+  <div class="a-cols">
+
+    <form class="a-form" id="saForm" novalidate>
+
+      <section class="a-block">
+        <h2>Tell us about your site</h2>
+        <div class="pa-grid">
+          <label class="pa-field">
+            <span>Site postcode</span>
+            <input name="postcode" type="text" autocomplete="postal-code" placeholder="NR20 5DF">
+          </label>
+          <label class="pa-field">
+            <span>Developer</span>
+            <input name="developer" type="text" autocomplete="organization" placeholder="Acme Homes">
+          </label>
+          <label class="pa-field">
+            <span>How many units</span>
+            <input name="plots" type="number" min="1" step="1" inputmode="numeric" placeholder="42">
+          </label>
+          <label class="pa-field">
+            <span>When does construction start</span>
+            <input name="programme" type="date">
+          </label>
+          <div class="pa-field wide">
+            <span class="pa-legend">Planning status</span>
+            <select name="planning">
+              <option value="">Choose one</option>
+              <option>Pre application</option>
+              <option>Outline consent</option>
+              <option>Reserved matters submitted</option>
+              <option>Full consent, drawings fixed</option>
+              <option>On site</option>
+            </select>
+            <p class="hint">Tells us whether the roof layouts we size against are still moving.</p>
+          </div>
+          <div class="pa-field wide" data-chip-group="types">
+            <span class="pa-legend">House type information</span>
+            <div class="pa-chips">
+              <button class="pa-chip" type="button" aria-pressed="false">Detached</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Semi detached</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Terrace</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Bungalow</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Apartments</button>
+            </div>
+            <p class="hint">Designed plot-by-plot from your drawings, no cherry picking only the best plots, no over specifying solar the home is unable to use.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="a-block">
+        <h2>Your scheme drawings</h2>
+        <div class="pa-drop" data-drop data-name="plan" tabindex="0" role="button" aria-label="Add the site plan">
+          <input type="file" accept=".pdf,.dwg,.png,.jpg,.jpeg">
+          <span class="big">Drop the site plan here</span>
+          <span class="small" data-drop-out>PDF, DWG or an image. A block plan with plot numbers is ideal.</span>
+        </div>
+      </section>
+
+      <section class="a-block">
+        <h2>Who we come back to</h2>
+        <div class="pa-grid">
+          <label class="pa-field">
+            <span>Full name</span>
+            <input name="name" type="text" autocomplete="name" placeholder="Jane Smith">
+          </label>
+          <label class="pa-field">
+            <span>Work email</span>
+            <input name="email" type="email" autocomplete="email" placeholder="jane@company.co.uk">
+          </label>
+          <label class="pa-field">
+            <span>Phone</span>
+            <input name="phone" type="tel" autocomplete="tel" placeholder="07XXX XXX XXX">
+          </label>
+          <label class="pa-field">
+            <span>Company</span>
+            <input name="company" type="text" autocomplete="organization" placeholder="Acme Homes">
+          </label>
+          <label class="pa-field wide">
+            <span>Tell us about your site</span>
+            <textarea name="message" placeholder="Tell us a bit about your site. Where is it? How many units? When does construction start?"></textarea>
+          </label>
+        </div>
+        <div class="pa-actions" style="margin-top:28px">
+          <button class="btn" type="submit">Request a site assessment</button>
+          <p class="pa-note">By submitting you agree to be contacted about your scheme. We&rsquo;ll never share your details. <a href="../faq.html">Read our privacy policy</a>.</p>
+        </div>
+      </section>
+
+    </form>
+
+    <aside class="pa-sticky">
+      <div class="pa-summary" id="saSummary">
+        <h2>Your scheme so far</h2>
+        <p class="why">This is exactly what lands with us. Nothing is sent until you press the button.</p>
+        <dl class="pa-rows">
+          <div data-sum="postcode"><dt>Site postcode</dt><dd data-empty="Not yet"></dd></div>
+          <div data-sum="developer"><dt>Developer</dt><dd data-empty="Not yet"></dd></div>
+          <div data-sum="plots"><dt>Units</dt><dd data-empty="Not yet"></dd></div>
+          <div data-sum="types"><dt>House types</dt><dd data-empty="None picked"></dd></div>
+          <div data-sum="programme"><dt>Construction starts</dt><dd data-empty="Not yet"></dd></div>
+          <div data-sum="planning"><dt>Planning status</dt><dd data-empty="Not yet"></dd></div>
+          <div data-sum="plan"><dt>Site plan</dt><dd data-empty="No file"></dd></div>
+          <div data-sum="name"><dt>Full name</dt><dd data-empty="Not yet"></dd></div>
+          <div data-sum="email"><dt>Work email</dt><dd data-empty="Not yet"></dd></div>
+        </dl>
+        <div class="pa-meter">
+          <div class="bar"><i data-meter></i></div>
+          <p class="cap" data-meter-count></p>
+        </div>
+      </div>
+
+      <div class="pa-sample" style="margin-top:28px">
+        <span class="tag">Sample output</span>
+        <h3>Indicative system design per plot.</h3>
+        <p class="lede">No obligation. No hard-sell. Just an indicative design and savings model based on your real plots. The figures below belong to a sample plot, not to your site.</p>
+        <dl>
+          <div><dt>Plot 14, semi detached</dt><dd>4 bed</dd></div>
+          <div><dt>Array</dt><dd>3.6 kWp, 9 panels</dd></div>
+          <div><dt>Battery and inverter</dt><dd>5.2 kWh, 3.68 kW hybrid</dd></div>
+          <div><dt>Energy performance modelling</dt><dd>SAP +14 points</dd></div>
+          <div><dt>Projected build cost saving</dt><dd>&pound;0 hardware cost</dd></div>
+          <div><dt>Simulated energy bill impact</dt><dd>&pound;74 a month, fixed</dd></div>
+        </dl>
+        <p class="smallprint">Sample figures. Your own plots are sized from your drawings and your unit mix.</p>
+      </div>
+    </aside>
+
+  </div>
+
+  </div><!-- /paForm -->
+
+  <div class="pa-done" id="paDone">
+    <div class="pa-receipt" id="saReceipt">
+      <span class="eyebrow">Request sent</span>
+      <h2>That is with the assessment team.</h2>
+      <p class="lede">We come back with an indicative system design, estimated energy performance, savings and subscriptions, usually within a week. If anything on the drawings is unclear we will call before we start.</p>
+      <dl class="pa-rows">
+        <div data-sum="__ref"><dt>Reference</dt><dd data-ref></dd></div>
+        <div data-sum="postcode"><dt>Site postcode</dt><dd></dd></div>
+        <div data-sum="developer"><dt>Developer</dt><dd></dd></div>
+        <div data-sum="plots"><dt>Units</dt><dd></dd></div>
+        <div data-sum="types"><dt>House types</dt><dd></dd></div>
+        <div data-sum="programme"><dt>Construction starts</dt><dd></dd></div>
+        <div data-sum="planning"><dt>Planning status</dt><dd></dd></div>
+        <div data-sum="plan"><dt>Site plan</dt><dd></dd></div>
+        <div data-sum="email"><dt>Work email</dt><dd></dd></div>
+      </dl>
+      <div class="after">
+        <a class="btn" href="index.html">Back to the five prototypes</a>
+        <a class="btn ghost" href="../faq.html">Read the FAQs while you wait</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+window.PA_PAGE = function () {
+  var form = document.getElementById('saForm');
+  PA.wireSummary(form, document.getElementById('saSummary'));
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    /* The reference row has no field behind it, so it is filled by fillReceipt
+       from the postcode and then left alone. */
+    PA.fillReceipt(form, document.getElementById('saReceipt'));
+    PA.hide(document.getElementById('paForm'));
+    PA.show(document.getElementById('paDone'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+};
+</script>
+<script src="proto-assess.js"></script>
+<script src="../../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>

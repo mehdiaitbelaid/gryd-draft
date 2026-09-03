@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E, one question at a time, Gryd site assessment</title>
+<meta name="description" content="Prototype E. One question per screen in a single column, answers stacking above, summary card at the end.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../g.css">
+<link rel="stylesheet" href="proto-assess.css">
+</head>
+<body>
+
+<script src="../../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="pa-page">
+<div class="wrap">
+
+  <div class="e-col" id="paForm">
+
+    <header class="pa-mast mid">
+      <span class="pa-flag"><b>Prototype</b> nothing is sent and no figure is calculated</span>
+      <span class="eyebrow">No obligation &middot; Free site assessment</span>
+      <h1>Tell us about your scheme.</h1>
+      <p class="stand">With just a site plan and house type information we can show you exactly what Gryd could deliver for your project, including build cost and homeowner bill savings.</p>
+    </header>
+
+    <!-- Answers land here as they are given, so the reader always has the whole
+         request in view without a second panel. -->
+    <div class="e-thread" id="eThread" aria-live="polite"></div>
+
+    <form id="saForm" novalidate>
+      <div class="e-progress" id="eProgress" aria-hidden="true"></div>
+      <div class="e-ask" id="eAsk">
+
+        <section class="e-pane on" data-q="Site postcode" data-f="postcode">
+          <p class="step-of">Question 1 of 7</p>
+          <h2>Where is the site?</h2>
+          <label class="pa-field">
+            <span>Site postcode</span>
+            <input name="postcode" type="text" autocomplete="postal-code" placeholder="NR20 5DF">
+          </label>
+          <div class="e-go"><button class="btn" type="button" data-step-next>Next</button></div>
+        </section>
+
+        <section class="e-pane" data-q="Units" data-f="plots">
+          <p class="step-of">Question 2 of 7</p>
+          <h2>How many units?</h2>
+          <label class="pa-field">
+            <span>How many units</span>
+            <input name="plots" type="number" min="1" step="1" inputmode="numeric" placeholder="42">
+          </label>
+          <div class="e-go">
+            <button class="btn ghost" type="button" data-step-back>Back</button>
+            <button class="btn" type="button" data-step-next>Next</button>
+          </div>
+        </section>
+
+        <section class="e-pane" data-q="House types" data-f="types">
+          <p class="step-of">Question 3 of 7</p>
+          <h2>What are you building?</h2>
+          <p class="why">Designed plot-by-plot from your drawings, no cherry picking only the best plots, no over specifying solar the home is unable to use.</p>
+          <div class="pa-field" data-chip-group="types">
+            <span class="pa-legend">House type information</span>
+            <div class="pa-chips">
+              <button class="pa-chip" type="button" aria-pressed="false">Detached</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Semi detached</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Terrace</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Bungalow</button>
+              <button class="pa-chip" type="button" aria-pressed="false">Apartments</button>
+            </div>
+          </div>
+          <div class="e-go">
+            <button class="btn ghost" type="button" data-step-back>Back</button>
+            <button class="btn" type="button" data-step-next>Next</button>
+          </div>
+        </section>
+
+        <section class="e-pane" data-q="Construction starts" data-f="programme">
+          <p class="step-of">Question 4 of 7</p>
+          <h2>When does construction start?</h2>
+          <p class="why">Sets when the hardware has to land on site, and whether the drawings are still moving.</p>
+          <div class="pa-grid">
+            <label class="pa-field">
+              <span>When does construction start</span>
+              <input name="programme" type="date">
+            </label>
+            <div class="pa-field">
+              <span class="pa-legend">Planning status</span>
+              <select name="planning">
+                <option value="">Choose one</option>
+                <option>Pre application</option>
+                <option>Outline consent</option>
+                <option>Reserved matters submitted</option>
+                <option>Full consent, drawings fixed</option>
+                <option>On site</option>
+              </select>
+            </div>
+          </div>
+          <div class="e-go">
+            <button class="btn ghost" type="button" data-step-back>Back</button>
+            <button class="btn" type="button" data-step-next>Next</button>
+          </div>
+        </section>
+
+        <section class="e-pane" data-q="Site plan" data-f="plan">
+          <p class="step-of">Question 5 of 7</p>
+          <h2>Send us your scheme drawings.</h2>
+          <p class="why">A block plan with plot numbers is enough to start.</p>
+          <div class="pa-drop" data-drop data-name="plan" tabindex="0" role="button" aria-label="Add the site plan">
+            <input type="file" accept=".pdf,.dwg,.png,.jpg,.jpeg">
+            <span class="big">Drop the site plan here</span>
+            <span class="small" data-drop-out>PDF, DWG or an image.</span>
+          </div>
+          <div class="e-go">
+            <button class="btn ghost" type="button" data-step-back>Back</button>
+            <button class="btn" type="button" data-step-next>Next</button>
+          </div>
+        </section>
+
+        <section class="e-pane" data-q="Work email" data-f="email">
+          <p class="step-of">Question 6 of 7</p>
+          <h2>Who do we come back to?</h2>
+          <div class="pa-grid">
+            <label class="pa-field">
+              <span>Full name</span>
+              <input name="name" type="text" autocomplete="name" placeholder="Jane Smith">
+            </label>
+            <label class="pa-field">
+              <span>Work email</span>
+              <input name="email" type="email" autocomplete="email" placeholder="jane@company.co.uk">
+            </label>
+            <label class="pa-field">
+              <span>Phone</span>
+              <input name="phone" type="tel" autocomplete="tel" placeholder="07XXX XXX XXX">
+            </label>
+            <label class="pa-field">
+              <span>Company</span>
+              <input name="company" type="text" autocomplete="organization" placeholder="Acme Homes">
+            </label>
+          </div>
+          <div class="e-go">
+            <button class="btn ghost" type="button" data-step-back>Back</button>
+            <button class="btn" type="button" data-step-next>Next</button>
+          </div>
+        </section>
+
+        <section class="e-pane" data-q="Notes" data-f="message">
+          <p class="step-of">Question 7 of 7</p>
+          <h2>Send us your scheme. We&rsquo;ll send you the numbers.</h2>
+          <p class="why">No obligation. No hard-sell. Just an indicative design and savings model based on your real plots.</p>
+          <label class="pa-field">
+            <span>Tell us about your site</span>
+            <textarea name="message" placeholder="Tell us a bit about your site. Where is it? How many units? When does construction start?"></textarea>
+          </label>
+
+          <div class="pa-sample" style="margin-top:32px">
+            <span class="tag">Sample output</span>
+            <h3>Indicative system design per plot.</h3>
+            <p class="lede">The shape of what comes back once we have your drawings. The figures below belong to a sample plot, not to your site.</p>
+            <dl>
+              <div><dt>Plot 14, semi detached</dt><dd>3.6 kWp, 9 panels</dd></div>
+              <div><dt>Energy performance modelling</dt><dd>SAP +14 points</dd></div>
+              <div><dt>Projected build cost saving</dt><dd>&pound;0 hardware cost</dd></div>
+              <div><dt>Simulated energy bill impact</dt><dd>&pound;74 a month, fixed</dd></div>
+            </dl>
+            <p class="smallprint">Sample figures. Your own plots are sized from your drawings and your unit mix.</p>
+          </div>
+
+          <div class="e-go">
+            <button class="btn ghost" type="button" data-step-back>Back</button>
+            <button class="btn" type="submit">Request a site assessment</button>
+          </div>
+          <p class="pa-note" style="margin-top:16px">By submitting you agree to be contacted about your scheme. We&rsquo;ll never share your details. <a href="../faq.html">Read our privacy policy</a>.</p>
+        </section>
+
+      </div>
+    </form>
+  </div>
+
+  <div class="pa-done e-col" id="paDone">
+    <div class="pa-receipt" id="saReceipt">
+      <span class="eyebrow">Request sent</span>
+      <h2>That is the whole scheme, in your words.</h2>
+      <p class="lede">We come back with an indicative system design, estimated energy performance, savings and subscriptions, usually within a week.</p>
+      <dl class="pa-rows">
+        <div data-sum="__ref"><dt>Reference</dt><dd data-ref></dd></div>
+        <div data-sum="postcode"><dt>Site postcode</dt><dd></dd></div>
+        <div data-sum="plots"><dt>Units</dt><dd></dd></div>
+        <div data-sum="types"><dt>House types</dt><dd></dd></div>
+        <div data-sum="programme"><dt>Construction starts</dt><dd></dd></div>
+        <div data-sum="planning"><dt>Planning status</dt><dd></dd></div>
+        <div data-sum="plan"><dt>Site plan</dt><dd></dd></div>
+        <div data-sum="name"><dt>Full name</dt><dd></dd></div>
+        <div data-sum="email"><dt>Work email</dt><dd></dd></div>
+      </dl>
+      <div class="after">
+        <a class="btn" href="index.html">Back to the five prototypes</a>
+        <a class="btn ghost" href="../faq.html">Read the FAQs while you wait</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+window.PA_PAGE = function () {
+  var form = document.getElementById('saForm');
+  var thread = document.getElementById('eThread');
+  var panes = PA.$$('.e-pane', form);
+  var bar = document.getElementById('eProgress');
+  var steps;
+
+  panes.forEach(function () { bar.appendChild(document.createElement('span')); });
+  var ticks = PA.$$('span', bar);
+
+  /* The thread is rebuilt from the form on every move rather than appended to.
+     Appending means the stack and the answers can disagree the moment someone
+     goes back and changes one; rebuilding cannot. */
+  function paintThread(at) {
+    thread.textContent = '';
+    for (var n = 0; n < at; n++) {
+      var pane = panes[n];
+      var v = PA.value(form, pane.getAttribute('data-f'));
+      var turn = document.createElement('div');
+      turn.className = 'e-turn';
+      var q = document.createElement('p');
+      q.className = 'q';
+      q.textContent = pane.getAttribute('data-q');
+      var a = document.createElement('p');
+      a.className = 'a';
+      var said = document.createElement('span');
+      said.textContent = v || 'Skipped';
+      var edit = document.createElement('button');
+      edit.type = 'button';
+      edit.textContent = 'Change';
+      (function (target) {
+        edit.addEventListener('click', function () { steps.go(target); });
+      })(n);
+      a.appendChild(said);
+      a.appendChild(edit);
+      turn.appendChild(q);
+      turn.appendChild(a);
+      thread.appendChild(turn);
+    }
+  }
+
+  steps = PA.stepper({
+    root: form,
+    panels: panes,
+    onStep: function (i) {
+      ticks.forEach(function (t, n) { t.classList.toggle('on', n <= i); });
+      paintThread(i);
+    }
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    PA.fillReceipt(form, document.getElementById('saReceipt'));
+    PA.hide(document.getElementById('paForm'));
+    PA.show(document.getElementById('paDone'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+};
+</script>
+<script src="proto-assess.js"></script>
+<script src="../../../home-final/assets/site-footer.js"></script>
+
+</body>
+</html>
