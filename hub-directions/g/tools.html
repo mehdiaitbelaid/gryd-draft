@@ -11,127 +11,64 @@
 <link rel="stylesheet" href="../assets/tokens.css">
 <link rel="stylesheet" href="g.css">
 <style>
-  /* Three tools on a numbered ladder: the film's 01 02 03 rail down the left,
-     each tool a row with a preview of itself on the right. The dark plates and
-     the line marks the page used to carry are gone, because a line mark says
+  /* Three tools, three cards on paper, each carrying a preview of itself at 4:3
+     with the pill, title, paragraph, meta line and link under it. The dark
+     plates and the line marks the page used to carry are gone: a line mark says
      nothing a photograph of the tool at work does not say better.
 
      Battery modelling came off the page on Scott's call of 3 September and is
      named in the closing note rather than listed as a tool. */
-  .t-mast h1 { font-size: clamp(34px, 4.2vw, 56px); max-width: 20ch; }
 
-  .t-wrap {
+  /* The headline and the standfirst sit side by side so the cards begin inside
+     the first viewport. */
+  .t-mast {
     display: grid;
-    grid-template-columns: 148px minmax(0, 1fr);
-    gap: 44px;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--gutter) 56px;
+    align-items: end;
+    padding: 0 0 32px;
   }
-
-  /* The rail is the film's own, and it tracks whichever row holds the viewport. */
-  .t-rail {
-    position: sticky;
-    top: 150px;
-    align-self: start;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 18px;
-  }
-  .t-rail a {
-    display: block;
-    max-width: 130px;
-    text-decoration: none;
-    font-family: "Borna", sans-serif;
-    font-weight: 500;
-    font-size: 17px;
-    letter-spacing: 0.04em;
-    color: var(--warm-grey);
-    padding-left: 20px;
-    position: relative;
-    line-height: 1.4;
-  }
-  .t-rail a::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.62em;
-    width: 12px;
-    height: 2px;
-    background: var(--stone-mid);
-  }
-  .t-rail a.on { color: var(--ember); }
-  .t-rail a.on::before { background: var(--flare); width: 14px; }
-  .t-rail a:focus-visible { outline: 2px solid var(--ember); outline-offset: 6px; }
-
-  .t-steps {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--stone-mid);
-  }
-  .t-step {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 400px;
-    gap: 48px;
-    align-items: center;
-    padding: var(--sec-pad) 0;
-    border-bottom: 1px solid var(--stone-mid);
-  }
-  .t-step .n {
-    display: block;
-    font-family: "Borna", sans-serif;
-    font-weight: 500;
-    font-size: 15px;
-    letter-spacing: 0.14em;
-    color: var(--flare);
-  }
-  .t-step h2 {
-    margin-top: var(--label-gap);
-    font-size: 32px;
-    line-height: 1.08;
-    max-width: 22ch;
-  }
-  .t-dek {
-    margin: var(--head-gap) 0 0;
-    font-size: 16px;
-    line-height: 1.55;
-    color: #6B4A3E;
-    max-width: 50ch;
-  }
-  .t-facts {
+  .t-mast .eyebrow { grid-column: 1 / -1; }
+  .t-mast h1 {
+    font-size: clamp(30px, 3.4vw, 44px);
+    max-width: 18ch;
     margin: 18px 0 0;
-    font-size: 14px;
+  }
+  .t-mast .stand {
+    margin: 18px 0 0;
+    font-size: 17px;
+    line-height: 1.5;
     color: #6B4A3E;
+    max-width: 52ch;
+  }
+
+  .t-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+  }
+  .t-card {
     display: flex;
-    gap: var(--gutter);
-    flex-wrap: wrap;
-  }
-  .t-go {
-    display: inline-block;
-    text-decoration: none;
-    margin-top: 20px;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--ember);
-  }
-  .t-go:hover, .t-step:hover .t-go { text-decoration: underline; }
-  .t-go:focus-visible {
-    outline: 2px solid var(--ember);
-    outline-offset: 6px;
-    border-radius: var(--radius-chip);
+    flex-direction: column;
+    border: 1px solid var(--stone-mid);
+    border-radius: var(--radius-panel);
+    padding: 18px 18px 26px;
   }
 
   .t-prev {
     display: block;
     position: relative;
-    border-radius: var(--radius-panel);
+    border-radius: var(--radius-chip);
     overflow: hidden;
     background: var(--stonelight);
   }
   .t-prev img {
     display: block;
     width: 100%;
-    height: 300px;
+    height: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
@@ -146,19 +83,55 @@
     pointer-events: none;
   }
 
-  /* Row hover, the site's own device, lifted from the audience band on the
-     homepage: the plate zooms 1.5 percent, the keyline under the title draws
-     out to the full column, the row lifts, and the arrow moves the 4px the
-     hub's card links move. Nothing gains a shadow. */
-  .t-step { transition: transform .45s cubic-bezier(.22,.61,.36,1); }
-  .t-step:hover { transform: translateY(-2px); }
-  .t-step .t-prev img {
+  .t-card .g-pill { align-self: flex-start; margin-top: 22px; }
+  .t-card h2 {
+    margin-top: var(--label-gap);
+    font-size: 24px;
+    line-height: 1.1;
+    max-width: 22ch;
+  }
+  .t-dek {
+    margin: var(--head-gap) 0 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #6B4A3E;
+  }
+  .t-facts {
+    margin: 16px 0 0;
+    font-size: 14px;
+    color: #6B4A3E;
+    display: flex;
+    gap: var(--gutter);
+    flex-wrap: wrap;
+  }
+  .t-go {
+    display: inline-block;
+    text-decoration: none;
+    margin-top: auto;
+    padding-top: 18px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ember);
+  }
+  .t-go:hover, .t-card:hover .t-go { text-decoration: underline; }
+  .t-go:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 6px;
+    border-radius: var(--radius-chip);
+  }
+
+  /* Hover, the site's own device: the card lifts 2px, the preview zooms 1.5
+     percent, the keyline under the title draws out to the full column, and the
+     arrow moves the 4px the hub's card links move. Nothing gains a shadow. */
+  .t-card { transition: transform .45s cubic-bezier(.22,.61,.36,1); }
+  .t-card:hover { transform: translateY(-2px); }
+  .t-card .t-prev img {
     transform: none;
     transition: transform .5s cubic-bezier(.22,.61,.36,1);
   }
-  .t-step:hover .t-prev img { transform: scale(1.015); }
+  .t-card:hover .t-prev img { transform: scale(1.015); }
 
-  .t-step .key {
+  .t-card .key {
     display: block;
     height: 2px;
     width: 100%;
@@ -168,42 +141,40 @@
     transform: scaleX(0.14);
     transition: transform .62s cubic-bezier(.22,.61,.36,1);
   }
-  .t-step:hover .key { transform: scaleX(1); }
+  .t-card:hover .key { transform: scaleX(1); }
 
-  .t-step .ar {
+  .t-card .ar {
     display: inline-block;
     transition: transform .4s cubic-bezier(.22,.61,.36,1);
   }
-  .t-step:hover .ar { transform: translateX(4px); }
+  .t-card:hover .ar { transform: translateX(4px); }
 
   @media (prefers-reduced-motion: reduce) {
-    .t-step,
-    .t-step .t-prev img,
-    .t-step .key,
-    .t-step .ar { transition: none; }
-    .t-step:hover { transform: none; }
-    .t-step:hover .t-prev img { transform: none; }
-    .t-step:hover .ar { transform: none; }
-    .t-step .key, .t-step:hover .key { transform: scaleX(1); }
+    .t-card,
+    .t-card .t-prev img,
+    .t-card .key,
+    .t-card .ar { transition: none; }
+    .t-card:hover { transform: none; }
+    .t-card:hover .t-prev img { transform: none; }
+    .t-card:hover .ar { transform: none; }
+    .t-card .key, .t-card:hover .key { transform: scaleX(1); }
   }
 
   .t-note {
-    margin: var(--sec-pad) auto 0;
+    margin: 48px auto 0;
     max-width: 62ch;
     text-align: center;
     font-size: 15px;
     color: #6B4A3E;
   }
+  .t-page .g-close { margin-top: 56px; }
 
   @media (max-width: 1080px) {
-    .t-wrap { grid-template-columns: 1fr; gap: var(--gutter); }
-    .t-rail { position: static; grid-auto-flow: column; justify-content: start; gap: 26px; }
-    .t-step { grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; }
-    .t-prev img { height: 240px; }
+    .t-mast { grid-template-columns: 1fr; align-items: start; }
+    .t-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 760px) {
-    .t-step { grid-template-columns: 1fr; gap: 24px; padding: 48px 0; }
-    .t-prev img { height: 220px; }
+    .t-cards { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -212,83 +183,64 @@
 <!-- the shared pill nav, the same one every other page in the tree carries -->
 <script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
 
-<div class="g-page">
+<div class="g-page t-page">
 
 <div class="wrap">
 
-  <header class="g-mast t-mast">
+  <header class="t-mast">
     <span class="eyebrow">Tools</span>
     <h1>Three tools. Each answers a question before you commit a plot.</h1>
     <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.</p>
   </header>
 
-  <div class="t-wrap">
+  <ol class="t-cards">
 
-    <ol class="t-rail" aria-label="The three tools">
-      <li><a href="#step-01" data-rail="step-01">01<br>Site Assessment</a></li>
-      <li><a href="#step-02" data-rail="step-02">02<br>FHS Checker</a></li>
-      <li><a href="#step-03" data-rail="step-03">03<br>Council Solar Index</a></li>
-    </ol>
+    <li class="t-card">
+      <span class="t-prev">
+        <picture>
+          <source type="image/webp" srcset="../img/tools/site-assess-800.webp 800w, ../img/tools/site-assess-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 380px">
+          <img src="../img/tools/site-assess-800.jpg" srcset="../img/tools/site-assess-800.jpg 800w, ../img/tools/site-assess-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 380px" alt="An overhead view of a new build scheme with a printed site plan laid out in the foreground" width="1600" height="871" loading="eager" decoding="async">
+        </picture>
+      </span>
+      <span class="g-pill">Developers</span>
+      <h2>See what a scheme carries before it is priced</h2>
+      <span class="key" aria-hidden="true"></span>
+      <p class="t-dek">Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.</p>
+      <p class="t-facts"><span>Scheme level</span><span>Under two minutes</span></p>
+      <a class="t-go" href="site-assessment.html">Open the tool <span class="ar">&rarr;</span></a>
+    </li>
 
-    <ol class="t-steps">
+    <li class="t-card">
+      <span class="t-prev">
+        <picture>
+          <source type="image/webp" srcset="../img/tools/fhs-800.webp 800w, ../img/tools/fhs-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 380px">
+          <img src="../img/tools/fhs-800.jpg" srcset="../img/tools/fhs-800.jpg 800w, ../img/tools/fhs-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 380px" alt="A new build front elevation with an energy rating card pinned to the sales board" width="1600" height="871" loading="eager" decoding="async">
+        </picture>
+      </span>
+      <span class="g-pill">Future Homes Standard</span>
+      <h2>Check a house type against the published standard</h2>
+      <span class="key" aria-hidden="true"></span>
+      <p class="t-dek">Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.</p>
+      <p class="t-facts"><span>House type level</span><span>60 seconds</span></p>
+      <a class="t-go" href="../../fhs/pages/2/index.html#assess">Open the checker <span class="ar">&rarr;</span></a>
+    </li>
 
-      <li class="t-step" id="step-01">
-        <div>
-          <span class="n">01</span>
-          <span class="g-pill">Developers</span>
-          <h2>See what a scheme carries before it is priced</h2>
-          <span class="key" aria-hidden="true"></span>
-          <p class="t-dek">Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.</p>
-          <p class="t-facts"><span>Scheme level</span><span>Under two minutes</span></p>
-          <a class="t-go" href="site-assessment.html">Open the tool <span class="ar">&rarr;</span></a>
-        </div>
-        <span class="t-prev">
-          <picture>
-            <source type="image/webp" srcset="../img/tools/site-assess-800.webp 800w, ../img/tools/site-assess-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 400px">
-            <img src="../img/tools/site-assess-800.jpg" srcset="../img/tools/site-assess-800.jpg 800w, ../img/tools/site-assess-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 400px" alt="An overhead view of a new build scheme with a printed site plan laid out in the foreground" width="1600" height="871" loading="eager" decoding="async">
-          </picture>
-        </span>
-      </li>
+    <li class="t-card">
+      <span class="t-prev shot">
+        <picture>
+          <source type="image/webp" srcset="../img/tools/csi-map-800.webp 800w, ../img/tools/csi-map-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 380px">
+          <img src="../img/tools/csi-map-800.jpg" srcset="../img/tools/csi-map-800.jpg 800w, ../img/tools/csi-map-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 380px" alt="The Council Solar Index map of the UK, shaded by council homes with solar" width="1600" height="888" loading="eager" decoding="async">
+        </picture>
+      </span>
+      <span class="g-pill">Council housing</span>
+      <h2>See how far council housing has got with rooftop solar</h2>
+      <span class="key" aria-hidden="true"></span>
+      <p class="t-dek">Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.</p>
+      <p class="t-facts"><span>UK wide</span><span>2025 and 2026 returns</span></p>
+      <a class="t-go" href="council-solar-index.html">Open the map <span class="ar">&rarr;</span></a>
+    </li>
 
-      <li class="t-step" id="step-02">
-        <div>
-          <span class="n">02</span>
-          <span class="g-pill">Future Homes Standard</span>
-          <h2>Check a house type against the published standard</h2>
-          <span class="key" aria-hidden="true"></span>
-          <p class="t-dek">Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.</p>
-          <p class="t-facts"><span>House type level</span><span>60 seconds</span></p>
-          <a class="t-go" href="../../fhs/pages/2/index.html#assess">Open the checker <span class="ar">&rarr;</span></a>
-        </div>
-        <span class="t-prev">
-          <picture>
-            <source type="image/webp" srcset="../img/tools/fhs-800.webp 800w, ../img/tools/fhs-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 400px">
-            <img src="../img/tools/fhs-800.jpg" srcset="../img/tools/fhs-800.jpg 800w, ../img/tools/fhs-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 400px" alt="A new build front elevation with an energy rating card pinned to the sales board" width="1600" height="871" loading="eager" decoding="async">
-          </picture>
-        </span>
-      </li>
-
-      <li class="t-step" id="step-03">
-        <div>
-          <span class="n">03</span>
-          <span class="g-pill">Council housing</span>
-          <h2>See how far council housing has got with rooftop solar</h2>
-          <span class="key" aria-hidden="true"></span>
-          <p class="t-dek">Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.</p>
-          <p class="t-facts"><span>UK wide</span><span>2025 and 2026 returns</span></p>
-          <a class="t-go" href="council-solar-index.html">Open the map <span class="ar">&rarr;</span></a>
-        </div>
-        <span class="t-prev shot">
-          <picture>
-            <source type="image/webp" srcset="../img/tools/csi-map-800.webp 800w, ../img/tools/csi-map-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 400px">
-            <img src="../img/tools/csi-map-800.jpg" srcset="../img/tools/csi-map-800.jpg 800w, ../img/tools/csi-map-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 400px" alt="The Council Solar Index map of the UK, shaded by council homes with solar" width="1600" height="888" loading="eager" decoding="async">
-          </picture>
-        </span>
-      </li>
-
-    </ol>
-
-  </div>
+  </ol>
 
   <p class="t-note">Battery modelling and a grid constraint check are still in design. Each is listed here once it is ready to be used rather than looked at.</p>
 
@@ -301,22 +253,6 @@
 </div>
 
 </div>
-
-<script>
-(function () {
-  var links = [].slice.call(document.querySelectorAll(".t-rail a"));
-  var steps = links.map(function (a) { return document.getElementById(a.dataset.rail); });
-  if (!("IntersectionObserver" in window)) { links[0].classList.add("on"); return; }
-  var seen = steps.map(function () { return 0; });
-  var io = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { seen[steps.indexOf(e.target)] = e.intersectionRatio; });
-    var best = 0;
-    for (var i = 1; i < seen.length; i++) { if (seen[i] > seen[best]) best = i; }
-    links.forEach(function (a, i) { a.classList.toggle("on", i === best); });
-  }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
-  steps.forEach(function (s) { io.observe(s); });
-})();
-</script>
 
 <!-- the canonical footer, generated from the homepage's own -->
 <script src="../../home-final/assets/site-footer.js"></script>
