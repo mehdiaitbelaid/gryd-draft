@@ -14,18 +14,40 @@
      nobody sees. The clip runs at 24fps; a thirtieth of a second is under one
      frame and still kills the jitter of seeking on every tick. */
   var SEEK_EPS = 1 / 30;
+  /* The nav pill ends at 72px. Below this the band would be held under it. */
+  var MIN_TOP = 88;
 
+  var card = track.querySelector(".pin-card");
   var steps = track.querySelectorAll(".step");
-  var rails = track.querySelectorAll(".rail i");
   var visual = track.querySelector(".visual");
   var video = track.querySelector(".clip");
-  var last = -1, ready = false, armed = false;
+  var last = null, ready = false, armed = false;
+  var span = 1, pinTop = MIN_TOP;
 
   function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-  /* Smoothstep rather than an expo. The label crossfades have to be continuous
-     through the step boundary in both directions, and an expo.out is steep at
-     its own start, which reads as a snap when it is scrubbed. */
+  /* Smoothstep rather than an expo. The weights have to be continuous through
+     the step boundary in both directions, and an expo.out is steep at its own
+     start, which reads as a snap when it is scrubbed. */
   function smooth(p) { p = clamp(p); return p * p * (3 - 2 * p); }
+
+  /* The band is centred in the window for the whole of the scrub, which means
+     the sticky offset is half of what the window's height leaves over. That is
+     two numbers the sheet does not have, so it is written from here, and the
+     track is measured from the band rather than stated in screens: the runway
+     is the band's own height and one step of the three more. */
+  function measure() {
+    track.style.height = "";
+    var h = card.getBoundingClientRect().height;
+    pinTop = Math.max(MIN_TOP, Math.round((window.innerHeight - h) / 2));
+    track.style.setProperty("--pin-top", pinTop + "px");
+    span = Math.max(1, Math.round(h * (4 / 3)));
+    track.style.height = Math.round(h + span) + "px";
+  }
+
+  function progress() {
+    var box = track.getBoundingClientRect();
+    return clamp((-box.top + pinTop) / span);
+  }
 
   /* The clip is fetched when the band is within a viewport of the reader and
      not before, so it cannot compete with first paint. Both sources are
@@ -57,6 +79,11 @@
       video.currentTime = 0;
       ready = true;
       visual.classList.add("ready");
+      /* The loop only draws when the band has moved, so a clip that finishes
+         decoding after the reader has already stopped inside the band would
+         sit on its first frame until the next scroll. Draw once here. */
+      last = null;
+      draw();
     };
     if (p && p.then) { p.then(settle).catch(settle); } else { settle(); }
   }
@@ -78,30 +105,23 @@
   }
 
   function draw() {
-    var box = track.getBoundingClientRect();
-    var span = box.height - window.innerHeight;
-    var p = span > 0 ? clamp(-box.top / span) : 0;
+    var p = progress();
     track.style.setProperty("--p", p.toFixed(4));
 
     var raw = p * STEPS;
+    var i = Math.min(STEPS - 1, Math.floor(raw));
 
-    /* Labels. Each fades up over the first fifth of its own third; the first is
-       held in from the top so the band pins with a readable label rather than
-       with a hole where one will be, and the last never fades out so the band
-       rests on it. */
+    /* Every step stays readable: the scrub moves the emphasis, not the text.
+       The weight sits on a triangular window centred on the step's own third,
+       so the band pins with its first step already at full weight rather than
+       with three dim rows and nothing to read. */
     for (var s = 0; s < steps.length; s++) {
-      var l = clamp(raw - s);
-      var inp = s === 0 ? 1 : smooth(l / 0.20);
-      var outp = s === STEPS - 1 ? 0 : smooth((l - 0.84) / 0.16);
-      steps[s].style.setProperty("--o", (inp * (1 - outp)).toFixed(3));
-      steps[s].style.setProperty("--y", ((1 - inp) * 18 - outp * 14).toFixed(1) + "px");
+      var d = Math.abs(raw - (s + 0.5));
+      steps[s].style.setProperty(
+        "--o", (1 - 0.55 * smooth(clamp((d - 0.5) / 0.5))).toFixed(3));
+      steps[s].toggleAttribute("data-on", s === i);
     }
-    /* The dashes take the raw progress with no easing at all, so each grows at
-       exactly the rate the page is being scrolled. */
-    for (var r = 0; r < rails.length; r++) {
-      rails[r].style.setProperty("--f", clamp(raw - r).toFixed(3));
-    }
-    track.dataset.step = Math.min(STEPS - 1, Math.floor(raw));
+    track.dataset.step = i;
 
     /* The day to evening move runs across the whole band rather than inside one
        step, with a short flat lead in and lead out so both end states can be
@@ -122,10 +142,30 @@
      scroll. The compare guard means an idle page does no layout work beyond the
      one read. */
   function tick() {
-    var box = track.getBoundingClientRect();
-    if (box.top !== last) { last = box.top; draw(); }
+    var top = track.getBoundingClientRect().top;
+    if (top !== last) { last = top; draw(); }
     requestAnimationFrame(tick);
   }
+
+  function remeasure() { measure(); last = null; draw(); }
+
+  /* The screenshot harness and the gates need the document scroll position of a
+     given progress, and it has to be the driver's own arithmetic rather than a
+     second copy of it, or the shots and the page disagree about what half way
+     through the band means. */
+  window.battTarget = function (p) {
+    var zero = window.scrollY + track.getBoundingClientRect().top - pinTop;
+    return Math.round(zero + p * span);
+  };
+  window.battProgress = progress;
+
+  measure();
   draw();
+  window.addEventListener("resize", remeasure);
+  /* Web fonts land after first paint and change the copy column's height, which
+     changes both the centre and the runway. */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(remeasure);
+  }
   requestAnimationFrame(tick);
 })();
