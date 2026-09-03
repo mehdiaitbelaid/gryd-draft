@@ -14,8 +14,29 @@
   "use strict";
 
   var me = document.currentScript;
-  var IMG = new URL("img/site-assess/", me ? me.src : location.href).href;
+  var BASE = me ? me.src : location.href;
+  var IMG = new URL("img/site-assess/", BASE).href;
   var HREF = "request-site-assessment.html";
+
+  /* The stylesheet is fetched on the first open, not with the script. Every
+     page on the site carries this file, and a sheet in the head is a sheet the
+     browser waits on before it paints: the popup is behind a click and has no
+     claim on the first frame of a page nobody has clicked yet. */
+  function sheet(then) {
+    var link = document.querySelector("link[data-assess-modal-css]");
+    if (link) { return then(); }
+    link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = new URL("site-assess-modal.css", BASE).href;
+    link.setAttribute("data-assess-modal-css", "");
+    var done = false;
+    function go() { if (!done) { done = true; then(); } }
+    link.onload = go;
+    link.onerror = go;
+    document.head.appendChild(link);
+    /* a sheet that never answers must not cost the reader the popup */
+    window.setTimeout(go, 400);
+  }
 
   var BEDS = ["1 bed", "2 bed", "3 bed", "4 bed", "5 bed"];
   var TYPES = [["Detached", "type-detached"], ["Semi detached", "type-semi"],
@@ -216,12 +237,14 @@
   /* ------------------------------------------------------------ open, close */
 
   function open(trigger) {
-    if (!root) { build(); }
-    opener = trigger || null;
-    root.hidden = false;
-    document.documentElement.style.overflow = "hidden";
-    requestAnimationFrame(function () { root.classList.add("open"); });
-    show(at === 3 ? 0 : at);
+    sheet(function () {
+      if (!root) { build(); }
+      opener = trigger || null;
+      root.hidden = false;
+      document.documentElement.style.overflow = "hidden";
+      requestAnimationFrame(function () { root.classList.add("open"); });
+      show(at === 3 ? 0 : at);
+    });
   }
 
   function close() {

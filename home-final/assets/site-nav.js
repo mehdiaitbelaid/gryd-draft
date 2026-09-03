@@ -91,12 +91,7 @@
   /* The site assessment popup, on every page the nav is on. The nav's own call
      to action and every other Request button keep their href, so the click is
      only intercepted where this script is running. */
-  if (!document.querySelector('link[data-assess-modal]')) {
-    var mcss = document.createElement('link');
-    mcss.rel = 'stylesheet';
-    mcss.href = new URL('site-assess-modal.css', me.src).href;
-    mcss.setAttribute('data-assess-modal', '');
-    document.head.appendChild(mcss);
+  if (!document.querySelector('script[data-assess-modal]')) {
     var mjs = document.createElement('script');
     mjs.src = new URL('site-assess-modal.js', me.src).href;
     mjs.setAttribute('data-assess-modal', '');
