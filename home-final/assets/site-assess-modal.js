@@ -96,6 +96,10 @@
             + ' placeholder="Where is it? How many units? When does construction start?"></textarea>',
             "Optional, and a sentence is plenty.");
 
+    var returns = '<ul class="sam-returns">' + RETURNS.map(function (t, i) {
+      return '<li><span class="n">0' + (i + 1) + "</span><span>" + esc(t) + "</span></li>";
+    }).join("") + "</ul>";
+
     return '<div class="sam-box" role="dialog" aria-modal="true" aria-labelledby="samTitle">'
       + '<button type="button" class="sam-close" data-close aria-label="Close">&times;</button>'
       + '<div class="sam-prog">' + STAGES.map(function (s) {
@@ -105,19 +109,37 @@
       + '<div class="sam-body">'
       + '<section class="sam-pane" data-pane="0" hidden><span class="sam-eyebrow">Introduction</span>'
       + '<h2 id="samTitle">Where the site is and how big</h2>' + one + "</section>"
-      + '<section class="sam-pane" data-pane="1" hidden><span class="sam-eyebrow">Details</span>'
-      + "<h2>Who we send the numbers to</h2>" + two + "</section>"
-      + '<section class="sam-pane" data-pane="2" hidden><span class="sam-eyebrow">Your scheme</span>'
-      + "<h2>The drawings and the programme</h2>" + three + "</section>"
-      + '<section class="sam-pane sam-done" data-pane="3" hidden><span class="sam-eyebrow">Request received</span>'
-      + '<h2>Your site assessment is being <span class="flare">prepared.</span></h2>'
-      + '<p class="stand">Send us your scheme drawings and unit mix. We come back with an indicative'
-      + ' system design, estimated energy performance, savings and subscriptions, usually within a week.</p>'
-      + '<ul class="sam-returns">' + RETURNS.map(function (t, i) {
-          return '<li><span class="n">0' + (i + 1) + "</span><span>" + esc(t) + "</span></li>";
-        }).join("") + "</ul></section>"
+
+      /* What three answers buy, said plainly, and what they do not. No figure
+         is put on the scheme here because none can be: the sizing is drawn off
+         the roofs, and the roofs come with the drawings. */
+      + '<section class="sam-pane sam-partial" data-pane="1" hidden>'
+      + '<span class="sam-eyebrow">Partial response</span>'
+      + "<h2>What we can say so far</h2>"
+      + '<p class="sam-read" data-read></p>'
+      + '<p class="sam-short">This is a partial answer. The four things below are drawn off the'
+      + " roofs on your drawings, so they come with the full assessment:</p>"
+      + returns
+      + '<p class="sam-hint">Leave us a way to reach you and we will take it from there.</p>'
+      + "</section>"
+
+      + '<section class="sam-pane" data-pane="2" hidden><span class="sam-eyebrow">Details</span>'
+      + "<h2>Who we send the numbers to</h2>" + two
+      + '<p class="sam-gate" data-gate hidden>A name and a work email are all we need to reply.</p>'
+      + "</section>"
+
+      + '<section class="sam-pane" data-pane="3" hidden><span class="sam-eyebrow">Your scheme, optional</span>'
+      + "<h2>The drawings and the programme</h2>"
+      + '<p class="sam-short">Every answer here sharpens the assessment. None of them holds it up.</p>'
+      + three + "</section>"
+
+      + '<section class="sam-pane sam-done" data-pane="4" hidden><span class="sam-eyebrow">Request received</span>'
+      + '<h2>Gryd will get back to <span class="flare">you.</span></h2>'
+      + '<p class="stand">We have what we need to start. Here is what comes back:</p>'
+      + returns + "</section>"
       + "</div>"
       + '<div class="sam-nav"><button type="button" class="sam-go" data-go>Continue</button>'
+      + '<button type="button" class="sam-send" data-send hidden>Send now</button>'
       + '<button type="button" class="sam-back" data-back hidden>Back</button>'
       + '<span class="sam-count"></span></div>'
       + '<p class="sam-consent" hidden>By submitting you agree to be contacted about your scheme.'
@@ -127,7 +149,12 @@
 
   /* ------------------------------------------------------------------ state */
 
-  var root = null, box, panes, segs, go, back, count, consent, at = 0, opener = null;
+  var root = null, box, panes, segs, go, send, back, count, consent, gate;
+  var at = 0, opener = null;
+  /* the dash has three marks and the flow has five panes: the partial answer
+     belongs to the questions that produced it, the confirmation to the last mark */
+  var SEG_OF = [0, 0, 1, 2, 2];
+  var PANE_DONE = 4, PANE_CONTACT = 2, PANE_SCHEME = 3;
   var values = {};
 
   function build() {
@@ -140,7 +167,9 @@
     panes = [].slice.call(root.querySelectorAll(".sam-pane"));
     segs = [].slice.call(root.querySelectorAll(".sam-seg"));
     go = root.querySelector("[data-go]");
+    send = root.querySelector("[data-send]");
     back = root.querySelector("[data-back]");
+    gate = root.querySelector("[data-gate]");
     count = root.querySelector(".sam-count");
     consent = root.querySelector(".sam-consent");
     wire();
@@ -150,7 +179,9 @@
   function wire() {
     root.addEventListener("input", function (ev) {
       var el = ev.target.closest("[data-key]");
-      if (el) { values[el.getAttribute("data-key")] = el.value.trim(); }
+      if (!el) { return; }
+      values[el.getAttribute("data-key")] = el.value.trim();
+      if (at === PANE_CONTACT) { gated(); }
     });
     root.addEventListener("click", function (ev) {
       if (ev.target === root) { close(); return; }
@@ -175,6 +206,7 @@
         return;
       }
       if (t.closest("[data-back]")) { show(at - 1); return; }
+      if (t.closest("[data-send]")) { show(PANE_DONE); return; }
       if (t.closest("[data-go]")) { show(at + 1); }
     });
 
@@ -214,20 +246,57 @@
     });
   }
 
+  /* A name and a work email are the whole gate. Nothing past the contact pane
+     is reachable without them, because a scheme nobody can reply to is not a
+     lead, and the reader is told which one is missing rather than left with a
+     button that does nothing. */
+  function ready() {
+    return !!(values.name && values.email && values.email.indexOf("@") > 0);
+  }
+  function gated() {
+    var ok = ready();
+    go.disabled = !ok;
+    send.disabled = !ok;
+    gate.hidden = ok;
+  }
+
+  /* The partial answer, in the reader's own terms: what they told us, read
+     back, and the line about what is still missing. */
+  function readback() {
+    var el = root.querySelector("[data-read]");
+    var has = [];
+    if (values.plots) { has.push("a scheme of " + values.plots + " plots"); }
+    if (values.bedrooms) { has.push("a " + values.bedrooms.toLowerCase() + " mix"); }
+    if (values.postcode) { has.push("at " + values.postcode.toUpperCase()); }
+    el.textContent = has.length
+      ? ("We have " + has.join(", ") + ". That places the site and tells us the shape of the mix.")
+      : "We have the start of it. Tell us where the site is and how big and we can place it.";
+  }
+
   function show(i) {
     at = Math.max(0, Math.min(panes.length - 1, i));
     panes.forEach(function (p, n) { p.hidden = n !== at; });
+    var mark = SEG_OF[at];
     segs.forEach(function (seg, n) {
       var bar = seg.querySelector("i");
-      bar.style.width = n < at ? "100%" : (n === at ? "50%" : "0%");
-      seg.classList.toggle("on", n === at);
-      seg.classList.toggle("done", n < at);
+      bar.style.width = n < mark ? "100%" : (n === mark ? (at === PANE_DONE ? "100%" : "50%") : "0%");
+      seg.classList.toggle("on", n === mark);
+      seg.classList.toggle("done", n < mark);
     });
-    var done = at === 3;
+    var done = at === PANE_DONE;
+    if (at === 1) { readback(); }
     back.hidden = at === 0 || done;
-    consent.hidden = at !== 2;
-    count.textContent = done ? "" : "Stage 0" + (at + 1) + " of 03";
-    go.textContent = done ? "Close" : (at === 2 ? "Request a site assessment" : "Continue");
+    send.hidden = at !== PANE_CONTACT;
+    consent.hidden = at !== PANE_CONTACT && at !== PANE_SCHEME;
+    count.textContent = done ? "" : ["Stage 01 of 03", "Partial answer", "Stage 02 of 03",
+                                     "Stage 03 of 03, optional"][at];
+    go.textContent = done ? "Close"
+      : (at === PANE_CONTACT ? "Add scheme details"
+        : (at === PANE_SCHEME ? "Send to Gryd" : "Continue"));
+    go.disabled = false;
+    send.disabled = false;
+    gate.hidden = true;
+    if (at === PANE_CONTACT) { gated(); }
     if (done) { go.onclick = function () { close(); }; } else { go.onclick = null; }
     root.querySelector(".sam-body").scrollTop = 0;
     var first = panes[at].querySelector("input, textarea, button");

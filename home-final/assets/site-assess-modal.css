@@ -216,11 +216,43 @@
   cursor: pointer;
 }
 .sam-go:hover { background: #E8431F; }
+.sam-send {
+  font: inherit;
+  font-size: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sam-plate);
+  color: var(--sam-ink);
+  padding: 11px 20px;
+  cursor: pointer;
+}
+.sam-send:hover { background: #E5DDD3; }
+.sam-send:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
+.sam-go[disabled], .sam-send[disabled] { opacity: .45; cursor: not-allowed; }
+.sam-go[disabled]:hover { background: var(--sam-flare); }
+.sam-send[disabled]:hover { background: var(--sam-plate); }
 .sam-back { font: inherit; font-size: 13px; background: transparent; border: 0; color: var(--sam-grey); cursor: pointer; padding: 0; }
 .sam-back:hover { color: var(--sam-ink); }
 .sam-count { margin-left: auto; font-size: 11px; letter-spacing: .08em; color: var(--sam-grey); }
 .sam-go:focus-visible, .sam-back:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
 .sam-consent { margin: 8px 0 0; font-size: 11px; color: var(--sam-grey); max-width: 62ch; }
+
+/* ------------------------------------------------------- the partial answer */
+/* The pane that says what three answers are worth and what they are not. It
+   carries no figure of its own: the four returns below it are the wording the
+   page already uses, and they are what the drawings buy. */
+
+.sam-read {
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+  max-width: 58ch;
+}
+.sam-short { font-size: 14px; color: var(--sam-grey); margin: 0 0 4px; max-width: 62ch; }
+.sam-partial .sam-returns { margin: 4px 0 10px; }
+.sam-partial .sam-returns li { padding: 6px 0; }
+.sam-hint { font-size: 13px; color: var(--sam-grey); margin: 0; }
+.sam-gate { font-size: 12px; color: var(--sam-flare); margin: 10px 0 0; }
 
 /* --------------------------------------------------------- the confirmation */
 
