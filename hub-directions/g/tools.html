@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tools, Gryd</title>
-<meta name="description" content="The three Gryd tools live at launch: the site assessment, the Future Homes Standard readiness checker, and battery modelling.">
+<meta name="description" content="The two Gryd tools live at launch: the site assessment and the Future Homes Standard readiness checker.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="g.css">
 <style>
   /* Two tools, so the three column listing grid would leave a hole. The pair sits
-     on its own two column grid at the listing's gutter.
+     on its own two column grid at the listing's gutter. Battery modelling came
+     off the page on Scott's call of 3 September and is not listed here.
 
      The covers carry no photograph on purpose: a tool is not a project or an
      article, and a stock rooftop under a calculator would read as a case study.
@@ -22,7 +23,7 @@
 
   .t-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 32px;
     align-items: start;
   }
@@ -121,8 +122,8 @@
 
   <header class="g-mast">
     <span class="eyebrow">Tools</span>
-    <h1>Three tools. Each answers a question before you commit a plot.</h1>
-    <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One prices four years for a single plot, side by side.</p>
+    <h1>Two tools. Each answers a question before you commit a plot.</h1>
+    <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard.</p>
   </header>
 
   <div class="t-grid">
@@ -158,26 +159,9 @@
       <span class="go">Open the checker &rarr;</span>
     </a>
 
-    <a class="t-card" href="battery-tool.html">
-      <span class="t-cover">
-        <svg viewBox="0 0 32 32" aria-hidden="true">
-          <path d="M5 11h19v13H5z"/>
-          <path d="M24 15.5h3v4h-3"/>
-          <path d="M11 8.5h7"/>
-          <path d="M15 13.5l-3 5h4l-1.4 4"/>
-        </svg>
-        <span class="over">Battery Modelling</span>
-      </span>
-      <span class="g-pill">Developers</span>
-      <h2>Price four years for one plot, side by side</h2>
-      <p class="dek">The plot with no solar, with solar only, with solar and a battery on a time of use tariff, and with solar and a battery run by Gryd on a dynamic tariff. Every figure opens to show its working.</p>
-      <p class="facts"><span>Plot level</span><span>Four priced years</span></p>
-      <span class="go">Open the tool &rarr;</span>
-    </a>
-
   </div>
 
-  <p class="t-note">A grid constraint check is still in design. It is listed here once it is ready to be used rather than looked at.</p>
+  <p class="t-note">Battery modelling and a grid constraint check are still in design. Each is listed here once it is ready to be used rather than looked at.</p>
 
   <div class="g-close">
     <h2>Not sure which one you need?</h2>

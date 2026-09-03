@@ -415,9 +415,15 @@
 
   function sync() {
     var at = y();
-    tuck(tucked ? at > FREE_AT : at > TUCK_AT);
-    // scrolling is the reader looking at the page, not at the menu
-    if (tucked && peeking) peek(false);
+    /* Mehdi, 3 September: the mark only capsule is no longer a scroll state. It
+       was what the reader got back after flicking up, and it made them hover a
+       mark to get a menu they had just asked for. Reading down still takes the
+       nav off screen; coming back up returns the bar itself, links and call to
+       action, with nothing to hover. TUCK_AT and FREE_AT keep their meaning for
+       the direction layer below, which is the only thing left using them.
+       tuck(false) rather than no call at all, so a page that opened retracted
+       under the pre paint sync is put right on the first scroll. */
+    tuck(false);
 
     /* The direction layer. The top of the page is always the full bar, so
        nothing is hidden there whichever way the reader arrived. Below it, any

@@ -22,7 +22,7 @@
   if (!me) return;
 
   var ROOT = new URL('../../', me.src).href;   // the served root, gryd-homepage
-  var TREE = [{"label": "Developers", "section": "developers", "href": "home-final/draft/index.html#developers", "kids": []}, {"label": "Hub", "section": "hub", "href": "home-final/draft/index.html#hub", "kids": [{"label": "Projects", "href": "hub-directions/g/projects.html"}, {"label": "Blog", "href": "hub-directions/g/blog.html"}, {"label": "News", "href": "hub-directions/g/news.html"}]}, {"label": "Tools", "section": "tools", "href": "hub-directions/g/tools.html", "kids": [{"label": "All tools", "href": "hub-directions/g/tools.html"}, {"label": "Site Assessment", "href": "hub-directions/g/site-assessment.html"}, {"label": "FHS Checker", "href": "fhs/pages/2/index.html#assess"}, {"label": "Battery modelling", "href": "hub-directions/g/battery-tool.html"}]}, {"label": "FHS", "section": "fhs", "href": "fhs/pages/2/index.html", "kids": []}, {"label": "FAQs", "section": "faqs", "href": "hub-directions/g/faq.html", "kids": []}];
+  var TREE = [{"label": "Developers", "section": "developers", "href": "home-final/draft/index.html#developers", "kids": []}, {"label": "Hub", "section": "hub", "href": "home-final/draft/index.html#hub", "kids": [{"label": "Projects", "href": "hub-directions/g/projects.html"}, {"label": "Blog", "href": "hub-directions/g/blog.html"}, {"label": "News", "href": "hub-directions/g/news.html"}]}, {"label": "Tools", "section": "tools", "href": "hub-directions/g/tools.html", "kids": [{"label": "All tools", "href": "hub-directions/g/tools.html"}, {"label": "Site Assessment", "href": "hub-directions/g/site-assessment.html"}, {"label": "FHS Checker", "href": "fhs/pages/2/index.html#assess"}]}, {"label": "FHS", "section": "fhs", "href": "fhs/pages/2/index.html", "kids": []}, {"label": "FAQs", "section": "faqs", "href": "hub-directions/g/faq.html", "kids": []}];
   var HOME = "home-final/draft/index.html";
   var CTA = {"label": "Request a site assessment", "short": "Assessment", "href": "hub-directions/g/site-assessment.html"};
 
@@ -566,9 +566,15 @@
 
   function sync() {
     var at = y();
-    tuck(tucked ? at > FREE_AT : at > TUCK_AT);
-    // scrolling is the reader looking at the page, not at the menu
-    if (tucked && peeking) peek(false);
+    /* Mehdi, 3 September: the mark only capsule is no longer a scroll state. It
+       was what the reader got back after flicking up, and it made them hover a
+       mark to get a menu they had just asked for. Reading down still takes the
+       nav off screen; coming back up returns the bar itself, links and call to
+       action, with nothing to hover. TUCK_AT and FREE_AT keep their meaning for
+       the direction layer below, which is the only thing left using them.
+       tuck(false) rather than no call at all, so a page that opened retracted
+       under the pre paint sync is put right on the first scroll. */
+    tuck(false);
 
     /* The direction layer. The top of the page is always the full bar, so
        nothing is hidden there whichever way the reader arrived. Below it, any

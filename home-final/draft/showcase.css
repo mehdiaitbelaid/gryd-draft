@@ -20,16 +20,20 @@
   display: block; margin-top: 4px; font-size: 15px; color: var(--warm-grey);
 }
 
-/* The block. Scott asked for one enclosure holding the site: its figures, its
-   pictures and the way in to the case study, with the route to the rest of the
-   projects left outside it. The keyline is what draws that edge; the ground
-   stays paper so nothing inside changes contrast against the page. */
-.showcase-block {
-  margin-top: 28px; padding: clamp(22px, 2.2vw, 32px);
-  border: 1px solid var(--stone-mid); border-radius: var(--radius-panel);
-  background: var(--paper);
-}
+/* The block. It still holds the site as one thing, but it no longer draws a
+   line round it: Scott read the keyline as a box on a page that has no other
+   boxes, so the enclosure is now the grouping alone. The ground stays paper, and
+   with no edge to sit inside there is nothing for the padding to hold off, so
+   the contents run to the column. */
+.showcase-block { margin-top: 28px; background: var(--paper); }
 
+/* The clip and the two stills as one row, the clip dominant. The stills used to
+   sit under it in the right hand column, where they read as a footnote and left
+   the clip taking most of the band on its own. */
+.showcase-top {
+  display: grid; grid-template-columns: minmax(0, 1fr) .34fr;
+  gap: 14px; align-items: stretch;
+}
 .showcase-hero {
   width: 100%; margin-inline: auto; aspect-ratio: 16 / 9;
   border-radius: var(--radius-panel); overflow: hidden; background: var(--stonelight);
@@ -46,25 +50,32 @@
   gap: clamp(32px, 5vw, 72px); margin-top: 34px; align-items: start;
 }
 .showcase-copy .lede { margin: 0; }
-/* the right hand column: the two smaller stills, then the way in to the study */
+/* the right hand column, which is now the way in to the study and nothing else:
+   it sits in the space the stills used to hold */
 .showcase-side { display: flex; flex-direction: column; align-items: flex-start; }
-.showcase-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
-.showcase-pair figure { margin: 0; }
+/* stacked, and as tall as the clip beside them, so the row finishes level */
+.showcase-pair {
+  display: grid; grid-template-rows: 1fr 1fr; gap: 14px;
+  width: 100%; height: 100%;
+}
+.showcase-pair figure {
+  margin: 0; min-height: 0; display: flex; flex-direction: column;
+}
 .showcase-frame {
   margin: 0; border-radius: var(--radius-panel); overflow: hidden;
-  aspect-ratio: 4 / 3; background: var(--stonelight);
+  flex: 1 1 auto; min-height: 0; background: var(--stonelight);
 }
 .showcase-pair img {
   display: block; width: 100%; height: 100%; object-fit: cover;
 }
 .showcase-caption { font-size: 14px; color: var(--warm-grey); margin-top: 8px; }
-/* 26px clears the caption baseline and keeps this button well away from the
-   one below the block, so the two never read as a pair. */
-.showcase-case { margin-top: 26px; }
+/* the button leads its column, level with the blurb it sits opposite */
+.showcase-case { margin-top: 0; }
 
+/* No rule over the figures. It was the second line in a block that now draws
+   none, and Scott asked for both to go. */
 .showcase-stats {
   display: flex; flex-wrap: wrap; gap: 10px clamp(28px, 5vw, 66px);
-  padding-top: 16px; border-top: 1px solid var(--stone-mid);
   font-size: 15px; color: var(--warm-grey);
 }
 /* numbers at the foot of the block, the placement the draft shipped with */
@@ -87,4 +98,9 @@
 @media (max-width: 900px) {
   .showcase-under { grid-template-columns: 1fr; }
   .showcase-who { text-align: start; }
+  /* no room for a column beside the clip, so the stills go back under it, side
+     by side on their own measured crop */
+  .showcase-top { grid-template-columns: 1fr; gap: 20px; }
+  .showcase-pair { grid-template-rows: none; grid-template-columns: 1fr 1fr; height: auto; }
+  .showcase-frame { flex: 0 0 auto; aspect-ratio: 4 / 3; }
 }

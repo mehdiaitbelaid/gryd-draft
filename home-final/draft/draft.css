@@ -428,13 +428,13 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 }
 
 /* Seen in is its own quiet band between the projects stack and the proof
-   quotes, centred on the copy column, closed off on a hairline above it. */
+   quotes, centred on the copy column. The hairline over it came off on Scott's
+   call of 3 September: the band's own space is the separation. */
 .a-seen { padding-bottom: 0; }
 .a-seen .press {
   max-width: var(--measure);
   margin: 0 auto;
   padding: 30px 28px 0;
-  border-top: 1px solid var(--stone-mid);
 }
 .a-seen .press .hint {
   display: block;

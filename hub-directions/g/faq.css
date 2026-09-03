@@ -15,7 +15,6 @@ h2.sec-head { font-size: clamp(30px, 3.6vw, 50px); max-width: 20ch; margin-top: 
   border-left: 2px solid var(--stone-mid); padding-left: 14px;
 }
 .faq-index a:hover, .faq-index a:focus-visible { color: var(--flare); border-left-color: var(--flare); }
-.faq-index .count { color: var(--ink-soft); margin-left: 6px; }
 
 .faq-set + .faq-set { margin-top: 88px; }
 .faq-set > .sec-head { margin-bottom: 18px; }
