@@ -1,10 +1,12 @@
 /* The FHS readiness tool on the hub.
 
-   The page is a masthead and a button. The check itself runs in a popup, the
-   way the live page runs it: gryd.energy opens fhs-ready.gryd.energy in a modal
-   iframe. Ours asks the live tool's twelve questions in the live tool's own
-   words, one to a screen, and takes the same name and email before it prints
-   anything.
+   Mehdi, 4 September: the check is the page. It was behind a button and a
+   popup and he could not see the thing he had approved, so the run is mounted
+   inline under the masthead and the first question is on screen when the page
+   loads. It asks the live tool's twelve questions in the live tool's own words,
+   one to a screen, and takes the same name and email before it prints
+   anything. Nothing about the questions, the tiles or the model changed; only
+   where they are drawn.
 
    The verdict and every word of it come from fhs/pages/assess-model.js, which
    is the live tool's own logic and prose. This file only chooses what to send
@@ -76,6 +78,7 @@
   }
   function el(sel) { return d.querySelector(sel); }
   function all(sel) { return Array.prototype.slice.call(d.querySelectorAll(sel)); }
+  function all2(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
 
   function tidySpace(node) {
     var walk = d.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
@@ -279,28 +282,78 @@
   }
   function onGate() { return at >= seq().length; }
 
-  /* ------------------------------------------------------------------ modal */
+  /* ------------------------------------------------------------------ shell */
+  /* The run's own markup, mounted in the page rather than over it. The .fm
+     class stays on the shell so the pane, the tiles, the gate and the type all
+     keep the sizes they were signed off at; only its own box rules changed
+     from a floating plate to a panel in the column. */
 
-  function buildModal() {
-    var box = d.createElement("div");
-    box.className = "fm";
-    box.setAttribute("hidden", "");
-    box.innerHTML = '<div class="fm-box" role="dialog" aria-modal="true" aria-label="FHS readiness check">'
-      + '<button type="button" class="fm-close" data-close aria-label="Close">×</button>'
+  function mountCheck() {
+    var host = el("[data-check]");
+    host.innerHTML = '<div class="fm"><div class="fm-box">'
       + '<div class="fm-prog" data-prog aria-hidden="true"></div>'
       + '<div class="fm-body">'
-      + '<section class="fhs-q" data-qn="0"><h2 data-head></h2>'
+      + '<section class="fhs-q" data-qn="0">'
+      + '<span class="eyebrow" data-eyebrow>FHS readiness check</span>'
+      + '<h2 data-head></h2>'
       + '<p class="fm-stand" data-stand hidden></p><div data-fields></div></section>'
       + "</div>"
       + '<div class="fm-nav">'
       + '<button type="button" class="fm-back" data-back hidden>Back</button>'
       + '<button type="button" class="btn fm-go" data-go hidden>See your readiness check</button>'
-      + '<span class="fm-count" data-count></span></div></div>';
-    d.body.appendChild(box);
-    return box;
+      + '<span class="fm-count" data-count></span></div></div></div>';
+    return host;
   }
 
-  function paint() {
+  /* Two digits, the way the run labels itself on screen. */
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  /* ------------------------------------------------------- the step change */
+  /* Answering moves through the run rather than redrawing the panel. The
+     question on screen slides out the way the run is going, the next one comes
+     in from the other side and rises, and its tiles land one after another.
+     Everything is on the site's standing curve, the same .34s the result's
+     rows and plates use. Back plays the move in reverse. */
+  var STEP_MS = 340;
+  var moving = false;
+
+  function reduced() {
+    return !!(w.matchMedia && w.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  /* The incoming pane and its tiles, staggered in the order they are read. */
+  function revealPane(dir) {
+    var pane = el(".fhs-q");
+    pane.classList.remove("q-out");
+    pane.setAttribute("data-dir", dir);
+    if (reduced()) { return; }
+    void pane.offsetWidth;
+    pane.classList.add("q-in");
+    all(".fm .f-tile").forEach(function (tile, i) {
+      tile.style.setProperty("--d", STAGGER * i + "ms");
+      tile.classList.add("t-rise");
+    });
+  }
+
+  /* The run holds still while a change is in flight, so a second tap during
+     the slide cannot land the reader two questions on. */
+  function goTo(next, dir) {
+    if (moving) { return; }
+    if (reduced()) { at = next; paint(dir); return; }
+    var pane = el(".fhs-q");
+    moving = true;
+    pane.classList.remove("q-in");
+    pane.setAttribute("data-dir", dir);
+    void pane.offsetWidth;
+    pane.classList.add("q-out");
+    w.setTimeout(function () {
+      at = next;
+      paint(dir);
+      moving = false;
+    }, STEP_MS);
+  }
+
+  function paint(dir) {
     var n = seq().length;
     var q = paneAt(at);
     var pane = el(".fhs-q");
@@ -312,17 +365,26 @@
     stand.hidden = !q.stand;
     el("[data-fields]").innerHTML = q.body();
 
-    el("[data-prog]").innerHTML = new Array(n + 1).join("x").split("").map(function (_, i) {
-      return '<span class="fm-seg' + (i < at ? " done" : (i === at ? " on" : "")) + '"></span>';
-    }).join("");
+    /* The segments are built once per run length and only their state changes
+       after that, because a segment replaced on every question would start at
+       its finished width and the fill would never be seen to move. */
+    var prog = el("[data-prog]");
+    if (prog.children.length !== n) {
+      prog.innerHTML = new Array(n + 1).join("x").split("").map(function () {
+        return '<span class="fm-seg"><i></i></span>';
+      }).join("");
+    }
+    Array.prototype.forEach.call(prog.children, function (seg, i) {
+      seg.className = "fm-seg" + (i < at ? " done" : (i === at ? " on" : ""));
+    });
     el("[data-count]").textContent = onGate()
-      ? "Your details" : "Question " + (at + 1) + " of " + n;
+      ? "Your details" : "Step " + pad(at + 1) + " of " + pad(n);
 
     el("[data-back]").hidden = at === 0;
     el("[data-go]").hidden = !onGate();
-    el(".fm-body").scrollTop = 0;
     if (q.key === "bedrooms") { flagOdd(); }
     gate();
+    revealPane(dir || "fwd");
   }
 
   /* The live tool's guard: some house type and bedroom pairs have no published
@@ -342,7 +404,9 @@
     return ready();
   }
 
-  function open() {
+  /* The run starts itself. There is no button to press and nothing to open:
+     the page loads on question one. */
+  function begin() {
     a = G.defaults();
     a.houseType = null; a.bedrooms = null; a.storeys = null;
     a.heating = null; a.partL = null; a.ventilation = null;
@@ -350,17 +414,13 @@
     a.hasSolar = false; a.panels = 0; a.hasBattery = false; a.hasWWHR = false;
     contact = { name: "", email: "" };
     at = 0;
-    el(".fm").hidden = false;
-    d.body.style.overflow = "hidden";
-    requestAnimationFrame(function () { el(".fm").classList.add("open"); });
+    el("[data-check]").hidden = false;
     paint();
   }
-  function close() {
-    var m = el(".fm");
-    m.classList.remove("open");
-    d.body.style.overflow = "";
-    w.setTimeout(function () { m.hidden = true; }, 220);
-  }
+
+  /* The result takes the run's place in the column rather than sitting under
+     an answered questionnaire. Start over puts the run back. */
+  function hideCheck() { el("[data-check]").hidden = true; }
 
   /* ------------------------------------------------------------- the lead */
   /* The gate posts to the HubSpot form on portal 144906745 (eu1). The whole
@@ -557,11 +617,17 @@
       + '<p class="fhs-hint">Tap a measure to see why.</p>'
       + '<ul class="ar-list fhs-rows">' + rows + "</ul></section>"
 
-      + '<details class="ar-fold r-detail rise" style="--d:' + (STAGGER * 10)
-      + 'ms"><summary><h3>Show the detail</h3>'
-      + '<span class="ar-show">Show</span></summary>'
+      + '<details class="ar-sec ar-fold r-detail rise" style="--d:' + (STAGGER * 10)
+      + 'ms"><summary><h3>Your answers and the comparison</h3>'
+      + '<span class="ar-foldcue"><span class="ar-show">Show the detail</span>'
+      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
+      + ' aria-hidden="true" focusable="false">'
+      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
+      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+      + "</svg></span></summary>"
+      + '<div class="ar-foldbody"><div class="ar-foldinner">'
       + '<div class="r-detail-in" data-summary>' + m.flags + specBlock() + m.table
-      + "</div></details>"
+      + "</div></div></div></details>"
 
       + '<p class="ar-foot note rise" style="--d:' + (STAGGER * 11) + 'ms" data-live>' + esc(m.disclaimer) + "</p>"
 
@@ -571,12 +637,54 @@
       + '<button type="button" class="btn ghost ar-btn" data-restart>Start over</button>'
       + "</div></div>";
 
+    wireFolds(host);
     host.hidden = false;
+  }
+
+  /* The fold is the assessment result's own control, classes and animation:
+     assess-result.css styles it and this mirrors the wiring that ships inside
+     GrydAssessResult.render. It is duplicated rather than shared because that
+     behaviour is not exported; if it ever is, this goes and the export is
+     called instead. Keep the two in step. */
+  var FOLD_MS = 420;
+
+  function wireFolds(root) {
+    all2(root, ".ar-fold").forEach(function (fold) {
+      var sum = fold.querySelector("summary");
+      var body = fold.querySelector(".ar-foldbody");
+      var show = fold.querySelector(".ar-show");
+      var shut = null;
+      function label() {
+        show.textContent = fold.open ? "Hide the detail" : "Show the detail";
+        sum.setAttribute("aria-expanded", fold.open ? "true" : "false");
+      }
+      fold.addEventListener("toggle", function () {
+        if (fold.open) {
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () { body.classList.add("is-open"); });
+          });
+        } else {
+          body.classList.remove("is-open");
+        }
+        label();
+      });
+      sum.addEventListener("click", function (ev) {
+        body.setAttribute("data-anim", "");
+        if (!fold.open) { return; }
+        ev.preventDefault();
+        body.classList.remove("is-open");
+        show.textContent = "Show the detail";
+        sum.setAttribute("aria-expanded", "false");
+        w.clearTimeout(shut);
+        shut = w.setTimeout(function () { fold.open = false; }, FOLD_MS);
+      });
+      label();
+    });
   }
 
   function show() {
     renderResult();
-    close();
+    hideCheck();
     w.setTimeout(function () {
       el("[data-result]").scrollIntoView({ behavior: "smooth", block: "start" });
     }, 220);
@@ -607,8 +715,8 @@
     var host = el("[data-result]");
     host.hidden = true;
     host.innerHTML = "";
-    w.scrollTo(0, 0);
-    open();
+    begin();
+    el("[data-check]").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   /* One note open at a time, under the row it belongs to. hidden is taken off
@@ -651,14 +759,13 @@
   }
 
   function start() {
-    buildModal();
+    mountCheck();
+    begin();
 
     d.addEventListener("click", function (ev) {
       var t = ev.target;
       if (!t || !t.closest) { return; }
 
-      if (t.closest("[data-open]")) { open(); return; }
-      if (t.closest("[data-close]") || t === el(".fm")) { close(); return; }
       if (t.closest("[data-restart]")) { reset(); return; }
 
       var chip = t.closest(".r-chip");
@@ -677,14 +784,15 @@
           if (!G.isSupported(a)) { return; }
         }
         /* A single choice answers the question, so the run moves on by itself.
-           The pause is one beat, long enough to see the tile take the answer. */
+           The pause is one beat, long enough to see the tile take the answer
+           before the pane starts leaving. */
         w.setTimeout(function () {
-          if (at < seq().length) { at += 1; paint(); }
+          if (at < seq().length) { goTo(at + 1, "fwd"); }
         }, 160);
         return;
       }
 
-      if (t.closest("[data-back]")) { at = Math.max(0, at - 1); paint(); return; }
+      if (t.closest("[data-back]")) { goTo(Math.max(0, at - 1), "back"); return; }
       if (t.closest("[data-go]")) {
         if (!gate()) { return; }
         finish();
@@ -696,10 +804,6 @@
       if (!f) { return; }
       contact[f.getAttribute("data-k")] = f.value.trim();
       gate();
-    });
-
-    d.addEventListener("keydown", function (ev) {
-      if (ev.key === "Escape" && !el(".fm").hidden) { close(); }
     });
   }
 

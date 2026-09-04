@@ -27,11 +27,14 @@
 <meta property="og:title" content="Are you Future Homes Standard ready? Gryd tools">
 <meta property="og:description" content="What the Future Homes Standard asks for, and a readiness check that takes your house type spec and tells you what has to change.">
 <meta property="og:url" content="https://gryd.energy/hub-directions/g/fhs.html">
-<meta property="og:image" content="https://gryd.energy/home-final/assets/img/gryd-lockup@2x.png">
+<meta property="og:image" content="https://gryd.energy/home-final/assets/img/housing-site-under-construction-aerial-1200.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="900">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Are you Future Homes Standard ready? Gryd tools">
 <meta name="twitter:description" content="What the Future Homes Standard asks for, and a readiness check that takes your house type spec and tells you what has to change.">
-<meta name="twitter:image" content="https://gryd.energy/home-final/assets/img/gryd-lockup@2x.png">
+<meta name="twitter:image" content="https://gryd.energy/home-final/assets/img/housing-site-under-construction-aerial-1200.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://gryd.energy/#organization","name":"Gryd","legalName":"Gryd Energy Ltd","url":"https://gryd.energy/","logo":"https://gryd.energy/home-final/assets/img/gryd-lockup@2x.png","identifier":"15092056","address":{"@type":"PostalAddress","addressLocality":"London","addressCountry":"GB"},"areaServed":{"@type":"Country","name":"United Kingdom"},"sameAs":["https://www.linkedin.com/company/grydenergy","https://www.crunchbase.com/organization/gryd-energy","https://find-and-update.company-information.service.gov.uk/company/15092056"],"contactPoint":[{"@type":"ContactPoint","contactType":"sales","email":"hello@gryd.energy","telephone":"+442045726364","areaServed":"GB","availableLanguage":"English"},{"@type":"ContactPoint","contactType":"press","email":"press@gryd.energy","areaServed":"GB","availableLanguage":"English"}]},{"@type":"BreadcrumbList","@id":"https://gryd.energy/hub-directions/g/fhs.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gryd.energy/home-final/draft/index.html"},{"@type":"ListItem","position":2,"name":"Are you Future Homes Standard ready? Gryd tools","item":"https://gryd.energy/hub-directions/g/fhs.html"}]},{"@type":"Service","@id":"https://gryd.energy/hub-directions/g/fhs.html#service","name":"Future Homes Standard readiness check","description":"Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.","url":"https://gryd.energy/hub-directions/g/fhs.html","serviceType":"House type level","provider":{"@id":"https://gryd.energy/#organization"},"areaServed":{"@type":"Country","name":"United Kingdom"},"audience":{"@type":"Audience","audienceType":"Housebuilders and property developers"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}</script>
 <!-- /SEO head -->
 </head>
 <body class="fhs-tool">
@@ -52,9 +55,6 @@
     <span class="eyebrow">Future Homes Standard</span>
     <h1>Are you Future Homes Standard <span class="flare">ready.</span></h1>
     <p class="stand" data-live>Our FHS Readiness assessment takes your current house type specification and tells you exactly what needs to change to meet the Future Homes Standard, with a focus on the solar and energy requirements that matter most to your build programme.</p>
-    <div class="g-actions">
-      <button type="button" class="btn" data-open>Check your FHS readiness</button>
-    </div>
     <ul class="fhs-facts">
       <li data-live>On-site renewable electricity generation</li>
       <li data-live>Low-carbon heating</li>
@@ -62,8 +62,13 @@
     </ul>
   </header>
 
-  <!-- The readiness check runs in the popup fhs.js builds. Its result lands
-       here, on the page, so it can be read and shared by scrolling. -->
+  <!-- Mehdi, 4 September: the check is the page, not something behind a button.
+       fhs.js mounts the run here on load, one question to a screen, and the
+       gate is its last screen. -->
+  <section class="fhs-check" data-check></section>
+
+  <!-- The result lands here, on the page, so it can be read and shared by
+       scrolling. -->
   <section class="fhs-result" data-result hidden></section>
 
   <div class="g-close">

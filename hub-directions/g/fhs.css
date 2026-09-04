@@ -17,7 +17,7 @@
 
 /* ------------------------------------------------------------------ masthead */
 
-.fhs-mast { padding-bottom: 24px; }
+.fhs-mast { padding-bottom: 0; }
 .fhs-mast h1 {
   font-size: clamp(40px, 5.6vw, 74px);
   max-width: 17ch;
@@ -38,7 +38,7 @@
 
 .fhs-facts {
   list-style: none;
-  margin: 56px 0 0;
+  margin: 38px 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -52,91 +52,132 @@
   color: var(--ink-soft);
 }
 
-/* ================================================================== the popup */
-/* The site assessment modal's plate, copied rather than shared. */
+/* =============================================================== the check */
+/* Mehdi, 4 September: the run is the page. .fm stays as the shell's class so
+   the pane, the tiles, the gate and the type keep the sizes they were signed
+   off at; what changed is the box around them, from a plate floating over the
+   page to a panel sitting in the content column. */
 
-.fm {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(40, 18, 12, .46);
-  opacity: 0;
-  transition: opacity .22s ease;
-  color: var(--red110);
-}
-.fm.open { opacity: 1; }
-.fm[hidden] { display: none; }
+/* Mehdi, 4 September, against the first version of this page: no plate. The
+   run sits straight on the paper under the masthead, centred, the way it did
+   when he approved it. The rail, the eyebrow, the heading, the hint, the tiles
+   and the step count are the whole of it. */
+.fhs-check { padding-top: 80px; }
+.fhs-check[hidden] { display: none; }
+
+.fm { display: block; color: var(--red110); }
 
 .fm-box {
   position: relative;
-  text-align: left;
-  width: min(640px, 100%);
-  min-height: 430px;
-  max-height: calc(100vh - 48px);
-  background: var(--paper);
-  border-radius: var(--radius-panel);
-  padding: 26px 34px 24px;
+  text-align: center;
+  width: 100%;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--panel-shadow);
-  transform: translateY(10px) scale(.985);
-  transition: transform .22s cubic-bezier(.22,.61,.36,1);
 }
-.fm.open .fm-box { transform: none; }
+
+/* the eyebrow the run carries on every question, our own label for the panel */
+.fm .fhs-q .eyebrow { justify-content: center; margin-bottom: 26px; }
+
+/* --------------------------------------------------------- the step change */
+/* Mehdi, 4 September: answering should feel like moving through the run, not
+   like the panel redrawing. The question on screen slides out the way the run
+   is going and the next one comes in from the other side and rises, with its
+   tiles landing one after another. Everything is on the site's standing curve,
+   the same .34s the result's rows and plates already use. Back plays the same
+   move in reverse, which is what data-dir carries. */
+@keyframes q-out-fwd {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(-16px); }
+}
+@keyframes q-out-back {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(16px); }
+}
+@keyframes q-in-fwd {
+  from { opacity: 0; transform: translate(16px, 12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes q-in-back {
+  from { opacity: 0; transform: translate(-16px, 12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes q-tile-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+.fm .fhs-q.q-out[data-dir="fwd"] { animation: q-out-fwd .34s cubic-bezier(.22,.61,.36,1) both; }
+.fm .fhs-q.q-out[data-dir="back"] { animation: q-out-back .34s cubic-bezier(.22,.61,.36,1) both; }
+.fm .fhs-q.q-in[data-dir="fwd"] { animation: q-in-fwd .34s cubic-bezier(.22,.61,.36,1) backwards; }
+.fm .fhs-q.q-in[data-dir="back"] { animation: q-in-back .34s cubic-bezier(.22,.61,.36,1) backwards; }
+
+/* backwards, not both, for the same reason the result's reveal uses it: the
+   finished animation must not freeze a transform over the tile's own hover and
+   selected states. */
+.fm .f-tile.t-rise {
+  animation: q-tile-rise .34s cubic-bezier(.22,.61,.36,1) backwards;
+  animation-delay: var(--d, 0ms);
+}
 
 /* the progress dash, one segment per question in this run */
+/* the rail is a short centred run of segments, not a bar across the column */
 .fm-prog {
   display: flex;
-  gap: 6px;
-  margin: 0 46px 18px 0;
+  gap: 8px;
+  margin: 0 auto 40px;
+  width: min(100%, 640px);
   flex: none;
 }
+/* Each segment fills rather than switches colour, so the dash reads as the run
+   moving through it. The fill is a child so the segment's own track stays put,
+   and it scales from the left on the site's standing curve. */
 .fm-seg {
   flex: 1 1 0;
   height: 2px;
   background: var(--stone-mid);
   border-radius: 2px;
-}
-.fm-seg.done, .fm-seg.on { background: var(--flare); }
-.fm-seg.on { opacity: .55; }
-
-.fm-close {
-  position: absolute;
-  top: 20px;
-  right: 22px;
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--stonelight);
-  color: var(--red110);
-  font-size: 17px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background .2s ease, color .2s ease;
-  z-index: 3;
-}
-.fm-close:hover { background: var(--flare); color: #ffffff; }
-.fm-close:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
-
-/* One question to a screen, so nothing inside the popup ever scrolls. The
-   plate holds one height across the run, and the question sits in the middle of
-   it, so answering does not make the box jump. */
-.fm-body {
   overflow: hidden;
+}
+.fm-seg i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--flare);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .34s cubic-bezier(.22,.61,.36,1), opacity .34s cubic-bezier(.22,.61,.36,1);
+}
+.fm-seg.done i, .fm-seg.on i { transform: scaleX(1); }
+.fm-seg.on i { opacity: .55; }
+
+/* One question to a screen, so nothing inside the panel ever scrolls. The
+   panel holds one height across the run, and the question sits in the middle of
+   it, so answering does not make it jump. */
+/* The panel keeps a floor so a two tile question does not collapse it, and a
+   taller question grows it. Nothing is clipped and nothing scrolls: inline,
+   the column is free to be as tall as the question needs. */
+.fm-body {
   flex: 1 1 auto;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.fm .fhs-q { overflow: hidden; }
-.fm .fhs-q h2 { font-size: 34px; letter-spacing: -0.025em; line-height: 1.25; margin: 0 0 18px; max-width: 22ch; }
-.fm-stand { font-size: 13px; color: var(--warm-grey); margin: -12px 0 18px; max-width: 60ch; }
+.fm .fhs-q h2 {
+  font-size: 34px;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  margin: 0 auto 18px;
+  max-width: 22ch;
+}
+.fm-stand {
+  font-size: 13px;
+  color: var(--warm-grey);
+  margin: -12px auto 22px;
+  max-width: 60ch;
+}
 .fm-stand[hidden] { display: none; }
 
 /* one question to a labelled band of tiles */
@@ -150,12 +191,18 @@
   color: var(--warm-grey);
   margin-bottom: 10px;
 }
-.fm .f-tiles { max-width: none; gap: 12px; }
+.fm .f-tiles { max-width: none; gap: 12px; margin: 44px auto 0; }
 .fm .f-tiles.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .fm .f-tiles.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fm .f-tiles.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .fm .f-tiles.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .fm .f-tiles.narrow { max-width: 260px; }
+/* the run is centred, so a question with few options keeps its tiles together
+   in the middle rather than stranded on the left of a wide panel */
+.fm .f-tiles.cols-2 { max-width: 300px; }
+.fm .f-tiles.cols-3 { max-width: 420px; }
+.fm .f-tiles.cols-4 { max-width: 540px; }
+.fm .f-tiles.cols-5 { max-width: 660px; }
 .fm .f-tile { padding-bottom: 12px; }
 .fm .f-tile .t-name { font-size: 12px; line-height: 1.25; letter-spacing: .08em; overflow-wrap: anywhere; }
 
@@ -179,13 +226,22 @@
   margin: 4px auto 4px;
 }
 
-.fm-hint { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: var(--warm-grey); max-width: 62ch; }
+.fm-hint { margin: 12px auto 0; font-size: 15px; line-height: 1.5; color: var(--warm-grey); max-width: 62ch; }
 .fm-flag { margin: 4px 0 12px; font-size: 12px; color: var(--ember); }
 .fm-flag[hidden] { display: none; }
 [data-panels][hidden] { display: none; }
 
 /* the gate: one hairline per field, no box */
-.fm-gate { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 620px; }
+/* The run is centred, but a pair of fields is not: labels and what is typed
+   into them line up on the left the way every other form on the site does. */
+.fm-gate {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 620px;
+  margin-inline: auto;
+  text-align: left;
+}
 .fm-in label {
   display: block;
   font-size: 12px;
@@ -213,14 +269,24 @@
 .fm-in ::placeholder { color: var(--warm-grey); opacity: .8; }
 
 /* the nav row */
-.fm-nav { display: flex; align-items: center; gap: 18px; padding-top: 16px; flex: none; }
+/* With no plate there is no footer rail to sit on: the step count is centred
+   under the tiles the way it was, and Back and the gate's button stack above
+   it in the middle rather than spreading to the edges of the column. */
+.fm-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 44px;
+  flex: none;
+}
 /* The primary action is the site's own .btn, so the popup's button is the same
    shape, size and colour as every other button on the hub. Only the stacking
    order and the standing button margin are set here. */
 .fm-go {
   border: 0;
   cursor: pointer;
-  order: 2;
+  order: 1;
   margin: 0;
 }
 .fm-go:hover { background: var(--flare-dark); }
@@ -234,12 +300,11 @@
   color: var(--warm-grey);
   cursor: pointer;
   padding: 0;
-  order: 1;
+  order: 2;
 }
 .fm-back:hover { color: var(--red110); }
 .fm-back[hidden] { display: none; }
 .fm-count {
-  margin-left: auto;
   order: 3;
   font-size: 11px;
   letter-spacing: .08em;
@@ -368,7 +433,7 @@
 .fhs-result .ar-acts { gap: 18px; margin-top: 26px; flex-wrap: wrap; }
 
 /* the send failed, said once and quietly, under the gate */
-.fm-sent { margin: 14px 0 0; font-size: 13px; line-height: 1.5; color: var(--ember); }
+.fm-sent { margin: 14px auto 0; max-width: 620px; font-size: 13px; line-height: 1.5; color: var(--ember); }
 .fm-sent[hidden] { display: none; }
 
 @media (max-width: 1080px) {
@@ -380,8 +445,10 @@
   .fhs-facts li { margin-top: 12px; }
   .ar-list.fhs-rows { grid-template-columns: minmax(0, 1fr); }
   .fhs-result .ar-stat { padding: 16px 16px 14px; }
-  .fm { padding: 12px; }
-  .fm-box { padding: 20px 18px 18px; max-height: calc(100vh - 24px); }
+  .fhs-check { padding-top: 52px; }
+  .fm-prog { margin-bottom: 30px; }
+  .fm .f-tiles { margin-top: 32px; }
+  .fm-nav { margin-top: 32px; }
   .fm .fhs-q h2 { font-size: 19px; }
   .fm .f-tiles.cols-4, .fm .f-tiles.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .fm .f-tile .t-art, .fm .f-tile img { width: 56px; height: 56px; }
@@ -389,6 +456,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .fm, .fm-box, .fm .f-tile .t-art, .fm-seg i, .r-chip { transition: none; }
+  .fm .fhs-q.q-out, .fm .fhs-q.q-in, .fm .f-tile.t-rise { animation: none; }
 }
 
 /* ------------------------------------------------- the row is a control */
@@ -440,13 +508,13 @@
 /* backwards, not both: the fill holds the start state through the delay and
    then lets go, so the finished animation never freezes a transform on top of
    the hover lift the rows and the plates carry. */
-.fhs-result .rise {
+.fhs .rise {
   animation: fhs-rise .22s cubic-bezier(.2,.7,.3,1) backwards;
   animation-delay: var(--d, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fhs-result .rise { animation: none; }
+  .fhs .rise { animation: none; }
   .r-chip .c-chev, .r-note { transition: none; }
 }
 
