@@ -19,12 +19,12 @@
   var CO2_PER_HOME = 0.9513;
 
   var BANDS = [
-    { key: "small", band: "1 to 2 Beds", subscription: "£55 to 75",
+    { key: "small", band: "1 - 2 Beds", subscription: "£55-75",
       lifetimeSaving: 13779, lifetimePct: 30.01, hardware: "12 Panels + Battery" },
-    { key: "mid", band: "3 to 4 Beds", subscription: "£75 to 95",
-      lifetimeSaving: 18420, lifetimePct: 32.44, hardware: "14 Panels + Battery" },
-    { key: "large", band: "5+ Beds", subscription: "£95 to 130",
-      lifetimeSaving: 24960, lifetimePct: 34.10, hardware: "18 Panels + Battery" }
+    { key: "mid", band: "3 - 4 Beds", subscription: "£75-95",
+      lifetimeSaving: 18420, lifetimePct: 32.44, hardware: "18 Panels + Battery" },
+    { key: "large", band: "5+ Beds", subscription: "£95-130",
+      lifetimeSaving: 24960, lifetimePct: 34.10, hardware: "24 Panels + Battery" }
   ];
 
   /* Postcode areas we can name without a lookup service. Anything else is
