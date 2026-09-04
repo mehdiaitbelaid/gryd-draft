@@ -7,7 +7,7 @@
     {
       "source": "/",
       "destination": "/home-final/draft/index.html",
-      "permanent": true
+      "statusCode": 301
     }
   ],
   "rewrites": [],
