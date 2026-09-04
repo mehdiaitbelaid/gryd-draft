@@ -36,7 +36,9 @@
 }
 
 .sa-sec-head {
-  font-size: clamp(26px, 2.6vw, 38px);
+  font-size: 34px;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
   margin-top: var(--label-gap);
 }
 
@@ -63,7 +65,7 @@
 }
 .f-hint {
   margin: 10px 0 0;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   color: var(--warm-grey);
   max-width: 52ch;
@@ -76,11 +78,11 @@
 
 .f-text,
 .f-area {
-  font-family: "Borna", "DM Sans", sans-serif;
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
   letter-spacing: -0.02em;
-  font-size: 26px;
-  line-height: 1.25;
+  font-size: 22px;
+  line-height: 1.55;
   color: var(--red110);
   width: 100%;
   display: block;
@@ -94,10 +96,10 @@
   transition: border-color .2s ease;
 }
 .f-area {
-  font-family: "DM Sans", sans-serif;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
-  letter-spacing: 0;
-  font-size: 17px;
+  letter-spacing: normal;
+  font-size: 16px;
   line-height: 1.6;
   color: var(--ink-soft);
   resize: vertical;
@@ -125,9 +127,10 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   /* 16px is the site's standing clearance between things that light up under a
      pointer, and these five sit side by side */
-  gap: 16px;
-  max-width: 620px;
+  gap: 20px;
+  max-width: 560px;
 }
+.f-tile-cell { min-width: 72px; }
 .f-tile {
   font: inherit;
   background: transparent;
@@ -141,9 +144,11 @@
   color: var(--warm-grey);
   transition: color .2s ease;
 }
+/* the FHS popup's tile scale, which is where the reader meets these tiles first */
 .f-tile img {
-  width: 100%;
-  height: auto;
+  width: 72px;
+  height: 72px;
+  margin: 4px auto;
   display: block;
   filter: saturate(.35) opacity(.55);
   transition: filter .25s ease, transform .25s ease;
@@ -152,6 +157,7 @@
   display: block;
   margin-top: 2px;
   font-size: 12px;
+  line-height: 1.25;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -172,6 +178,33 @@
 .f-tile[aria-pressed="true"] img { filter: none; transform: translateY(-2px); }
 .f-tile[aria-pressed="true"]::after { width: 26px; }
 .f-tile:focus-visible { outline: 2px solid var(--flare); outline-offset: 4px; }
+
+/* the plot count under a chosen tile, on the same hairline as every other field */
+.f-count {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  width: 100%;
+  min-width: 72px;
+  display: block;
+  margin-top: 8px;
+  text-align: center;
+  background: transparent;
+  color: var(--red110);
+  border: 0;
+  border-bottom: 1px solid var(--stone-mid);
+  border-radius: 0;
+  padding: 4px 0 6px;
+  appearance: none;
+}
+.f-count::placeholder { color: var(--warm-grey); opacity: .7; }
+.f-count:focus { outline: 0; border-bottom-color: var(--flare); }
+.f-count::-webkit-inner-spin-button,
+.f-count::-webkit-outer-spin-button { appearance: none; margin: 0; }
+.f-tally { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--warm-grey); }
+.f-tally.is-off { color: var(--flare); }
 
 /* ------------------------------------------------------- segmented hairline control */
 /* Five states on one continuous rule. The chosen one takes the rule in flare
@@ -243,15 +276,20 @@
 
 .f-close { padding: 46px 0 0; }
 .f-submit {
-  font: inherit;
-  font-size: 16px;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
   font-weight: 500;
+  line-height: 1.55;
   cursor: pointer;
   border: 0;
-  padding: 16px 30px;
+  padding: 14px 26px;
   border-radius: 999px;
   background: var(--flare);
   color: #ffffff;
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: center;
+  display: inline-block;
 }
 .f-submit:focus-visible { outline: 2px solid var(--red110); outline-offset: 3px; }
 .f-turn {
@@ -375,10 +413,8 @@
   justify-content: center;
 }
 .a-cols.first .f-row { grid-template-columns: 240px minmax(0, 1fr); padding: 20px 0 18px; }
-.a-cols.first .f-text { font-size: clamp(28px, 2.7vw, 38px); }
-.a-cols.first .f-lab { font-size: 13px; padding-top: 16px; }
-.a-cols.first .f-tiles { max-width: 620px; gap: 20px; }
-.a-cols.first .f-hint { font-size: 15px; }
+.a-cols.first .f-lab { padding-top: 16px; }
+.a-cols.first .f-tiles { max-width: 560px; gap: 20px; }
 .a-col { min-width: 0; }
 .a-rail {
   background: var(--stonelight);
@@ -429,8 +465,7 @@
 /* the stage itself */
 .a-block > .eyebrow { margin-bottom: 6px; }
 .a-block .f-row { padding: 18px 0 16px; }
-.a-block .f-text { font-size: clamp(26px, 2.1vw, 30px); }
-.a-block .f-area { font-size: 20px; min-height: 76px; }
+.a-block .f-area { min-height: 76px; }
 .a-block .f-lab { padding-top: 16px; }
 .e-nav { display: flex; align-items: center; gap: 26px; margin-top: 22px; }
 .e-stage[data-stage="2"] .e-nav { margin-top: 14px; }
@@ -457,10 +492,22 @@
    pages so the whole stage still lands on the first screen. Like the flow it is
    a task page, so the site footer stands down while a stage is open. */
 body.sa-tool > footer { display: none; }
-body.sa-tool .sa { padding-top: 104px; }
+body.sa-tool .sa { padding-top: 82px; }
 .sa-tool .sa-mast { padding-bottom: 22px; }
-.sa-tool .sa-mast h1 { font-size: clamp(26px, 2.5vw, 34px); max-width: 22ch; margin-top: 6px; }
-.sa-tool .sa-mast .stand { font-size: 15px; max-width: 70ch; margin-top: 10px; }
+.sa-tool .sa-mast h1 { font-size: clamp(26px, 2.5vw, 34px); max-width: 22ch; margin-top: 4px; }
+.sa-tool .sa-mast .stand { font-size: 15px; max-width: 70ch; margin: 6px 0 0; }
+/* Mehdi, 4 September: the stage was centred in whatever height was left, which
+   opened a band of paper between the standfirst and the first label whenever
+   the questions were short. The stage now starts under the masthead and the
+   separation is the masthead's own padding, so it holds at every height. */
+.sa-tool .a-cols.first .a-col { justify-content: flex-start; }
+/* the stage still owns the height the column reserves, so a tall screen is not
+   a band of paper under the questions, but its content starts at the top */
+.sa-tool .a-cols.first .e-stage { flex: 1 1 auto; }
+.sa-tool .a-cols.first .a-block > .eyebrow { margin-bottom: 4px; }
+.sa-tool .a-cols.first .sa-sec-head { margin-top: 6px; }
+.sa-tool .a-cols.first .f-row { padding: 8px 0 6px; }
+.sa-tool .a-cols.first .e-nav { margin-top: 14px; }
 /* once the reader is past the first stage the band has done its work, so it
    collapses to the headline and gives the height back to the questions */
 .sa-tool.past-first .sa-mast .stand { display: none; }
@@ -507,17 +554,17 @@ body.sa-flow .sa { padding-top: 104px; }
    text rows above them */
 .e-stage[data-stage="2"] .f-row { padding: 6px 0 5px; }
 .e-stage[data-stage="2"] .f-lab { padding-top: 8px; }
-.e-stage[data-stage="2"] .f-tiles { max-width: 380px; gap: 16px; }
+.e-stage[data-stage="2"] .f-tiles { max-width: 560px; gap: 20px; }
 .e-stage[data-stage="2"] .f-tile { padding-bottom: 8px; }
-.e-stage[data-stage="2"] .t-name { font-size: 9px; line-height: 1.2; overflow-wrap: anywhere; }
-.e-stage[data-stage="2"] .sa-sec-head { font-size: clamp(20px, 1.9vw, 24px); margin-top: 4px; }
-.e-stage[data-stage="2"] .f-hint { font-size: 12px; margin-top: 3px; }
+.e-stage[data-stage="2"] .t-name { overflow-wrap: anywhere; }
+.e-stage[data-stage="2"] .sa-sec-head { margin-top: 4px; }
+.e-stage[data-stage="2"] .f-hint { margin-top: 3px; }
 .e-stage[data-stage="2"] .f-seg .seg { padding-top: 6px; padding-bottom: 6px; }
 .e-stage[data-stage="2"] .f-drop { padding: 6px; }
 .e-stage[data-stage="2"] .f-drop .inner { padding: 8px 12px; }
 .e-stage[data-stage="2"] .f-drop .d-line { font-size: 15px; margin-top: 4px; }
 .e-stage[data-stage="2"] .f-drop .d-sub { display: none; }
-.e-stage[data-stage="2"] .f-area { min-height: 28px; font-size: 16px; }
+.e-stage[data-stage="2"] .f-area { min-height: 28px; }
 .e-stage[data-stage="2"] .f-hint { margin-top: 4px; }
 
 [hidden] { display: none !important; }
@@ -535,7 +582,14 @@ body.sa-flow .sa { padding-top: 104px; }
   .f-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .f-lab { padding-top: 0; }
   .f-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .f-text { font-size: 22px; }
+  .sa-tool .a-cols.first .f-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .sa-tool .a-cols.first .f-lab { padding-top: 0; }
+  .sa-tool .a-cols.first .e-nav {
+    position: sticky;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 1;
+    background: var(--paper);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

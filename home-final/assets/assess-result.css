@@ -211,3 +211,29 @@
 @media (max-width: 560px) {
   .ar-details { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ------------------------------------------------------------------ the hover */
+/* The summary answers a question, so the rows it answers it with lift under a
+   pointer the way the project and quote cards on the homepage do: the same
+   0.34s curve, the same 2px of travel the tiles use, and the plate colour and
+   shadow already declared above. Nothing new is introduced. */
+.ar-list li,
+.ar-table tbody tr,
+.ar-stat {
+  transition: transform .34s cubic-bezier(.22,.61,.36,1),
+              box-shadow .34s cubic-bezier(.22,.61,.36,1),
+              background-color .34s cubic-bezier(.22,.61,.36,1);
+}
+.ar-list li:hover,
+.ar-table tbody tr:hover {
+  transform: translateY(-2px);
+  background-color: var(--ar-plate);
+}
+.ar-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 18, 12, .07);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ar-list li, .ar-table tbody tr, .ar-stat { transition: none; }
+  .ar-list li:hover, .ar-table tbody tr:hover, .ar-stat:hover { transform: none; }
+}

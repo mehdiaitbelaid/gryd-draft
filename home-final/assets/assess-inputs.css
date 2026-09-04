@@ -35,7 +35,7 @@
   vertical-align: middle;
   margin-right: 8px;
 }
-.ai-screen h2 { font-size: 20px; line-height: 1.2; margin: 0 0 6px; font-weight: 500; }
+.ai-screen h2 { font-size: 34px; letter-spacing: -0.025em; line-height: 1.25; margin: 0 0 6px; font-weight: 500; }
 
 /* the hairline rows */
 .ai-rows { margin-top: 6px; }
@@ -47,17 +47,22 @@
   padding: 12px 0 10px;
 }
 .ai-lab {
-  font-size: 10px;
-  letter-spacing: .14em;
+  font-size: 12px;
+  letter-spacing: .16em;
+  font-weight: 500;
   text-transform: uppercase;
   color: var(--ai-grey);
   padding-top: 8px;
 }
 .ai-in { min-width: 0; max-width: 440px; }
+/* the bed tiles carry a count field each, so their row runs wider than the text rows */
+.ai-in:has(.ai-tiles) { max-width: 520px; }
 .ai-text {
-  font: inherit;
-  font-size: 20px;
-  line-height: 1.25;
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: 22px;
+  line-height: 1.55;
   width: 100%;
   display: block;
   background: transparent;
@@ -73,7 +78,7 @@
 .ai-text::placeholder { color: var(--ai-grey); opacity: .85; }
 .ai-text::-webkit-inner-spin-button,
 .ai-text::-webkit-outer-spin-button { appearance: none; margin: 0; }
-.ai-hint { margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: var(--ai-grey); }
+.ai-hint { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ai-grey); }
 .ai-note { display: block; font-size: 12px; color: var(--ai-flare); margin-top: 4px; }
 .ai-note[hidden] { display: none; }
 
@@ -84,9 +89,10 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   /* 16px is the site's standing clearance between things that light up under a
      pointer, and these five sit side by side */
-  gap: 16px;
-  max-width: 420px;
+  gap: 20px;
+  max-width: 520px;
 }
+.ai-tile-cell { min-width: 72px; }
 .ai-tile {
   font: inherit;
   background: transparent;
@@ -100,9 +106,11 @@
   color: var(--ai-grey);
   transition: color .2s ease;
 }
+/* the FHS popup's tile scale, which is where the reader meets these tiles first */
 .ai-tile img {
-  width: 100%;
-  height: auto;
+  width: 72px;
+  height: 72px;
+  margin: 4px auto;
   display: block;
   filter: saturate(.35) opacity(.55);
   transition: filter .25s ease, transform .25s ease;
@@ -110,7 +118,8 @@
 .ai-tile .ai-tile-name {
   display: block;
   margin-top: 2px;
-  font-size: 9px;
+  font-size: 12px;
+  line-height: 1.25;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -131,9 +140,39 @@
 .ai-tile[aria-pressed="true"]::after { width: 20px; }
 .ai-tile:focus-visible { outline: 2px solid var(--ai-flare); outline-offset: 3px; }
 
+/* the plot count under a chosen tile, on the same hairline as every other field */
+.ai-count {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  width: 100%;
+  min-width: 72px;
+  display: block;
+  margin-top: 8px;
+  text-align: center;
+  background: transparent;
+  color: var(--ai-ink);
+  border: 0;
+  border-bottom: 1px solid var(--ai-line);
+  border-radius: 0;
+  padding: 4px 0 6px;
+  appearance: none;
+}
+.ai-count[hidden] { display: none; }
+.ai-count::placeholder { color: var(--ai-grey); opacity: .7; }
+.ai-count:focus { outline: 0; border-bottom-color: var(--ai-flare); }
+.ai-count::-webkit-inner-spin-button,
+.ai-count::-webkit-outer-spin-button { appearance: none; margin: 0; }
+.ai-tally { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ai-grey); }
+.ai-tally[hidden] { display: none; }
+.ai-tally.is-off { color: var(--ai-flare); }
+
 @media (max-width: 720px) {
   .ai-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .ai-lab { padding-top: 0; }
+  .ai-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ai-tile img, .ai-tile::after { transition: none; }
