@@ -5,7 +5,7 @@
   --ar-paper: var(--paper, #F8F6F2);
   --ar-plate: var(--stonelight, #EFEAE3);
   --ar-ink: var(--red110, #4E251B);
-  --ar-grey: var(--warm-grey, #8A776E);
+  --ar-muted: var(--ink-soft, #6B4A3E);
   --ar-line: var(--stone-mid, #D8CFC5);
   --ar-flare: var(--flare, #FF5532);
   --ar-ember: var(--ember, #872823);
@@ -13,63 +13,116 @@
   color: var(--ar-ink);
 }
 
-.ar-title { font-size: 22px; font-weight: 500; margin: 0 0 4px; line-height: 1.15; }
-.ar-sec { padding: 16px 0 4px; }
+.ar-title { font-size: 24px; font-weight: 500; margin: 0 0 10px; line-height: 1.1; }
+.ar-sec { padding: 12px 0 2px; min-width: 0; }
 .ar-sec h3 {
   font-size: 10px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: var(--ar-grey);
+  color: var(--ar-muted);
   font-weight: 500;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
-.ar-details { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 28px; }
-.ar-detail { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: baseline; }
-.ar-detail dt { font-size: 12px; color: var(--ar-grey); }
-.ar-detail dd { margin: 0; font-size: 14px; }
+.ar-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ar-stat { background: var(--ar-plate); border-radius: 16px; padding: 14px 16px 13px; }
+.ar-stat p { font-size: 14px; line-height: 1.4; margin: 8px 0 0; max-width: 48ch; text-wrap: pretty; }
+.ar-fig {
+  display: block;
+  color: var(--ar-flare);
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(40px, 4.2vw, 50px);
+  font-weight: 500;
+  line-height: .95;
+  letter-spacing: -.035em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
 
-.ar-headline { font-size: 17px; line-height: 1.35; margin: 0 0 8px; max-width: 62ch; }
-.ar-fig { color: var(--ar-flare); font-weight: 500; white-space: nowrap; }
+.ar-details {
+  margin: 0;
+  display: grid;
+  grid-template-columns: .7fr 1fr 1.7fr .9fr;
+  border-top: 1px solid var(--ar-line);
+  border-bottom: 1px solid var(--ar-line);
+}
+.ar-detail { min-width: 0; padding: 8px 14px 8px 0; }
+.ar-detail dt { font-size: 10px; color: var(--ar-muted); letter-spacing: .04em; }
+.ar-detail dd { margin: 2px 0 0; font-size: 13px; line-height: 1.3; overflow-wrap: break-word; }
 
-.ar-list { margin: 0; padding: 0; list-style: none; max-width: 68ch; }
+.ar-benefits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.ar-list { margin: 0; padding: 0; list-style: none; }
 .ar-list li {
-  position: relative;
-  padding: 6px 0 6px 20px;
-  font-size: 14px;
-  line-height: 1.45;
+  display: grid;
+  grid-template-columns: 13px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 7px 0;
+  border-top: 1px solid var(--ar-line);
+  font-size: 15px;
+  line-height: 1.35;
+  text-wrap: pretty;
 }
-.ar-list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 13px;
-  width: 10px;
-  height: 1.5px;
-  background: var(--ar-flare);
+.ar-list li[hidden] { display: none; }
+.ar-glyph {
+  width: 7px;
+  height: 7px;
+  margin: 6px 0 0 2px;
+  border: 1px solid var(--ar-flare);
+  transform: rotate(45deg);
 }
+.ar-more {
+  min-height: 40px;
+  margin: 1px 0 0 21px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--ar-ember);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-underline-position: from-font;
+}
+.ar-more:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 3px; }
 
 .ar-table-wrap { overflow-x: auto; }
-.ar-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13px; }
+.ar-data { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 28px; align-items: start; }
+.ar-table { border-collapse: collapse; table-layout: fixed; width: 100%; font-size: 11px; }
+.ar-table th:nth-child(1) { width: 16%; }
+.ar-table th:nth-child(2) { width: 19%; }
+.ar-table th:nth-child(3) { width: 19%; }
+.ar-table th:nth-child(4) { width: 18%; }
+.ar-table th:nth-child(5) { width: 28%; }
 .ar-table th {
   text-align: left;
   font-weight: 500;
-  font-size: 10px;
-  letter-spacing: .08em;
+  font-size: 8px;
+  line-height: 1.25;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  color: var(--ar-grey);
-  padding: 0 14px 7px 0;
+  color: var(--ar-muted);
+  padding: 0 8px 6px 0;
   border-bottom: 1px solid var(--ar-line);
+  vertical-align: bottom;
 }
-.ar-table td { padding: 9px 14px 9px 0; border-bottom: 1px solid var(--ar-line); font-variant-numeric: tabular-nums; }
+.ar-table td {
+  padding: 7px 8px 7px 0;
+  border-bottom: 1px solid var(--ar-line);
+  line-height: 1.3;
+  vertical-align: top;
+  overflow-wrap: break-word;
+  font-variant-numeric: tabular-nums;
+}
 .ar-table tr:last-child td { border-bottom: 0; }
 
 /* the chart */
-.ar-chart-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 22px; margin-bottom: 6px; }
+.ar-chart-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 7px 18px; margin-bottom: 2px; }
 .ar-chart-head h4 { font-size: 14px; font-weight: 500; margin: 0; }
-.ar-key { display: flex; flex-wrap: wrap; gap: 14px; margin: 0; padding: 0; list-style: none; font-size: 11px; color: var(--ar-grey); }
+.ar-chart-caption { margin: 2px 0 0; font-size: 11px; line-height: 1.35; color: var(--ar-muted); }
+.ar-key { display: flex; flex-wrap: wrap; gap: 5px 10px; margin: 0; padding: 0; list-style: none; font-size: 9px; color: var(--ar-muted); }
 .ar-key li { display: flex; align-items: center; gap: 6px; }
-.ar-key .k { width: 11px; height: 11px; border-radius: 3px; display: block; }
+.ar-key .k { width: 9px; height: 9px; border-radius: 2px; display: block; }
 .ar-key .k-sub { background: var(--ar-flare); }
 .ar-key .k-ret { background: var(--ar-ember); }
 .ar-key .k-out { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ar-ink); }
@@ -77,8 +130,8 @@
 .ar-chart-plot { position: relative; }
 .ar-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
 .ar-grid { stroke: var(--ar-line); stroke-width: 1; }
-.ar-ytick, .ar-xtick { font-size: 10px; fill: var(--ar-grey); font-family: inherit; }
-.ar-axis { font-size: 10px; fill: var(--ar-grey); letter-spacing: .06em; font-family: inherit; }
+.ar-ytick, .ar-xtick { font-size: 10px; fill: var(--ar-muted); font-family: inherit; }
+.ar-axis { font-size: 10px; fill: var(--ar-muted); letter-spacing: .06em; font-family: inherit; }
 .ar-sub { fill: var(--ar-flare); }
 .ar-ret { fill: var(--ar-ember); }
 .ar-hit { fill: transparent; }
@@ -104,15 +157,37 @@
 }
 .ar-tip[hidden] { display: none; }
 
-.ar-foot { font-size: 11px; color: var(--ar-grey); margin: 14px 0 0; max-width: 70ch; }
+.ar-foot { font-size: 10px; line-height: 1.4; color: var(--ar-muted); margin: 10px 0 0; max-width: 88ch; }
 .ar-note { font-size: 11px; color: var(--ar-flare); margin: 4px 0 0; }
 
-.ar-acts { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
-/* .ar-btn and .ar-btn-quiet are drawn by site-modal.css, on the same geometry
-   as .btn everywhere else on the site. Nothing about them is set here. */
-.ar-said { font-size: 12px; color: var(--ar-grey); }
+.ar-acts { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+
+/* The summary is long by nature, so once it is on screen the plate takes the
+   screen it needs instead of scrolling inside a question sized box. */
+.sam-box.sam-result-box { max-height: calc(100vh - 48px); }
+.ar-root .ar-btn { margin: 0; padding: 10px 20px; }
+.ar-said { font-size: 12px; color: var(--ar-muted); }
 
 @media (max-width: 720px) {
+  .sam-box.sam-result-box { max-height: calc(100vh - 24px); }
+  .ar-title { font-size: 22px; }
+  .ar-stats { grid-template-columns: minmax(0, 1fr); }
+  .ar-stat { padding: 12px 14px; }
+  .ar-fig { font-size: 40px; }
+  .ar-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ar-detail { padding: 7px 10px 7px 0; }
+  .ar-benefits { gap: 16px; }
+  .ar-list li { font-size: 15px; gap: 6px; }
+  .ar-data { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .ar-table { min-width: 520px; font-size: 11px; }
+  .ar-table th { font-size: 8px; }
+  .ar-chart-head { display: block; }
+  .ar-key { margin-top: 5px; }
+  .ar-acts { flex-wrap: wrap; }
+}
+
+/* Two benefit columns need room for a line of prose. Below that they stack. */
+@media (max-width: 560px) {
+  .ar-benefits { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .ar-details { grid-template-columns: minmax(0, 1fr); }
-  .ar-detail { grid-template-columns: 130px minmax(0, 1fr); }
 }

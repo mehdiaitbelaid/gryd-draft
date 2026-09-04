@@ -122,7 +122,8 @@
     });
 
     return '<div class="ar-chart" data-chart>'
-      + '<div class="ar-chart-head"><h4>Annual energy cost over 25 years</h4>'
+      + '<div class="ar-chart-head"><div><h4>Annual energy cost over 25 years</h4>'
+      + '<p class="ar-chart-caption">Annual costs with and without Gryd across the full 25 year system lifetime.</p></div>'
       + '<ul class="ar-key"><li><span class="k k-sub"></span>Gryd Subscription</li>'
       + '<li><span class="k k-ret"></span>Remaining Traditional Retailer Bill</li>'
       + '<li><span class="k k-out"></span>Annual Energy Cost without Gryd</li></ul></div>'
@@ -159,9 +160,12 @@
     }).join("");
 
     var dev = DEV_BENEFITS.map(function (f) {
-      return "<li>" + esc(f(result)) + "</li>";
+      return '<li><span class="ar-glyph" aria-hidden="true"></span>'
+        + "<span>" + esc(f(result)) + "</span></li>";
     }).join("");
-    var home = HOME_BENEFITS.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+    var home = HOME_BENEFITS.map(function (t) {
+      return '<li><span class="ar-glyph" aria-hidden="true"></span><span>' + esc(t) + "</span></li>";
+    }).join("");
 
     var rows = (result.rows || []).map(function (r) {
       return "<tr><td>" + esc(r.band) + "</td><td>" + esc(r.subscription) + "</td><td>"
@@ -170,36 +174,64 @@
     }).join("");
 
     container.innerHTML = '<h2 class="ar-title">Assessment Summary</h2>'
-      + '<section class="ar-sec" data-sec="details"><h3>Project Details</h3>'
+      + '<section class="ar-sec ar-results" data-sec="results"><h3>Results</h3>'
+      + '<div class="ar-stats"><article class="ar-stat">'
+      + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
+      + '<p>As a Developer, working with Gryd, you could save ' + money(result.developerSaving)
+      + " in build cost</p></article>"
+      + '<article class="ar-stat"><span class="ar-fig" data-home>'
+      + money(result.homeownerLifetimeSaving) + "</span>"
+      + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
+      + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article></div></section>"
+
+      + '<section class="ar-sec ar-project" data-sec="details"><h3>Project Details</h3>'
       + '<dl class="ar-details">' + details + "</dl></section>"
 
-      + '<section class="ar-sec" data-sec="results"><h3>Results</h3>'
-      + '<p class="ar-headline">As a Developer, working with Gryd, you could save '
-      + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
-      + " in build cost</p>"
-      + '<p class="ar-headline">The Homeowner will enjoy cheaper cleaner energy, saving up to '
-      + '<span class="ar-fig" data-home>' + money(result.homeownerLifetimeSaving) + "</span>"
-      + " over the systems lifetime</p></section>"
-
+      + '<div class="ar-benefits">'
       + '<section class="ar-sec" data-sec="dev"><h3>Developer additional benefits</h3>'
-      + '<ul class="ar-list">' + dev + "</ul></section>"
+      + '<ul class="ar-list">' + dev + '</ul><button type="button" class="ar-more" data-more'
+      + ' aria-expanded="false">Show all</button></section>'
 
       + '<section class="ar-sec" data-sec="home"><h3>Homeowner additional benefits</h3>'
-      + '<ul class="ar-list">' + home + "</ul></section>"
+      + '<ul class="ar-list">' + home + "</ul></section></div>"
 
-      + '<section class="ar-sec" data-sec="table"><h3>Breakdown by House Size</h3>'
+      + '<div class="ar-data"><section class="ar-sec" data-sec="table"><h3>Breakdown by House Size</h3>'
       + '<div class="ar-table-wrap"><table class="ar-table"><thead><tr>'
       + "<th>Home Size</th><th>Monthly Subscription</th><th>Lifetime Saving (£)</th>"
       + "<th>Lifetime Saving (%)</th><th>Hardware Supplied</th></tr></thead><tbody>"
       + rows + "</tbody></table></div></section>"
 
-      + '<section class="ar-sec" data-sec="chart">' + chartSvg(result.chart) + "</section>"
+      + '<section class="ar-sec" data-sec="chart">' + chartSvg(result.chart) + "</section></div>"
 
       + '<p class="ar-foot">' + esc(FOOTNOTE) + "</p>"
       + '<p class="ar-note" data-preview-note>Sample figures shown on this preview.</p>'
-      + '<div class="ar-acts"><button type="button" class="ar-btn" data-restart>Start Over</button>'
-      + '<button type="button" class="ar-btn ar-btn-quiet" data-share>Share</button>'
+      + '<div class="ar-acts"><button type="button" class="btn ar-btn" data-restart>Start Over</button>'
+      + '<button type="button" class="btn ghost ar-btn ar-btn-quiet" data-share>Share</button>'
       + '<span class="ar-said" data-said role="status"></span></div>';
+
+    var resultBox = container.closest ? container.closest(".sam-box") : null;
+    if (resultBox) { resultBox.classList.add("sam-result-box"); }
+
+    /* Every benefit string is in the markup either way. The extra rows are
+       folded behind Show all only when leaving them out would push the popup
+       past 1.6 screens of scrolling, so a roomy window shows the lot. */
+    var more = container.querySelector("[data-more]");
+    function fold(on) {
+      if (!more) { return; }
+      var lis = [].slice.call(more.previousElementSibling.querySelectorAll("li"));
+      lis.forEach(function (li, i) { if (i > 2) { li.hidden = on; } });
+      more.hidden = !on;
+      more.setAttribute("aria-expanded", on ? "false" : "true");
+      more.textContent = on ? "Show all" : "Show less";
+    }
+    if (more) {
+      more.addEventListener("click", function () {
+        fold(more.getAttribute("aria-expanded") === "true");
+      });
+    }
+    var scroller = container.closest ? container.closest(".sam-body") : null;
+    fold(false);
+    if (scroller && scroller.scrollHeight > scroller.clientHeight * 1.6) { fold(true); }
 
     var tip = container.querySelector("[data-tip]");
     var c = result.chart;
@@ -223,6 +255,7 @@
 
     var said = container.querySelector("[data-said]");
     container.querySelector("[data-restart]").addEventListener("click", function () {
+      if (resultBox) { resultBox.classList.remove("sam-result-box"); }
       if (opts.onRestart) { opts.onRestart(); }
     });
     container.querySelector("[data-share]").addEventListener("click", function () {
