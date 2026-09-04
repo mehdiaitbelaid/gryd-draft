@@ -204,6 +204,16 @@
 .fm .f-tiles.cols-4 { max-width: 540px; }
 .fm .f-tiles.cols-5 { max-width: 660px; }
 .fm .f-tile { padding-bottom: 12px; }
+/* the bedroom row is the same control the site assessment asks for, so it takes
+   that sheet's measurements: a 560px track, 20px between tiles and a 72px floor
+   under each one, which puts the five clay houses at the same pitch on both */
+.fm .f-tiles.cols-5.beds {
+  max-width: 560px;
+  gap: 20px;
+  grid-template-columns: repeat(5, 72px);
+  justify-content: center;
+}
+.fm .f-tiles.beds .f-tile { min-width: 72px; }
 .fm .f-tile .t-name { font-size: 12px; line-height: 1.25; letter-spacing: .08em; overflow-wrap: anywhere; }
 
 /* the drawn glyphs, held at the clay tiles' own scale and dimming */

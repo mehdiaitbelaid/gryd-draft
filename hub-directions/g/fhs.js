@@ -195,7 +195,7 @@
   function group(field, list, current, opt) {
     opt = opt || {};
     return '<div class="f-tiles cols-' + Math.min(5, list.length)
-      + (opt.narrow ? " narrow" : "") + '" role="group">'
+      + (opt.narrow ? " narrow" : "") + (opt.cls ? " " + opt.cls : "") + '" role="group">'
       + tiles(field, list, current, opt) + "</div>";
   }
 
@@ -219,7 +219,7 @@
     { key: "bedrooms", head: "Number of bedrooms",
       body: function () {
         return group("bedrooms", O.bedrooms, a.bedrooms,
-                     { name: function (v) { return v + " bed"; } })
+                     { cls: "beds", name: function (v) { return v + " bed"; } })
           + '<p class="fm-flag" data-odd hidden>This combination is unusual — '
           + "please contact us for a bespoke assessment.</p>";
       } },
