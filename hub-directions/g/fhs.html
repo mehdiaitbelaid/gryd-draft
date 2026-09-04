@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FHS readiness check, Gryd tools</title>
+<meta name="description" content="Check a house type against the published Future Homes Standard. Three taps, then the full readiness check, measure by measure.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../home-final/assets/tokens.css">
+<link rel="stylesheet" href="g.css">
+<link rel="stylesheet" href="site-assess.css">
+<link rel="stylesheet" href="fhs.css">
+</head>
+<body class="fhs-tool">
+
+<!-- the shared pill nav, the same one every other page in the tree carries -->
+<script src="../../home-final/assets/site-nav.js" data-nav-current="tools"></script>
+
+<div class="fhs">
+<div class="wrap">
+
+  <header class="fhs-mast">
+    <span class="eyebrow">Future Homes Standard</span>
+    <h1>Is this house type <span class="flare">ready.</span></h1>
+    <p class="stand">Three taps and we can tell you where a house type stands against the published Future Homes Standard. No forms, no typing, nothing to upload.</p>
+  </header>
+
+  <!-- the questions, the card and the result are all built by fhs.js, so there
+       is nothing on the page to type into until the reader has answered the
+       three questions -->
+  <div class="fhs-stage" data-stage>
+    <div class="fhs-quiz" data-quiz></div>
+    <section class="fhs-card" data-card hidden></section>
+  </div>
+  <section class="fhs-result" data-result hidden></section>
+
+  <div class="g-close">
+    <h2>Want this checked properly?</h2>
+    <p>Send us the scheme. We will size the solar and battery on every house type on it and come back with the numbers.</p>
+    <a class="btn" href="request-site-assessment.html">Request a site assessment</a>
+  </div>
+
+</div>
+</div>
+
+<!-- the canonical footer, generated from the homepage's own -->
+<script src="../../home-final/assets/site-footer.js"></script>
+<script src="../../fhs/pages/assess-model.js"></script>
+<script src="fhs.js"></script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+/* The FHS readiness tool, in the hub's Daylight skin.
+
+   Nothing here invents a surface. The clay tiles, the hairline field, the
+   segmented rule and the numbered returns are site-assess.css; the plate, the
+   pill and the closing band are g.css. This file adds three things that page
+   did not need: the tile screens laid out one to a view, the assumed spec
+   ledger, and the result the model returns.
+
+   There is no green anywhere in the palette, so a measure carries a word for
+   its state (Pass, Close, Fails) and a warm chip behind it. Colour alone never
+   says whether something passes. */
+
+.fhs { padding-top: 138px; }
+.fhs .wrap > :last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------------------ masthead */
+
+.fhs-mast { padding-bottom: 64px; }
+.fhs-mast h1 {
+  font-size: clamp(40px, 5.6vw, 74px);
+  max-width: 17ch;
+  margin-top: var(--label-gap);
+}
+.fhs-mast .stand {
+  margin-top: var(--head-gap);
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 56ch;
+}
+
+/* --------------------------------------------------------- the section header */
+/* The homepage device: the heading holds the content column and the label with
+   its orange rule sits in the right column, over the line that says what the
+   step is for. */
+
+.fhs-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: var(--gutter) 56px;
+  align-items: end;
+  padding-bottom: 40px;
+}
+.fhs-head h2 {
+  font-size: clamp(26px, 2.6vw, 38px);
+  max-width: 20ch;
+  margin: 0;
+}
+.fhs-head .col-r { display: flex; flex-direction: column; align-items: flex-start; }
+.fhs-head .col-r .eyebrow { margin-bottom: 12px; }
+.fhs-head .col-r p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--warm-grey);
+  max-width: 40ch;
+}
+
+/* --------------------------------------------- the questions, one at a time */
+/* Build G's layout: the page runs full width, one question sits centred in it
+   at a time, and the card under it is empty until the third tap. */
+
+.fhs-stage { padding-bottom: 20px; }
+.fhs-quiz { max-width: 720px; margin: 0 auto; text-align: center; }
+.fhs-quiz .eyebrow { justify-content: center; }
+.fhs-quiz h2 {
+  font-size: clamp(26px, 2.8vw, 34px);
+  max-width: 22ch;
+  margin: var(--label-gap) auto 0;
+}
+.fhs-quiz .q-sub {
+  margin: 14px auto 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--warm-grey);
+  max-width: 46ch;
+}
+.fhs-quiz .f-tiles { max-width: 620px; margin: 32px auto 0; }
+
+/* the progress rule, three marks on one line, the site's own orange */
+.fhs-prog {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 26px;
+}
+.fhs-prog i {
+  display: block;
+  width: 46px;
+  height: 2px;
+  background: var(--stone-mid);
+  transition: background .3s ease;
+}
+.fhs-prog i.on, .fhs-prog i.done { background: var(--flare); }
+.fhs-prog i.on { opacity: .5; }
+
+.fhs-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding-top: 32px;
+}
+.fhs-back {
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  padding: 6px 0;
+  cursor: pointer;
+  color: var(--warm-grey);
+}
+.fhs-back:hover { color: var(--red110); }
+.fhs-back:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
+.fhs-count {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The plot bands have no clay model, so the tile draws the band instead: a
+   field of plots with the band's own share of them lit. */
+.fhs-plots {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 10px 12px 12px;
+  background: var(--stonelight);
+  border-radius: var(--radius-chip);
+}
+.fhs-plots span {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--stone-mid);
+  transition: background .25s ease;
+}
+.fhs-plots span.lit { background: var(--ember); }
+.f-tile:hover .fhs-plots span.lit,
+.f-tile[aria-pressed="true"] .fhs-plots span.lit { background: var(--flare); }
+.f-tile[aria-pressed="true"] .fhs-plots { background: var(--blush); }
+
+/* ------------------------------------------------ the card under the questions */
+/* Nothing sits under the questions until the third tap. Then the card arrives
+   carrying the two fields, and the result renders in place of it. */
+
+.fhs-card {
+  max-width: 720px;
+  margin: 46px auto 0;
+  background: var(--stonelight);
+  border-radius: var(--radius-panel);
+  padding: 32px 40px 34px;
+}
+.fhs-card h2 { font-size: 28px; max-width: 20ch; margin-top: var(--label-gap); }
+.fhs-card .q-sub {
+  margin: 14px 0 6px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 48ch;
+}
+.fhs-card .f-row { grid-template-columns: 160px minmax(0, 1fr); padding: 18px 0 14px; }
+.fhs-card .f-text { font-size: 22px; }
+.fhs-card .f-submit { margin-top: 22px; }
+.fhs-card .f-submit[disabled] { opacity: .4; cursor: not-allowed; }
+.fhs-card .f-consent { margin-top: 18px; }
+
+/* ------------------------------------------------------------------ the result */
+
+.fhs-result { padding-bottom: 20px; }
+
+/* The verdict band. Three warm grounds, one for each state, and the state is
+   spelled out in the heading rather than left to the ground. */
+.fhs-result .sum-head {
+  border-radius: var(--radius-panel);
+  padding: 34px 36px 30px;
+  background: var(--stonelight);
+}
+.fhs-result .sum-head.band-amber { background: var(--blush); }
+.fhs-result .sum-head.band-red { background: var(--dark-card); color: var(--paper); }
+.fhs-result .sum-head.band-red .note { color: var(--dark-secondary); }
+.fhs-result .sum-head h3 { font-size: clamp(28px, 3vw, 42px); max-width: 18ch; }
+.fhs-result .sum-head > p {
+  margin: 18px 0 0;
+  font-size: 17px;
+  line-height: 1.6;
+  max-width: 62ch;
+}
+.fhs-result .note {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--warm-grey);
+  max-width: 68ch;
+}
+.fhs-result .sum-head .note { margin-top: 20px; }
+.fhs-result > .note { margin: 24px 0 0; }
+.fhs-result .note.flag { color: var(--ember); }
+
+.fhs-result .sum-block { padding-top: 56px; }
+.fhs-result .sum-block > h4 {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  color: var(--warm-grey);
+  margin: 0 0 8px;
+}
+
+/* One measure to a hairline row. The state word is the signal; the chip behind
+   it only warms it. */
+.fhs-result .scores { border-top: 1px solid var(--stone-mid); }
+.fhs-result .score {
+  border-bottom: 1px solid var(--stone-mid);
+  padding: 22px 0 20px;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.fhs-result .score-top { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.fhs-result .score-top h4 { font-size: 21px; margin: 0; }
+.fhs-result .score p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--ink-soft); }
+
+.fhs-result .m-state {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--stonelight);
+  color: var(--red110);
+}
+.fhs-result .score-amber .m-state { background: var(--blush); color: var(--ember); }
+.fhs-result .score-red .m-state { background: var(--flare); color: #ffffff; }
+.fhs-result .pill {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+}
+
+/* ------------------------------------------------------- the assumed spec ledger */
+
+.fhs-spec {
+  margin-top: 56px;
+  background: var(--stonelight);
+  border-radius: var(--radius-panel);
+  padding: 30px 34px 28px;
+}
+.fhs-spec h4 {
+  font-size: 21px;
+  margin: 10px 0 0;
+}
+.fhs-spec .lead { margin: 12px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-soft); max-width: 60ch; }
+.fhs-spec dl { margin: 22px 0 0; }
+.fhs-spec .s-row {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 20px;
+  padding: 12px 0;
+  border-top: 1px solid var(--stone-mid);
+}
+.fhs-spec dt {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+}
+.fhs-spec dd { margin: 0; font-size: 16px; }
+.fhs-adjust {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 22px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--flare);
+  cursor: pointer;
+  color: var(--red110);
+}
+.fhs-adjust:focus-visible { outline: 2px solid var(--flare); outline-offset: 4px; }
+.fhs-opts { margin-top: 30px; border-top: 1px solid var(--stone-mid); }
+.fhs-opts .f-row { grid-template-columns: 240px minmax(0, 1fr); }
+.fhs-opts .f-seg { border-bottom-color: var(--stone-mid); }
+
+/* ------------------------------------------------------------ the comparison table */
+
+.fhs-result .tbl-wrap { overflow-x: auto; }
+.fhs-result .tbl { width: 100%; border-collapse: collapse; font-size: 16px; }
+.fhs-result .tbl th, .fhs-result .tbl td {
+  text-align: left;
+  padding: 14px 20px 13px 0;
+  border-bottom: 1px solid var(--stone-mid);
+  vertical-align: top;
+}
+.fhs-result .tbl th {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--warm-grey);
+}
+.fhs-result .tbl .sub { display: block; font-size: 13px; color: var(--warm-grey); }
+
+.fhs-result .sum-acts { padding-top: 34px; }
+.fhs-result .num { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1080px) {
+  .fhs-head { grid-template-columns: 1fr; align-items: start; }
+  .fhs-result .score { grid-template-columns: 1fr; gap: 12px; }
+  .fhs-spec .s-row { grid-template-columns: 1fr; gap: 4px; }
+}
+@media (max-width: 760px) {
+  .fhs-step .f-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fhs-gate .f-row, .fhs-opts .f-row { grid-template-columns: 1fr; gap: 10px; }
+}
