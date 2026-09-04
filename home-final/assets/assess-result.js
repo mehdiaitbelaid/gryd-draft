@@ -78,6 +78,8 @@
      the page column. */
   var PLOT_H = { popup: 260, page: 320 };
 
+  var HOVER_KEY = "gryd.resultHover";
+
   /* The axis follows the data. It stops at the first £500 above the tallest
      value on the run, in £500 steps while that is £3,000 or less and £1,000
      steps above it, so a gas scheme keeps a fine ladder and an all electric
@@ -195,7 +197,9 @@
         + esc(r.hardware) + "</td></tr>";
     }).join("");
 
-    container.innerHTML = '<h2 class="ar-title">Assessment Summary</h2>'
+    container.innerHTML = '<div class="ar-head"><h2 class="ar-title">Assessment Summary</h2>'
+      + '<button type="button" class="ar-hovertoggle" data-hover aria-pressed="false">'
+      + 'Hover effects: <span data-hover-state>off</span></button></div>'
 
       + '<section class="ar-sec ar-project" data-sec="details"><h3>Project Details</h3>'
       + '<dl class="ar-details">' + details + "</dl></section>"
@@ -234,6 +238,26 @@
       + '<div class="ar-acts"><button type="button" class="btn ar-btn" data-restart>Start Over</button>'
       + '<button type="button" class="btn ghost ar-btn ar-btn-quiet" data-share>Share</button>'
       + '<span class="ar-said" data-said role="status"></span></div>';
+
+    /* Hover lift is off until someone turns it on, and the choice is per
+       browser. Private mode and a blocked store both throw on read and on
+       write, so every touch of localStorage is guarded and the page simply
+       falls back to the default. */
+    var hoverBtn = container.querySelector("[data-hover]");
+    var hoverState = container.querySelector("[data-hover-state]");
+    function applyHover(on) {
+      container.classList.toggle("ar-nohover", !on);
+      hoverState.textContent = on ? "on" : "off";
+      hoverBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    var hoverOn = false;
+    try { hoverOn = localStorage.getItem(HOVER_KEY) === "on"; } catch (e) { hoverOn = false; }
+    applyHover(hoverOn);
+    hoverBtn.addEventListener("click", function () {
+      hoverOn = !hoverOn;
+      applyHover(hoverOn);
+      try { localStorage.setItem(HOVER_KEY, hoverOn ? "on" : "off"); } catch (e) { /* not stored */ }
+    });
 
     var resultBox = container.closest ? container.closest(".sam-box") : null;
     if (resultBox) { resultBox.classList.add("sam-result-box"); }

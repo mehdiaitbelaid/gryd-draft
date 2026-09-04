@@ -41,13 +41,14 @@
                    uplift is needed; the sheet figure reproduces as it stands.
   10. Carbon       sum over bands of homes_in_band x generation x 0.225 / 1000
                    tonnes a year. Worked example 349.15 tonnes.
-  11. Chart        the live tool draws the largest band (its API field is
-                   gridCostsLarge) whatever the split: for the 100 home SW5 0PX
-                   West case it shows year 10 without Gryd 2,615.34, which is
-                   the sheet's 5+ bed year 9 value, and a flat 1,080 a year,
-                   which is 12 x the 5+ All Electric midpoint of 90. This engine
-                   does the same. The remaining retailer bill is the without
-                   line times the grid dependence.
+  11. Chart        the largest band present in the run. The live API only ships
+                   gridCostsLarge, so for the 100 home SW5 0PX West case with 5+
+                   bed plots it shows year 10 without Gryd 2,615.34, the sheet's
+                   5+ bed year 9 value, and a flat 1,080 a year, 12 x the 5+ All
+                   Electric midpoint of 90. A run with no 5+ bed plots is drawn
+                   on its own largest band instead, so the axis matches what is
+                   on screen. The remaining retailer bill is the without line
+                   times the grid dependence.
   12. Headline     homeowner lifetime saving is the largest lifetime saving of
                    the bands present, matching the API's largestLifetimeSaving.
 */
@@ -243,8 +244,12 @@
                 lifetimePct: round2(models[0].lifetimePct), hardware: models[0].hardware }];
     }
 
-    /* The chart always draws the largest band, the way the live tool does. */
-    var big = models[2];
+    /* The chart draws the largest band present in the run. The live API only
+       ever returns gridCostsLarge, so a scheme with no 5+ bed plots used to be
+       charted against a house nobody is building, which pushed the axis a whole
+       step above anything on screen. */
+    var big = models[0];
+    models.forEach(function (m, n) { if (counts[n] > 0) { big = m; } });
     var years = [], sub = [], retailer = [], without = [];
     for (var y = 1; y <= YEARS; y++) {
       var w = big.costs[y - 1];

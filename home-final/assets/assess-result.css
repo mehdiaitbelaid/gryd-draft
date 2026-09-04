@@ -13,7 +13,33 @@
   color: var(--ar-ink);
 }
 
-.ar-title { font-size: 24px; font-weight: 500; margin: 0 0 12px; line-height: 1.1; }
+.ar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+.ar-title { font-size: 24px; font-weight: 500; margin: 0; line-height: 1.1; }
+
+/* The lift and shade are a preference, so the reader keeps the switch next to
+   the thing it changes rather than in a settings panel nobody opens. */
+.ar-hovertoggle {
+  flex: none;
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ar-muted);
+  cursor: pointer;
+  border-bottom: 1px solid var(--ar-line);
+}
+.ar-hovertoggle:hover { color: var(--ar-ink); }
+.ar-hovertoggle:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 3px; }
 .ar-sec { padding: 0; min-width: 0; margin-bottom: 14px; }
 .ar-sec h3 {
   font-size: 10px;
@@ -224,15 +250,20 @@
               box-shadow .34s cubic-bezier(.22,.61,.36,1),
               background-color .34s cubic-bezier(.22,.61,.36,1);
 }
-.ar-list li:hover,
-.ar-table tbody tr:hover {
+.ar-root:not(.ar-nohover) .ar-list li:hover,
+.ar-root:not(.ar-nohover) .ar-table tbody tr:hover {
   transform: translateY(-2px);
   background-color: var(--ar-plate);
 }
-.ar-stat:hover {
+.ar-root:not(.ar-nohover) .ar-stat:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(40, 18, 12, .07);
 }
+/* Switched off, nothing moves or shades: the transition goes too, so a row
+   cannot be caught mid animation when the switch is thrown. */
+.ar-nohover .ar-list li,
+.ar-nohover .ar-table tbody tr,
+.ar-nohover .ar-stat { transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .ar-list li, .ar-table tbody tr, .ar-stat { transition: none; }
   .ar-list li:hover, .ar-table tbody tr:hover, .ar-stat:hover { transform: none; }

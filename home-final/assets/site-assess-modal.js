@@ -123,13 +123,27 @@
   var inputs = null, at = 0, opener = null, answers = null, lead = {};
   var PANE_INPUTS = 0, PANE_GATE = 1, PANE_RESULT = 2;
 
-  /* The one seam to a CRM, deliberately inert. TODO: post the lead to HubSpot
-     portal 144906745 in region eu1 once the form id exists. It does not yet: the
-     live tool posts to Gryd's own API and that calls HubSpot server side, so
-     there is no form to name here and no HubSpot form is embedded. Until then
-     the lead is held in memory and nothing leaves the browser. */
+  /* The lead goes to Gryd's own API, the one the live tool calls, through
+     assets/assess-lead.js. The popup is injected on pages that never name that
+     file, so it pulls it in itself, once, beside its own script. It is fire and
+     forget: the assessment renders whether or not the API answers. */
+  (function () {
+    if (document.querySelector("script[data-assess-lead]")) { return; }
+    var me = document.currentScript
+      || document.querySelector('script[src*="site-assess-modal.js"]');
+    if (!me) { return; }
+    var s = document.createElement("script");
+    s.src = new URL("assess-lead.js", me.src).href;
+    s.setAttribute("data-assess-lead", "");
+    document.head.appendChild(s);
+  })();
+
   function sendLead(payload) {
     window.grydAssessLead = payload;
+    if (!window.GrydAssessLeadApi) { return; }
+    var res = null;
+    try { res = window.GrydAssess.compute(payload.inputs); } catch (err) { res = null; }
+    window.GrydAssessLeadApi.send(payload.inputs, res, payload.lead);
   }
 
   function build() {

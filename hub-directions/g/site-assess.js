@@ -223,10 +223,21 @@
       window.grydAssessLead = { lead: { name: values.name, email: values.email },
                                 inputs: engineInputs() };
       var answers = engineInputs();
+      var result = window.GrydAssess.compute(answers);
+      /* the lead goes to HubSpot through the shared sender, carrying the bed
+         counts as well as the engine's own inputs, and it never blocks the
+         assessment */
+      if (window.GrydAssessLeadApi) {
+        var lead = { homes: answers.homes, postcode: answers.postcode,
+                     orientation: answers.orientation, energy: answers.energy,
+                     beds: beds.slice(), counts: counts };
+        window.GrydAssessLeadApi.send(lead, result,
+                                      { name: values.name, email: values.email });
+      }
       form.hidden = true;
       out.hidden = false;
       doc.body.classList.add("has-result");
-      window.GrydAssessResult.render(out, window.GrydAssess.compute(answers), answers, {
+      window.GrydAssessResult.render(out, result, answers, {
         onRestart: function () {
           out.hidden = true;
           out.innerHTML = "";
@@ -239,54 +250,59 @@
     });
   }
 
-  /* --------------------------------------------------------- the two stages */
-  /* One stage on screen, every question in it visible at once, nothing from a
-     later stage rendered before its turn. The rail beside stage two keeps the
-     answers already given. */
+  /* ------------------------------------------------- the steps, one at a time */
+  /* Mehdi, 4 September: the tools page runs the FHS check's composition now.
+     One question is on screen at a time, centred, under a three mark rail; the
+     gate is the fourth panel in the same frame. Enter on a field is the same
+     as pressing Continue, so a postcode or a plot count can be answered without
+     reaching for the mouse. The bedroom tiles stay multi select with a count
+     under each, so they never advance on their own. */
 
   var col = doc.querySelector("[data-staged]");
   if (col) {
-    var stages = all(".e-stage", col);
-    var segs = all(".e-seg", col);
+    var panels = all(".sa-q", col);
+    var marks = all(".sa-prog i", col);
     var at = 0;
 
     function show(i, moved) {
-      at = Math.max(0, Math.min(stages.length - 1, i));
-      stages.forEach(function (s, n) { s.hidden = n !== at; });
-      segs.forEach(function (seg, n) {
-        var bar = seg.querySelector("i");
-        if (bar) { bar.style.width = n < at ? "100%" : (n === at ? "50%" : "0%"); }
-        seg.classList.toggle("on", n === at);
-        seg.classList.toggle("done", n < at);
+      at = Math.max(0, Math.min(panels.length - 1, i));
+      panels.forEach(function (s, n) { s.hidden = n !== at; });
+      marks.forEach(function (m, n) {
+        m.className = n < at ? "done" : (n === at ? "on" : "");
       });
       doc.body.classList.toggle("past-first", at > 0);
-      col.classList.toggle("first", at === 0);
       fit();
-      var first = stages[at].querySelector(".f-text, .f-area, .f-tile, .seg");
-      if (first && first.focus) { first.focus({ preventScroll: true }); }
-      /* the reader asked for the next stage, so put it under the nav rather
-         than leaving them where the last one ended. Not on the first paint,
-         which would throw away the headline band. */
       if (moved) {
-        var top = stages[at].getBoundingClientRect().top + window.scrollY;
-        window.scrollTo(0, Math.max(0, Math.round(top - 132)));
+        var first = panels[at].querySelector(".f-text, .f-tile");
+        if (first && first.focus) { first.focus({ preventScroll: true }); }
+        window.scrollTo(0, 0);
       }
+      gateReady();
     }
 
-    /* a stage is centred in whatever the headline and the nav leave it,
-       measured rather than guessed so it never pushes the page into a scroll */
+    /* the height the stage may use, measured rather than guessed, so the
+       question is centred in it without ever pushing the page into a scroll */
     function fit() {
       var top = col.getBoundingClientRect().top + window.scrollY;
-      var room = window.innerHeight - top - 40;
-      col.style.setProperty("--first-fill", Math.max(360, Math.round(room)) + "px");
+      col.style.setProperty("--stage-fill",
+                            Math.max(300, Math.round(window.innerHeight - top - 36)) + "px");
     }
     window.addEventListener("resize", fit);
 
-    all("[data-next]", col).forEach(function (b) {
-      b.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });
+    all("[data-next]", col).forEach(function (btn) {
+      btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });
     });
-    all("[data-back]", col).forEach(function (b) {
-      b.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true); });
+    all("[data-back]", col).forEach(function (btn) {
+      btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true); });
+    });
+    col.addEventListener("keydown", function (ev) {
+      if (ev.key !== "Enter") { return; }
+      var f = ev.target;
+      if (!f || f.tagName !== "INPUT") { return; }
+      ev.preventDefault();
+      if (f.id === "saEmail" || f.id === "saName") { if (ready()) { submit.click(); } return; }
+      var next = panels[at].querySelector("[data-next]");
+      if (next) { next.click(); }
     });
     show(0);
   }

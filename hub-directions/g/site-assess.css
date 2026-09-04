@@ -605,3 +605,129 @@ body.sa-flow .sa { padding-top: 104px; }
 body.sa-tool.has-result .sa-mast { display: none; }
 body.sa-tool.has-result .sa { padding-top: 128px; }
 .f-submit:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ------------------------------------- the tools page, one question at a time */
+/* Mehdi, 4 September: the tools page had every question packed into the top
+   left of the column, which left a field of paper under it on a wide screen.
+   The FHS check already had the answer, so the composition is that page's:
+   masthead, a three mark progress rail, one centred question at a time, the
+   step count under it. The reveal and the timing are the FHS page's own, a
+   short rise on the site's standing cubic-bezier(.22,.61,.36,1). */
+
+.sa-stage {
+  padding-bottom: 24px;
+  /* the question sits in the middle of whatever the masthead leaves it, so a
+     tall screen is not a band of paper under the tiles */
+  min-height: var(--stage-fill, 0px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* the progress rail, three marks on one line in the site's orange */
+.sa-prog {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 26px;
+}
+.sa-prog i {
+  display: block;
+  width: 46px;
+  height: 2px;
+  background: var(--stone-mid);
+  transition: background .3s ease;
+}
+.sa-prog i.on, .sa-prog i.done { background: var(--flare); }
+.sa-prog i.on { opacity: .5; }
+
+/* one question, centred in the content column at every width */
+.sa-q {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.sa-q > .eyebrow { justify-content: center; }
+.sa-tool .sa-q .sa-sec-head {
+  font-size: clamp(26px, 2.8vw, 34px);
+  max-width: 22ch;
+  margin: var(--label-gap) auto 0;
+}
+.sa-q .q-sub {
+  margin: 12px auto 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--warm-grey);
+  max-width: 46ch;
+}
+.sa-q .q-field { margin-top: 28px; }
+.sa-q .q-one { max-width: 380px; margin-left: auto; margin-right: auto; }
+.sa-q .q-one .f-text { text-align: center; }
+.sa-q .f-big { font-size: 34px; }
+.sa-q .f-lab {
+  display: block;
+  padding: 0 0 4px;
+  text-align: center;
+}
+.sa-q .q-gate {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+.sa-q .q-gate .f-lab { text-align: left; }
+.sa-q .f-tiles { max-width: 620px; margin: 0 auto; gap: 20px; align-items: stretch; }
+/* the clay models are not all the same height, so the count field is pushed to
+   the foot of its cell and the five rules sit on one line */
+.sa-q .f-tile-cell { display: flex; flex-direction: column; }
+.sa-q .f-tile-cell .f-count { margin-top: auto; }
+.sa-q .f-tally { margin-top: 16px; }
+.sa-q .f-consent { margin-left: auto; margin-right: auto; text-align: center; }
+
+.sa-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding-top: 30px;
+}
+.sa-nav .e-back { order: 1; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; }
+.sa-nav .f-submit { order: 2; }
+.sa-count {
+  display: block;
+  margin-top: 18px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the reveal: the question rises once, its tiles follow it one after another */
+@keyframes sa-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.sa-q:not([hidden]) { animation: sa-rise .42s cubic-bezier(.22,.61,.36,1) both; }
+.sa-q:not([hidden]) .f-tile-cell {
+  animation: sa-rise .42s cubic-bezier(.22,.61,.36,1) both;
+  animation-delay: calc(120ms + var(--i, 0) * 55ms);
+}
+
+/* the masthead stands down once the reader is answering, the way the FHS page
+   gives the height back to the question */
+.sa-tool.past-first .sa-mast { padding-bottom: 14px; }
+
+@media (max-width: 760px) {
+  .sa-q .f-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 340px; }
+  .sa-q .q-gate { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .sa-prog i { width: 34px; }
+  .sa-q .f-big { font-size: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sa-q:not([hidden]), .sa-q:not([hidden]) .f-tile-cell { animation: none; }
+  .sa-prog i { transition: none; }
+}
