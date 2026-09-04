@@ -193,12 +193,21 @@
       li.querySelector('button').setAttribute('aria-expanded', on ? 'true' : 'false');
     }
 
+    /* Closing a panel is not the same event as the pointer leaving the bar, and
+       conflating the two is what put the capsule out under the pointer. Moving
+       from Tools to FHS commits null forty milliseconds later, because FHS has
+       no panel; when that commit also blanked the capsule, the highlight
+       arrived on FHS and then went out while the pointer was still sitting on
+       it. It only ever showed after a parent, since a plain link to a plain
+       link never reaches a commit at all, which is why it read as intermittent.
+       So commit decides panels and nothing else. The capsule is put out by the
+       three events that actually mean the pointer has gone: leaving the bar,
+       focus leaving it, and shut(). */
     function commit(li) {
       if (li === openLi) return;
       if (openLi) expose(openLi, false);
       openLi = li;
       if (li) expose(li, true);
-      if (!li) capOff();
     }
 
     function want(li) {
@@ -214,6 +223,7 @@
       clearTimeout(timer);
       timer = 0; pendingLi = null;
       commit(null);
+      capOff();
       nav.classList.remove('menu-open');
       if (burger) burger.setAttribute('aria-expanded', 'false');
     }
@@ -232,7 +242,15 @@
     // the magnetic lean. Cached geometry only, so this is arithmetic and not a
     // layout read, however fast the pointer moves.
     nav.addEventListener('mousemove', function (e) {
-      if (!wide() || coarse() || !shown || !anchor) return;
+      if (!wide() || coarse()) return;
+      /* The pointer can be over an item with the capsule anchored elsewhere or
+         not anchored at all: the open panel hangs over the bottom of the bar,
+         so a low path from Tools to FHS crosses the panel and enters no link on
+         the way. Asking what is under the pointer rather than trusting the last
+         mouseover recovers that in the same frame. */
+      var over = e.target.closest ? e.target.closest('.links .link') : null;
+      if (over && over !== anchor) capTo(over);
+      if (!shown || !anchor) return;
       var g = geo.get(anchor);
       if (!g) return;
       var d = (e.clientX - g.mid) / g.half;
