@@ -1,0 +1,559 @@
+# Gryd, full text
+
+Gryd Energy Ltd, London, United Kingdom. Company no. 15092056.
+Every section below is the text of the page named above it, on 2026-09-04.
+Index and links: https://gryd.energy/llms.txt
+
+
+## Home
+
+Source: https://gryd.energy/home-final/draft/index.html
+
+At Gryd, we make solar simple.
+Gryd offers developers and homeowners a smarter way to power new-build homes by providing fully-funded solar and storage that exceeds regulations and expectations.
+Sifted
+The Gryd process
+Five steps, from your drawings to a home that powers itself.
+01
+Assess
+Send us your planning drawings and we’ll model the optimal solar and battery system, bespoke for every plot. We’ll share an indicative proposal including system design, energy performance, savings and subscriptions, usually within a week.
+02
+Design
+Gryd solar and battery systems are optimally designed for each home’s size, orientation and expected demand. We typically achieve over 70% coverage of a home’s annual energy demand, and 10 to 15 SAP points gained.
+03
+Deploy
+We fund 100% of the hardware, panels, battery and hybrid inverter You install it as part of the build programme using your own team or our trusted partners. Gryd works around your construction programme, everything arrives on site exactly when it is needed.
+04
+Handover
+Your buyers can choose to subscribe to our fixed price energy-as-a-service contract or buy-out the system at any stage at a lower cost than a retrofit. Either way they are getting a high quality home that costs less to run.
+05
+Operate and Optimise
+For those who subscribe, Gryd monitors every system 24/7 and intelligently optimises them around each home’s usage and tariff. Gryd maintains the hardware under the Gryd Guarantee for the life of the subscription. Homeowners get full visibility in the Gryd app, plus recommendations on how to reduce whatever they still buy from the grid. No maintenance calls come back to you.
+01 02 03 04 05
+Proof
+Trusted by developers. Proven on site.
+Lower Farm Mews
+Completed project, Tittleshall, Norfolk
+9 new homes
+EPC A on every plot
+£90k off build cost
+20% saving on total home energy
+The scheme from the air
+The garden side
+Lower Farm Mews, Tittleshall, Norfolk. Nine new homes with Zero In Developments, four 3-beds and five 4-beds. Solar and battery on every plot, all achieve EPC A, £90k saved on project build cost and a 20% saving on total home energy from day one.
+Lower Farm Mews case study
+Watch the full video
+View more projects
+Build homes that power themselves.
+Solar may be the new standard, but not all solar is smart. With a fully managed, software-powered model, Gryd delivers high-performance solar systems that work better for homeowners, meet the next wave of regulations, and support the energy system of tomorrow.
+For developers
+£0 hardware cost. Gryd funds all solar panel, battery, inverter and monitoring hardware.
+Future Homes Standard compliance. Gryd systems meet and typically exceed the FHS on-site renewable generation requirement.
+SAP uplift of 10 to 20 points, typically an EPC improvement of at least one level.
+No increase in build cost, so homes stay affordable and your margins don't get squeezed.
+Deployable to all unit types. Gryd won't cherry-pick only the best plots like some others, we can deploy smart solar to every unit.
+For homeowners
+Lower energy bills from day one, typically 20 to 30%.
+Significant lifetime savings, up to £50,000 over the 25-year life of the system.
+Fixed, inflation-proof subscription, locked in for 25 years.
+25-year Gryd Guarantee with zero maintenance burden, covering insurance, 24/7 monitoring, servicing and maintenance.
+Flexibility and choice. Homeowners can subscribe to the system or buy it outright at any time for a transparent price that reduces over time.
+Battery as standard
+A battery in every home is what takes a system from good to game changing .
+Powered by the sun, midday to midnight
+01
+Excess solar fills the battery
+With a battery we can typically cover over 70% of a homes energy needs, compared to 20% with panels alone
+02
+Energy saved for the evening peak
+Energy is stored so it can be used then the family is actually home.
+03
+Standard feature for every plot
+We include a battery and hybrid inverter as standard, not an upgrade.
+Trust
+
+
+## The five stages
+
+Source: https://gryd.energy/home-final/draft/index.html
+
+Five steps, from your drawings to a home that powers itself.
+
+01 Assess
+Send us your planning drawings and we’ll model the optimal solar and battery system, bespoke for every plot. We’ll share an indicative proposal including system design, energy performance, savings and subscriptions, usually within a week.
+
+02 Design
+Gryd solar and battery systems are optimally designed for each home’s size, orientation and expected demand. We typically achieve over 70% coverage of a home’s annual energy demand, and 10 to 15 SAP points gained.
+
+03 Deploy
+We fund 100% of the hardware, panels, battery and hybrid inverter You install it as part of the build programme using your own team or our trusted partners. Gryd works around your construction programme, everything arrives on site exactly when it is needed.
+
+04 Handover
+Your buyers can choose to subscribe to our fixed price energy-as-a-service contract or buy-out the system at any stage at a lower cost than a retrofit. Either way they are getting a high quality home that costs less to run.
+
+05 Operate and Optimise
+For those who subscribe, Gryd monitors every system 24/7 and intelligently optimises them around each home’s usage and tariff. Gryd maintains the hardware under the Gryd Guarantee for the life of the subscription. Homeowners get full visibility in the Gryd app, plus recommendations on how to reduce whatever they still buy from the grid. No maintenance calls come back to you.
+
+
+## Tools
+
+Source: https://gryd.energy/hub-directions/g/tools.html
+
+Tools, Gryd
+Tools
+Three tools. Each answers a question before you commit a plot.
+One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.
+Developers
+See what a scheme carries before it is priced
+Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.
+Scheme level Under two minutes
+Open the tool →
+Future Homes Standard
+Check a house type against the published standard
+Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.
+House type level 60 seconds
+Open the checker →
+Council housing
+See how far council housing has got with rooftop solar
+Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.
+UK wide 2025 and 2026 returns
+Open the map →
+Battery modelling and a grid constraint check are still in design. Each is listed here once it is ready to be used rather than looked at.
+Not sure which one you need?
+Send us the scheme. We will run the ones that apply and come back with the numbers.
+Request a site assessment
+
+
+## Frequently asked questions
+
+Source: https://gryd.energy/hub-directions/g/faq.html
+
+Q: Does Gryd really cover 100% of the hardware cost?
+A: Yes. Gryd funds all solar panel, battery, inverter and monitoring hardware on every plot. The developer pays nothing for the renewable energy equipment. The developer covers installation labour as part of the normal build programme, using their own MCS-certified subcontractor or a Gryd-recommended installer partner.
+
+Q: Does Gryd help with Future Homes Standard compliance?
+A: Gryd systems meet and typically exceed the FHS on-site renewable generation requirement. Systems are designed from a home optimisation perspective, not a minimum compliance perspective, typically delivering a SAP uplift of 10 to 20 points. FHS regulations come into force March 2027.
+
+Q: Does Gryd only work on south-facing plots?
+A: No. Gryd does not cherry-pick only south-facing or optimally orientated plots. Systems are designed and deployed across all home types, orientations and roof arrangements, including terraces and apartments.
+
+Q: What does the developer have to do?
+A: Coordinate the installation as part of the normal build programme. Gryd provides comprehensive support through the deployment. We'll work with you and your installer to schedule hardware deliveries to site in batches aligned with your build programme.
+
+Q: What happens if a homeowner sells the property?
+A: The 25-year subscription transfers with the property. The new owner inherits the same fixed price and benefits. Homeowners can also choose to buy the system outright at any point, at a transparent, depreciation-based price that is cheaper than an equivalent retrofit from day one.
+
+Q: What happens after the homes are sold?
+A: The developer has no ongoing responsibility. All customer care, maintenance, monitoring and warranty obligations sit with Gryd for 25 years, including a mid-life battery and inverter replacement. The homeowner's contract is with Gryd, not the developer.
+
+Q: What scheme sizes do you work with?
+A: Each Gryd system is self-contained and operates entirely behind the meter, so there is no shared infrastructure required. The model is fully scalable from a handful of homes to several hundred units.
+
+Q: Why Gryd?
+A: Gryd makes it easy for developers to avoid the rising build cost associated with tightening sustainability regulations. We do this by funding, operating and maintaining smart solar and battery systems on new homes. We remove the upfront cost and complexity, so you can build more desirable and affordable homes. Gryd makes it easy for developers to meet increasing sustainability regulations by funding, operating and maintaining rooftop solar + battery systems for new homes. Homeowners access the benefits via a simple subscription, without paying a premium when buying the home, and developers avoid upfront capital expenditure.
+
+Q: Who pays for what?
+A: Gryd funds all hardware (solar panels, batteries, inverters). You cover installation cost, using your preferred contractor or one of Gryd’s partners. Homeowners pay a fixed monthly subscription, no upfront cost, no ownership hassle.
+
+Q: What’s it like working with Gryd?
+A: It starts with a site assessment. We evaluate your site and propose an optimal system for each home. From there, we work with you to confirm the design and the timeline for installation. Once approved, we fund all the hardware and ensure it is delivered to your site when it’s needed for you to install. While you market and sell the homes, Gryd provides hands-on support and marketing materials to help explain the benefits to buyers and accelerate sales.
+
+Q: What benefits do homeowners get?
+A: Buyers enjoy the benefits of solar energy without the upfront investment or burden of ownership. They receive access to every kilowatt-hour of energy generated for fixed-price subscription that delivers substantial savings from day one while shielding them from rising energy prices over the long term. They also get 24/7 monitoring, regular servicing and ongoing maintenance which includes a battery and inverter replacement under Gryd’s 25-year guarantee.
+
+Q: How does it affect home sales?
+A: A Gryd system isn’t designed to meet the regulatory requirements, it exceeds them, improving EPC and carbon efficiency ratings beyond what would have otherwise been achieved. This gives a real point of differentiation over similar homes for sale in the area and has proven to accelerate sales velocity. With the hardware provided at zero cost, you have more flexibility to add other desirable features or set more affordable sales prices.
+
+Q: What are the savings for developers?
+A: Because we fund all the solar hardware, you save up to £10,000 per home. This removes a major capital hurdle, especially when building at scale, and allows you to offer future-proofed homes without squeezing your margins. It also strengthens your planning position and helps meet regulatory requirements without compromising on financial performance.
+
+Q: When should we engage with Gryd?
+A: The best time to involve Gryd is early in the development process but we can get involved all the way up to shell completion. This ensures that solar and battery systems can be seamlessly integrated into the design and build programme without causing delays or retrofitting issues.
+
+Q: Who maintains the system?
+A: Gryd provides full lifecycle support, including 24/7 monitoring, performance optimisation, insurance, and all necessary replacements over a 25-year term. If a battery or inverter needs to be replaced, Gryd handles it, ensuring peace of mind for both you and the homeowner.
+
+Q: Who owns the system?
+A: Gryd owns, operates and maintains the system over its 25-year life under our simple Rooftop Solar Lease arrangement. This clearly sets out our responsibilities to keep the system operating at peak performance and delivering the maximum benefit to homeowners.
+
+Q: What is Gryd and how does it work in my new home?
+A: Gryd provides and maintains the smart rooftop solar panels and battery storage for your home, without the need for you to buy or own the system outright. Instead, you get access to clean, low-cost solar energy through a simple monthly subscription. The system is already installed when you move in, so you start saving on your energy bills from day one, without any upfront costs.
+
+Q: How much does the subscription cost?
+A: The subscription will depend on the size of your home, the number of panels and amount of battery storage. A typical 3 bedroom home can expect a subscription of around £70 per month, fixed for 25 years. That means no price rises due to inflation or energy market spikes, just predictable, stable energy costs year after year.
+
+Q: What do I get as part of the subscription?
+A: You get access to every kilowatt-hour of energy generated by the system on your home, along with 24/7 remote monitoring, ongoing maintenance, insurance, and intelligent optimisation. Gryd also covers any necessary repairs or equipment replacements for 25 years. Everything is included in your monthly fee, with no hidden costs.
+
+Q: How much will I save on my energy bills?
+A: Most homeowners see immediate net savings of around 20% compared to buying electricity from a traditional energy provider. Over the lifetime of the system, the savings can add up to over £40,000, depending on your usage. In the first year alone, a typical 3 bed home could expect to save around £360.
+
+Q: Do I still need a regular energy supplier?
+A: Yes, but you’ll need much less energy from the grid. The Gryd system typically covers over 70% of your home’s electricity needs over the year, so your standard energy bill is significantly reduced. Gryd works alongside your chosen supplier to maximise your savings. The amount of energy provided by the Gryd system will vary with the seasons. You can expect to have little to no bill from your traditional retailer in the summer months and slightly higher in the winter when there’s less consistent sunshine.
+
+Q: Who will my regular energy supplier be?
+A: That’s completely up to you, you are free to choose which energy supplier you would like to provide any remaining electricity that can’t be supplied by the system. Gryd may let you know about tariffs we think could help you boost your savings even more and help you switch if you wanted to.
+
+Q: What happens if energy prices rise?
+A: Your Gryd subscription is completely fixed, so rising energy prices won’t affect your monthly subscription. This gives you protection and peace of mind, especially in today’s unpredictable energy market. The energy you get from the grid is subject to the changes in energy price, that’s why we help make sure you’re getting as much of your energy from the solar system as possible.
+
+Q: What if I want to own and manage the system myself?
+A: Absolutely! You can choose to own the system if it makes sense for you. If you plan to stay in your home for more than 10 years, buying the solar and battery system might be a smart investment. With Gryd, ownership is always optional and you’re never locked in. You can take ownership at any time, even on day one, for less than the cost of a traditional retrofit on day one. Plus, the price to buy the system decreases over time. So if you’re unsure about your long-term plans when you move in, you can wait and decide later, while still enjoying lower bills and cleaner energy from day one.
+
+Q: What if I sell my home?
+A: If you move, the Gryd subscription transfers easily to the next owner. There’s no disruption to their energy supply, and they’ll continue enjoying the same low-cost benefits. You just need to let us know when you decide to sell your home. The new owner will also have the same option to take ownership of the system if they want to.
+
+Q: Is the system reliable and safe?
+A: Absolutely. Gryd uses best-in-class solar and battery technology, installed by MCS certified professionals and backed by a 25-year performance guarantee. Your system is constantly monitored and fully insured. If anything goes wrong, it’s Gryd’s responsibility to fix it.
+
+Q: How do I manage or track the system?
+A: Gryd will monitor the system 24/7 to make sure everything is at peak performance. You’ll get access to our online portal where you can see how much energy your home is generating, using, and storing, as well as the savings you’ve made. It’s all designed to be simple, transparent, and hands-off unless you want to dive into the details.
+
+Q: Why is a solar lease better than owning solar myself?
+A: With Gryd, there’s no upfront cost, no loan, no need to arrange your own installation, and no worries about long-term maintenance. You get all the benefits of solar, lower bills, clean energy, and a more sustainable home, without the hassle of ownership. It gives you the ultimate flexibility to benefit from solar and storage without the complexity of figuring out if it’s a worthwhile return on investment, or if the payback period lines up with your living situation. And if your circumstances change such that it makes sense, you always have the option to own.
+
+Q: What is the Future Homes Standard?
+A: The Future Homes Standard (FHS) is a set of updated Building Regulations for new homes in England, published on 24 March 2026. It requires new homes to produce 75% fewer greenhouse gas emissions than homes built under the 2013 regulations. It mandates low-carbon heating (such as heat pumps), improved building fabric, and on-site renewable electricity generation. For the vast majority of new homes, rooftop solar PV is the most practical way to meet this requirement.
+
+Q: When does the Future Homes Standard come into effect?
+A: The FHS regulations were published on 24 March 2026. The standard comes into force on 24 March 2027 for most new dwellings (24 September 2027 for higher-risk buildings). A 12-month transition period follows: building work must have commenced under previous regulations by 24 March 2028 . After that date, all new homes must be built to FHS. For developers, the critical question is when Building Regulations applications are submitted and when work starts on site. Schemes already well progressed may proceed under the previous regime if they meet the transitional arrangements. Transitional arrangements operate on an individual building basis, so different homes on the same site may fall under different regulations.
+
+Q: Does the FHS require solar panels on new homes?
+A: The FHS introduces a functional requirement for on-site renewable electricity generation, not specifically solar. However, its anticipated that the majority of compliance will be achieved through rooftop solar PV as its the most affordable and realistic way to meet this requirement. Developers must install on-site renewables equivalent to solar coverage of at least 40% of the building’s ground floor area where feasible. Where 40% coverage is not achievable (due to shading, orientation or building type), a reasonable amount of coverage is still required. Some exemptions apply, including high-rise buildings.
+
+Q: How much solar does a new home need under FHS?
+A: The confirmed requirement is on-site renewable electricity generation equivalent to solar coverage of at least 40% of the building’s ground floor area. For a typical 3-bedroom semi-detached home with approximately 80m² of ground floor area, meeting this with solar PV translates to roughly 32m² of panels, or a system of around 4-5 kWp. Gryd recommends larger systems paired with battery storage to maximise energy coverage and homeowner savings beyond the FHS minimum.
+
+Q: What does Gryd's zero-cost solar model mean for developers?
+A: Gryd funds the full cost of solar PV and battery hardware through an SPV financing structure. Developers pay nothing to add full scale solar and battery systems to homes. Homeowners pay a fixed monthly subscription that delivers bill savings from day one, with an ownership option available at any time.
+
+Q: Can Gryd help with homes that already have solar in the spec?
+A: Yes. Many developers are specifying minimum-compliant 3 to 4 panel systems. Gryd can upgrade these to full-scale solar + battery systems that genuinely reduce bills, at no additional cost to the developer.
+
+
+## Lower Farm Mews, Tittleshall, Norfolk
+
+Source: https://gryd.energy/hub-directions/g/projects/lower-farm-mews.html
+
+How Gryd helped deliver higher sustainability, without adding a penny to the build cost
+Higher Sustainability, Zero Build Cost
+Nine homes in Tittleshall, Norfolk, taken from around 20% to around 70% energy coverage.
+Case study
+How Gryd helped deliver higher sustainability, without adding a penny to the build cost
+Download
+SW
+Scott Whiteside
+28 April 2026
+Summary
+Zero In Developments partnered with Gryd on Lower Farm Mews, a 9-home conversion in Tittleshall, Norfolk. With rising costs squeezing margins, ZID risked scaling back their sustainability ambitions. Gryd provided ~£100,000 of fully-funded solar and battery hardware at zero cost, upgrading every home from ~20% to ~70% energy coverage with 10 kWh battery storage. The result: EPC A-rated homes with £30,000–£40,000 in estimated lifetime energy savings and flexible buyer options — subscribe or buy outright.
+Key Details
+Developer: Zero In Developments (ZID)
+Project: Lower Farm Mews, Tittleshall, Norfolk
+Type: Conversion — 9 residential units (3 & 4-bed homes)
+Gryd hardware value: ~£100,000
+Battery storage per home: 10 kWh
+Energy coverage uplift: ~20% → ~70%
+EPC rating achieved: A
+Installer: Array Electrics
+Key Outcomes
+Zero additional build cost for solar and battery
+Higher sustainability credentials for marketing
+EPC A rating across all units
+Stronger sales proposition for buyers
+Ongoing support from site assessment to commissioning
+The Developer
+Zero In Developments (ZID) is a privately owned property development company based in the South East of England, focused on delivering sustainable, low-carbon homes that are built for the future. Founded by Sam Fryer and Jed Jordan, ZID specialises in finding disused commercial and light-industrial buildings and converting them into high-quality residential homes — reusing and restoring existing structures to minimise embodied carbon.
+Sustainability is not an afterthought for ZID — it is the priority. Their approach combines a fabric-first design philosophy with efficient systems and on-site renewables, targeting reduced whole-lifecycle emissions across every project.
+Our ambition from day one has been to deliver homes that are genuinely built for the future — not just ticking a box on sustainability, but setting a new standard for what responsible development looks like.
+Sam Fryer, Director & Co-Founder, Zero In Developments
+The Project
+Lower Farm Mews, Tittleshall, Norfolk
+Lower Farm Mews is a private development of nine 3 and 4-bedroom homes in the village of Tittleshall, Norfolk. The site is a conversion of the former Courtenay House — a disused care home — where the shell of the original building was retained and the internals were completely renovated and reconfigured into modern, energy-efficient residences.
+True to ZID’s ethos, the project was designed to deliver low-carbon, all-electric homes featuring air-source heat pumps, EV charging points, and repurposed building materials. Solar energy was always part of the plan.
+We’d set out to build the most sustainable homes we could, but the numbers were forcing us into compromises we really didn’t want to make. We were looking at delivering a good product, but not the exceptional one we’d promised ourselves and our buyers.
+Jed Jordan, Director & Co-Founder, Zero In Developments
+The Solution
+Initial engagement and site assessment
+ZID contacted Gryd to explore how a fully-funded solar and battery model could support the project. Gryd conducted an initial site assessment to determine the optimal system configuration for each of the nine plots and to model the energy performance and financial benefit for future homeowners.
+The results were compelling. Gryd could deliver significantly better energy performance than had previously been planned — without adding any cost to the project.
+Late-stage integration
+Typically, Gryd engages with a project at an early design stage so that solar and battery can be incorporated as a core component of the design. In this case, ZID had already contracted a solar installer based on a previous design, and works were only weeks away from starting on site.
+Rather than disrupt the programme, Gryd worked closely with ZID and their appointed installer, Array Electrics, to redesign the system specification and plan delivery around the existing schedule.
+From solar-only to solar + battery
+Panels sized per roof, 10 kWh of storage in every home, and the choice to subscribe or buy outright
+The original plan was a modest solar-only configuration. With Gryd’s fully-funded model, the project was upgraded to include:
+10 kWh of battery storage in every home — previously written off as unaffordable
+An increased number of solar panels per plot — optimised to each roof’s orientation and capacity
+Smart monitoring and control — enabling real-time performance tracking and energy management
+The total value of solar and battery hardware provided by Gryd across the site was approximately £100,000 — delivered at zero cost to the developer.
+When we saw what Gryd could deliver, it was a no-brainer. We went from a system that might cover 20% of a home’s energy needs to one that delivers up to 70% — and we didn’t have to spend a single extra pound to get there. That’s a game-changer for any developer watching their margins.
+Navigating Complexity
+Contractor insolvency
+The project experienced a significant setback when the main contractor went into administration — an event that nearly killed the project entirely. Through quick thinking, Sam and Jed took the decision to acquire the contractor and retain the workforce, allowing the project to continue with only a brief pause.
+Throughout this difficult period, Gryd maintained its commitment to the site, working flexibly around the disruption to ensure ZID didn’t have to sacrifice their sustainability goals.
+Grid connection delays
+A common but often underestimated challenge in construction is securing the grid connection — essential for commissioning any solar and battery system. After a prolonged period of uncertainty around the connection date, Gryd connected directly with the DNO (Distribution Network Operator) responsible for the works to push the connection through. This two-sided approach — both Gryd and ZID applying pressure — undoubtedly brought the connection date forward.
+Remote connectivity
+An unexpected challenge arose from the site’s rural location in Norfolk. Gryd’s systems require a data connection for real-time monitoring and performance management, typically achieved through a small mobile router installed alongside each system. However, Lower Farm Mews sits in a mobile data black spot.
+The team found a pragmatic interim solution: connecting systems to the construction team’s existing broadband where in range. Once homes are sold and occupied, each system will transfer to the homeowner’s own broadband service — a seamless transition requiring no additional hardware.
+The Impact
+For the developer
+~£100,000 of solar and battery hardware delivered at zero cost
+EPC A ratings awarded across all properties
+Higher sustainability credentials to market — exceeding original ambitions despite budget pressure
+A stronger sales proposition — homes that cost less to run, with a tangible technology story for buyers
+End-to-end support — from site assessment and system design through to commissioning and sign-off
+For homeowners
+Up to ~70% of home’s energy generated and stored on-site (up from ~20% solar-only plan)
+10 kWh battery storage enabling energy generated during the day to be used in the evening
+Flexible ownership options — buyers can choose to subscribe to the Gryd system with a fixed monthly fee, or buy outright
+Ongoing monitoring and maintenance with every Gryd subscription
+Estimated £30,000–£40,000 in lifetime energy saving s per home
+Buyer response
+The site is nearing completion, with one property already sold and occupied, and a further two reserved. The flexibility of Gryd’s model is already proving its value:
+One buyer opted to purchase the system outright, planning to live in the home long-term and wanting the maximum their financial benefit.
+Two buyers chose to subscribe, already at their maximum mortgage threshold and preferring the certainty of a fixed, low monthly payment without the upfront cost.
+What Sets Gryd Apart
+Gryd funds the hardware. The developer pays nothing. Solar panels, batteries, inverters, and smart monitoring — all provided, installed, and maintained through Gryd’s SPV-funded model. Developers get best-in-class energy systems on every home without impacting build budgets.
+This project demonstrates what makes Gryd different:
+Zero capex for the developer — no impact on build cost or project margin
+Late-stage flexibility — Gryd integrated with an existing programme and installer, weeks before works were due to start
+Hands-on project support — from DNO engagement and system design to on-site sign-off against strict quality standards
+Resilience through disruption — Gryd stayed committed through contractor insolvency and programme delays
+Buyer choice — homeowners can subscribe or buy, removing barriers to sale
+Lower Farm Mews is a perfect example of what happens when a developer’s sustainability ambitions meet the right funding model. ZID had the vision — they just needed a partner who could remove the cost barrier without compromising on quality. That’s exactly what Gryd is built to do. We’re not a bolt-on at the end of a project. We become part of the team, working through the same challenges, and making sure every home is delivered with a system we’re proud to put our name on.
+Mohamed Gaafar, Co-Founder & CEO, Gryd
+Back to projects
+Read this online
+Request a site assessment
+Share this case study
+in
+X
+🔗
+Keep reading
+A Year of Live Data
+Twelve monitored months on an all electric barn conversion.
+Case study
+Funded Solar and Battery for Three New Build Homes in St. Ives, Cornwall: A year with a Gryd solar subscription
+St Ives, Cornwall 3 homes
+Four Specifications, One Site
+A technical director costed the funded model across 55 plots.
+Analysis
+Independent Developer Analysis of Gryd on a 55-Home Site
+East Anglia 55 homes
+Tell us about your site and we’ll model the numbers .
+A site assessment gives you system sizing per plot, the effect on EPC, and what the homeowner pays, before you commit to anything.
+Request a site assessment
+
+
+## St Ives, Cornwall, a year of live data
+
+Source: https://gryd.energy/hub-directions/g/projects/st-ives-year-of-data.html
+
+Funded Solar and Battery for Three New Build Homes in St. Ives, Cornwall: A year with a Gryd solar subscription
+A Year of Live Data
+Twelve monitored months across three all electric barn conversions in St Ives, Cornwall.
+Case study
+Funded Solar and Battery for Three New Build Homes in St. Ives, Cornwall: A year with a Gryd solar subscription
+Download
+SW
+Scott Whiteside
+26 April 2026
+Summary
+BK Developments partnered with Gryd on their barn conversion project in St. Ives, Cornwall — three all-electric Build-to-Rent homes with Air Source Heat Pumps. Rising build costs had forced the developer to abandon solar entirely. Gryd stepped in with a fully-funded solar and battery system provided at zero cost, upgrading the properties from no renewable energy to 49% grid independence.
+The result: EPC A-rated homes, £158.87 in verified first-year tenant savings (14.1%), ~0.81 tonnes of CO₂ avoided annually, and a clear demonstration of what can be achievedwith innovative solutions to renewables challenges.
+Key Details
+Developer BK Developments
+Project Barn conversion — 3 residential units
+Location St. Ives, Cornwall
+Type Build-to-Rent (BTR)
+Heating All-electric with ASHP
+System installed 10 solar panels and 5.4 kWh battery
+Data period April 2025 – March 2026 (12 months, monitored)
+Key Outcomes
+Zero additional cost to include solar and battery
+EPC uplift from B to A
+14.1% tenant bill saving (£158.87/year)
+49% of consumption met by on-site solar
+3,919 kWh of clean energy generated
+~0.81 tonnes of CO₂ avoided per year
+Gryd’s proof of concept validated with real data
+The Developer
+BK Developments is a property developer delivering high-quality residential homes in the South West of England. For the St. Ives project, they acquired a traditional barn with planning permission to convert it into three modern homes. They chose to run it as a Build-to-Rent (BTR) scheme, retaining the freehold and letting the properties to tenants on long-term rental agreements.
+The BTR model meant that running costs mattered. Tenants would be living in these homes day-to-day, paying the bills, and their experience would directly affect tenant experience, retention and rental yields. Getting the energy specification right was a commercial priority, not just a sustainability aspiration.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+The project delivered three all-electric residential properties in St. Ives, Cornwall — each fitted with Air Source Heat Pumps (ASHPs) for heating and hot water, eliminating gas dependency entirely. This aligned with current building regulations and the UK’s push toward net zero.
+However, with no gas alternative, electricity was the single largest running cost for tenants. Every kilowatt-hour of heating, hot water, cooking, and appliance use would come from the grid at the prevailing tariff rate — making the energy specification critical to the affordability of the homes.
+BK Developments recognised early on that adding solar panels would make the properties more attractive to prospective tenants and differentiate the scheme in a competitive Cornish rental market.
+The Challenge
+As the project progressed, rising build costs forced the developer to abandon their solar plans. The additional capital expenditure for panels, inverters, and battery storage across three units simply couldn’t be justified within the project budget.
+This left the developer with a dilemma:
+Without solar, tenants in all-electric ASHP homes would face the full cost of the Standard Variable Tariff for every kilowatt-hour consumed. With no gas alternative, winter bills would be particularly high — ASHP demand peaks in the coldest months when electricity is needed most.
+Adding solar would reduce tenant bills and improve the property’s appeal —but the cost had ruled it out.
+We always wanted solar on these homes. They’re all-electric with heat pumps, so we knew the energy bills would be the first thing tenants looked at. But when build costs started climbing, we had to make hard choices, solar was one of the things that fell off the spec. It was frustrating, because we could see the value it would add, but the numbers just didn’t work.
+Ben, Director, BK Developments
+The Solution
+How Gryd got involved
+BK Developments discovered Gryd and found a model that resolved the tension entirely. Gryd could deliver a fully-funded solar and battery system on each property, at zero capital cost to the developer.
+This was Gryd’s very first project — a proof of concept that would validate the model with real-world performance data from a live scheme.
+The Gryd model for BTR
+The BTR structure created a clean commercial arrangement:
+Gryd funds the solar and battery system on each property — no cost to BKDevelopments.
+The developer subscribes at £50/month for each unit, recovered from the tenant as part of their rental charge.
+Tenants benefit from solar generation that offsets their consumption, plus, as there is a battery in the system they can take advantage of a Time of Use Tariff, charging it overnight at a cost significantly below the SVT.
+The property improves — the SAP scores increase and each homes EPC rating moves from B to A, enhancing long-term asset value.
+12-Month Performance
+The following results are based on actual monitored data from the Gryd system at one of the three units over the 12-month period April 2025 to March 2026.
+Energy performance
+For half the year, the property generated more electricity than it consumed — a remarkable outcome for a UK property, particularly with only 10 panels installed. Even across the full year, nearly half of all consumption was met directly by solar and battery storage.
+Seasonal Profile
+During spring and summer, the system covered 76–83% of all consumption from solar — dramatically reducing grid reliance. Even in winter, the system still offset over a quarter of demand.
+Financial impact: tenant bill savings
+This is where the Gryd model delivers tangible value.
+Monthly Savings Breakdown
+Figures exclude daily standing charge, applicable with or without Gryd.
+Key takeaways from the data:
+11 out of 12 months delivered a positive saving. The only exception was May — the tenant was away on holiday for two weeks, reducing consumption to just 207 kWh. With the SVT bill at only £54.86, it fell marginally below the Gryd cost. The difference: just 59p. Under normal occupancy, May would almost certainly have delivered a positive saving.
+Even in Winter Gryd delivered. January delivered the largest monthly saving (£26.33). Despite minimal solar generation, the reduced per-kWh rate from the TOU tariff, made accessible as a result of the battery, meant significant savings with overnight charging to power the ASHP throughout the day.
+The £50 subscription pays for itself every month where consumption exceeds approximately 189 kWh — which was every month except May.
+Energy price sensitivity
+The saving grows as energy prices rise. At crisis-era SVT levels, the system would save nearly £356/year:
+Every £0.01/kWh increase in the SVT, approximately £26 is added to the annual saving. The Gryd subscription offers a natural hedge against energy market volatility.
+The Impact
+For the developer
+Zero additional build cost for solar and battery — abandoned due to rising construction costs; Gryd restored it at no expense EPC A ratings across all three properties (up from B)
+More attractive rental proposition — lower running costs and visible ESG credentials
+Regulatory future-proofing — an A rating provides substantial headroom above upcoming MEES requirements
+Higher asset value — EPC A correlates with stronger property valuations and rental yields
+For homeowners
+£158.87 saved per year (14.1%) — verified from 12 months of monitored data
+49% grid independence — nearly half of all electricity consumed came from on-site solar
+2,082 kWh of clean energy consumed on-site, avoiding approximately 0.81 tonnes of CO₂ per year
+Protection from energy price rises and market volatility — tenants are partially shielded from future energy price increases
+What Sets Gryd Apart
+Gryd funds the hardware. The developer pays nothing. Solar panels, batteries, inverters, and smart monitoring — all provided, installed, and maintained through Gryd’s SPV-funded model. Developers get best-in-class energy systems on every home without impacting build budgets.
+This project demonstrates what makes Gryd different:
+Zero capex for the developer — no impact on build cost or project margin
+Purpose-built for BTR — the subscription model aligns perfectly with rental properties, transferring seamlessly between tenants
+Real-world proof — 12 months of monitored data validates the model with verified savings, not projections
+Performance despite constraints — even with only 10 panels (vs a typical 14–16), the system delivered 49% grid independence and 14% bill savings
+EPC uplift — moving from B to A adds tangible value to the asset and future-proofs against regulation
+Energy price hedge — the fixed Gryd rate protects tenants from SVT volatility, with savings growing as prices rise
+Every developer we speak to faces the same tension. They want to build high performance homes, but the economics won’t stretch. This project proved that tension doesn’t have to exist. We now have twelve months of real-world evidence that our model delivers for every stakeholder, and that gives developers the confidence that greener, more affordable homes aren’t a trade-off. They’re the new standard.
+Mohamed Gaafar, Co-Founder & CEO, Gryd
+Back to projects
+Read this online
+Request a site assessment
+Share this case study
+in
+X
+🔗
+Keep reading
+Four Specifications, One Site
+A technical director costed the funded model across 55 plots.
+Analysis
+Independent Developer Analysis of Gryd on a 55-Home Site
+East Anglia 55 homes
+Higher Sustainability, Zero Build Cost
+Nine Norfolk homes taken from around 20% to around 70% energy coverage.
+Case study
+How Gryd helped deliver higher sustainability, without adding a penny to the build cost
+Tittleshall, Norfolk 9 homes EPC A
+Tell us about your site and we’ll model the numbers .
+A site assessment gives you system sizing per plot, the effect on EPC, and what the homeowner pays, before you commit to anything.
+Request a site assessment
+
+
+## A 55-home site in East Anglia, independent developer analysis
+
+Source: https://gryd.energy/hub-directions/g/projects/fifty-five-plot-analysis.html
+
+Independent Developer Analysis of Gryd on a 55-Home Site
+Four Specifications, One Site
+A technical director costed four specifications across 55 plots and published what he found.
+Analysis
+Independent Developer Analysis of Gryd on a 55-Home Site
+Download
+SW
+Scott Whiteside
+21 April 2026
+Overview
+This case study is based on an independent cost analysis conducted by the Technical Director of a UK SME house builder. The developer was evaluating how to meet increasingly stringent energy performance requirements on a 55-home development in East Anglia while protecting project margins.
+The analysis compared four specification scenarios across two approaches: the developers current approach of self-supply and a funded solar and battery solution from Gryd Energy. The findings were shared with Gryd, and the developer gave permission to publish the anonymised results.
+The Challenge
+The developer had built a reputation for delivering high-performance, all-electric homes with an EPC A rating. Their M&E specification was driven by two objectives:
+Low operational carbon
+EPC A as standard
+This was achieved through an all-electric, no-gas approach combining excellent fabric performance, direct electric panel radiators, mechanical ventilation with heat recovery (MVHR), waste water heat recovery (WWHR), and substantial rooftop solar PV.
+However, the transition from 2013 to 2021 Building Regulations introduced significantly more stringent requirements. PV requirements increased substantially, and the cost of maintaining an EPC A specification rose sharply.
+On their 55-home site, the two largest energy specification cost contributors were PV and MVHR, accounting for an average increase of £9,560 per plot to achieve the required standards. Although adding battery storage is not required under regulations, it had been an ambition. However, it would push costs to approximately £13,224 per plot and deemed unfeasible.
+At a time when build cost pressure across the sector was intensifying, the developer needed a route to maintain their energy specification advantage without absorbing five- or six-figure cost increases across the site.
+The Gryd Proposition: What Was Assessed
+rooftop solar PV.
+Gryd’s proposal for the 55-home site included:
+Sitewide Impact
+Hardware value: £455,277
+Total panels: 922
+Generating capacity: 406 kWp
+Batteries: 55 units
+Storage capacity: 550 kWh
+CO₂ eliminated: 60.4 tonnes/year
+Per-Home Impact (Averages)
+Panels per home: 17 (range: 12–24)
+Battery per home: 10 kWh
+Demand served on-site: 69.2%
+Year 1 bill saving: 19.9%
+Lifetime saving: £36,610
+Monthly subscription: £70 avg (£56–£87)
+Gryd would specify, fund, and manage the energy systems. Installation would be carried out by the developer’s own subcontractors or a Gryd-recommended installer. The equipment would remain Gryd’s property under an air rights lease structure, serviced and maintained at Gryd’s cost for 25 years. The homeowner can choose to take ownership at any time, and after 25 years, the system is gifted to the homeowner.
+The Evaluation
+The Technical Director conducted a structured comparison of four scenarios across two approaches, using real costs from the 55-home site. Scenario 1 represents the cost to the developer of meeting their objectives with their current approach of funding all required components, this is the the base case to measure against. Scenario 2 is the same as Scenario 1, but includes a battery in the specification to enable direct comparison with Gryd’s proposal presented in Scenarios 3 and 4. Costs in the table represent the additional cost above the developer’s 2013 Building Regulations baseline for meeting the required compliance and the developer’s low carbon and EPC objectives.
+Cost Savings: The Developer ‘ s Findings
+The analysis demonstrated significant savings with Gryd’s offering, which are further improved with the enhanced renewables spec giving the opportunity to replace MVHR with dMEV.
+Scenario 3: Gryd with MVHR retained
+Total Site Cost: £304,375
+Saving vs Scenario 1: £221,400 (42% reduction)
+Cost per plot: £5,534 (down from £9,560)
+Scenario 4: Gryd with MVHR replaced by dMEV
+Total Site Cost: £150,375
+Saving vs Scenario 1: £375,400 (71% reduction)
+Cost per plot: £2,734 (down from £9,560)
+With Gryd covering all hardware costs for the energy systems, the remaining major costs to the developer were installation labour (~£94k, or £1,790/plot), EV chargers (~£32k, or £575/plot) and the cost of the ventilation strategy.
+MVHR systems represented a significant per-plot cost (£3,250/plot) and were also a source of ongoing customer care issues.
+The switch from MVHR to dMEV was made possible by the larger solar array specified under the Gryd scenarios and the inclusion of battery storage. Under 2021 Part L (the regulations applicable to this site), MVHR contributed meaningful SAP points through its heat recovery performance. Removing it would normally reduce the home’s SAP score and risk losing the EPC A rating. However, the larger solar array (well beyond minimum compliance), combined with battery storage, generated sufficient additional SAP points to offset the loss of MVHR’s contribution. This gave the developer the opportunity to replace MVHR with simpler, lower-cost dMEV at approximately £450/plot while maintaining the target EPC rating.
+Strategic Benefits Identified by the Developer
+Beyond direct cost savings, the developer’s analysis identified several strategic advantages:
+Batteries as a new market differentiator.
+The developer found little to no new-build competition in their price range offering battery storage as standard. In a market where EPC A ratings are becoming more common (6% of new builds and rising), batteries represented a genuinely novel selling point.
+Day-one buyout as a sales tool.
+With an outright purchase option available to homebuyers at a competitive price, the subscription model could flex to suit different buyer preferences without affecting the developer’s cost base.
+Zero customer care liability on energy systems.
+All equipment would be owned, serviced, and maintained by Gryd for 25 years. The developer would carry no aftercare obligation for PV, batteries, or inverters.
+Elimination of MVHR maintenance burden.
+MVHR systems were costly to install and were generating customer care issues post-completion. A funded model with battery storage opened the door to replacing MVHR with simpler, lower-maintenance dMEV systems.
+The Broader Context
+This analysis was conducted under 2021 Building Regulations against the backdrop of the UK’s transition to the Future Homes Standard. The FHS, published in March 2026 and effective from March 2027, mandates on-site renewable generation, low-carbon heating, and tighter airtightness for all new homes. Because this developer was already targeting an all-electric, high-performance EPC A specification, their fabric, ventilation, and solar PV already align with or exceed FHS expectations. The principal additional change required would be the transition from direct electric heating to heat pumps. The solar and battery components assessed here remain directly applicable under the FHS, where on-site renewable generation is a functional requirement.
+The conclusion reached by the developer was clear, a funded solar and battery model does not require compromise. It can simultaneously reduce build cost, improve the specification, eliminate maintenance liability, and strengthen the sales proposition.
+Want the full Case Study?
+For more information and additional photos from site, please download the full case study as a PDF.
+Back to projects
+Read this online
+Request a site assessment
+Share this case study
+in
+X
+🔗
+Keep reading
+Higher Sustainability, Zero Build Cost
+Nine Norfolk homes taken from around 20% to around 70% energy coverage.
+Case study
+How Gryd helped deliver higher sustainability, without adding a penny to the build cost
+Tittleshall, Norfolk 9 homes EPC A
+A Year of Live Data
+Twelve monitored months on an all electric barn conversion.
+Case study
+Funded Solar and Battery for Three New Build Homes in St. Ives, Cornwall: A year with a Gryd solar subscription
+St Ives, Cornwall 3 homes
+Tell us about your site and we’ll model the numbers .
+A site assessment gives you system sizing per plot, the effect on EPC, and what the homeowner pays, before you commit to anything.
+Request a site assessment

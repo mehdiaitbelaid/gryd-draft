@@ -1,19 +1,75 @@
 # Gryd
 
-> At Gryd, we make solar simple. Gryd offers developers and homeowners a smarter way to power new-build homes by providing fully-funded solar and storage that exceeds regulations and expectations.
+> At Gryd, we make solar simple. Homes that are cheaper to build and more affordable to run.
+
+Gryd Energy Ltd funds, specifies and manages solar panels, battery storage and a hybrid inverter on new build homes in the United Kingdom. The developer pays nothing for the hardware. The buyer either subscribes at a fixed price or buys the system outright.
+
+Full text of the pages below, for citation: [llms-full.txt](https://gryd.energy/llms-full.txt)
+
+## What Gryd does
+
+At Gryd, we make solar simple. Gryd offers developers and homeowners a smarter way to power new-build homes by providing fully-funded solar and storage that exceeds regulations and expectations.
 
 Fully funded solar and batteries. Meeting compliance. Reducing build cost. Unlocking developments.
 
 Homes that are cheaper to build and more affordable to run.
 
+Solar may be the new standard, but not all solar is smart. With a fully managed, software-powered model, Gryd delivers high-performance solar systems that work better for homeowners, meet the next wave of regulations, and support the energy system of tomorrow.
+
+Source: [Home](https://gryd.energy/home-final/draft/index.html)
+
+## Who it is for, and what it costs
+
+For developers:
+
+- £0 hardware cost. Gryd funds all solar panel, battery, inverter and monitoring hardware.
+- Future Homes Standard compliance. Gryd systems meet and typically exceed the FHS on-site renewable generation requirement.
+- SAP uplift of 10 to 20 points, typically an EPC improvement of at least one level.
+- No increase in build cost, so homes stay affordable and your margins don't get squeezed.
+- Deployable to all unit types. Gryd won't cherry-pick only the best plots like some others, we can deploy smart solar to every unit.
+
+For homeowners:
+
+- Lower energy bills from day one, typically 20 to 30%.
+- Significant lifetime savings, up to £50,000 over the 25-year life of the system.
+- Fixed, inflation-proof subscription, locked in for 25 years.
+- 25-year Gryd Guarantee with zero maintenance burden, covering insurance, 24/7 monitoring, servicing and maintenance.
+- Flexibility and choice. Homeowners can subscribe to the system or buy it outright at any time for a transparent price that reduces over time.
+
+Gryd funds all solar panel, battery, inverter and monitoring hardware on every plot. The developer pays nothing for the renewable energy equipment. The developer covers installation labour as part of the normal build programme, using their own MCS-certified subcontractor or a Gryd-recommended installer partner.
+
+Source: [Home](https://gryd.energy/home-final/draft/index.html), [FAQs](https://gryd.energy/hub-directions/g/faq.html)
+
+## The five stages
+
+Five steps, from your drawings to a home that powers itself.
+
+01. **Assess.** Send us your planning drawings and we’ll model the optimal solar and battery system, bespoke for every plot. We’ll share an indicative proposal including system design, energy performance, savings and subscriptions, usually within a week.
+02. **Design.** Gryd solar and battery systems are optimally designed for each home’s size, orientation and expected demand. We typically achieve over 70% coverage of a home’s annual energy demand, and 10 to 15 SAP points gained.
+03. **Deploy.** We fund 100% of the hardware, panels, battery and hybrid inverter You install it as part of the build programme using your own team or our trusted partners. Gryd works around your construction programme, everything arrives on site exactly when it is needed.
+04. **Handover.** Your buyers can choose to subscribe to our fixed price energy-as-a-service contract or buy-out the system at any stage at a lower cost than a retrofit. Either way they are getting a high quality home that costs less to run.
+05. **Operate and Optimise.** For those who subscribe, Gryd monitors every system 24/7 and intelligently optimises them around each home’s usage and tariff. Gryd maintains the hardware under the Gryd Guarantee for the life of the subscription. Homeowners get full visibility in the Gryd app, plus recommendations on how to reduce whatever they still buy from the grid. No maintenance calls come back to you.
+
+Source: [Home](https://gryd.energy/home-final/draft/index.html)
+
 ## Tools
 
 Three tools. Each answers a question before you commit a plot. One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.
 
-- [Tools](https://gryd.energy/hub-directions/g/tools.html): the three tools, and what each one answers.
-- [Site assessment](https://gryd.energy/hub-directions/g/site-assessment.html): roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.
-- [Future Homes Standard readiness check](https://gryd.energy/hub-directions/g/fhs.html): three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.
-- [Council Solar Index](https://gryd.energy/hub-directions/g/council-solar-index.html): interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.
+- [Site assessment](https://gryd.energy/hub-directions/g/site-assessment.html): Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.
+- [Future Homes Standard readiness check](https://gryd.energy/hub-directions/g/fhs.html): Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.
+- [Council Solar Index](https://gryd.energy/hub-directions/g/council-solar-index.html): Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.
+- [All three tools](https://gryd.energy/hub-directions/g/tools.html): the three tools, and what each one answers.
+
+## Projects, with the published numbers
+
+- [Lower Farm Mews, Tittleshall, Norfolk](https://gryd.energy/hub-directions/g/projects/lower-farm-mews.html): Nine homes in Tittleshall, Norfolk, taken from around 20% to around 70% energy coverage.
+- [St Ives, Cornwall, a year of live data](https://gryd.energy/hub-directions/g/projects/st-ives-year-of-data.html): Twelve monitored months across three all electric barn conversions in St Ives, Cornwall.
+- [A 55-home site in East Anglia, independent developer analysis](https://gryd.energy/hub-directions/g/projects/fifty-five-plot-analysis.html): A technical director costed four specifications across 55 plots and published what he found.
+
+Lower Farm Mews, Tittleshall, Norfolk. Nine new homes with Zero In Developments, four 3-beds and five 4-beds. Solar and battery on every plot, all achieve EPC A, £90k saved on project build cost and a 20% saving on total home energy from day one.
+
+Source: [Projects](https://gryd.energy/hub-directions/g/projects.html)
 
 ## Key pages
 
@@ -22,7 +78,16 @@ Three tools. Each answers a question before you commit a plot. One sizes the sol
 - [Knowledge Hub](https://gryd.energy/hub-directions/g/blog.html)
 - [News](https://gryd.energy/hub-directions/g/news.html)
 - [FAQs](https://gryd.energy/hub-directions/g/faq.html)
+- [Future Homes Standard](https://gryd.energy/hub-directions/g/fhs.html)
 - [Request a site assessment](https://gryd.energy/hub-directions/g/request-site-assessment.html)
+
+## Contact
+
+- Email: hello@gryd.energy
+- Press: press@gryd.energy
+- Telephone: 0204 572 6364
+- LinkedIn: https://www.linkedin.com/company/grydenergy
+- Gryd Energy Ltd, London, United Kingdom. Company no. 15092056.
 
 ## Legal
 

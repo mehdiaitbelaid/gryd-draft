@@ -24,3 +24,6 @@ User-agent: Bingbot
 Allow: /
 
 Sitemap: https://gryd.energy/sitemap.xml
+
+# llms: https://gryd.energy/llms.txt
+# llms-full: https://gryd.energy/llms-full.txt
