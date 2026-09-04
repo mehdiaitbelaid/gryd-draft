@@ -31,10 +31,12 @@
 @media (min-width: 901px) {
 
 /* ------------------------------------------------------------- the capsule */
-/* Sized once in pixels by the script and moved with translate3d plus a scaleX
-   off that size, so its width is never a layout property. transform-origin at
-   the left edge is what makes that scale mean "this item's width" rather than
-   "this item's width about its own centre". */
+/* Moved with translate3d and sized by a written width, both off one cached
+   measurement pass. Width on an absolutely positioned element out of the flow
+   costs no sibling a reflow, and it is the only way the 999px radius resolves
+   against the item the capsule is actually sitting on: a box scaled on one
+   axis carries a radius scaled with it, which is what made Developers read
+   stretched and FHS compressed. */
 .dnav .cap {
   display: block; position: absolute; left: 0; top: 0; z-index: 0;
   width: 1px; height: 1px; transform-origin: 0 0;

@@ -23,7 +23,7 @@
 
    Everything the loop touches is transform and opacity. The capsule's box is
    sized once, off a cached measurement, and the travel is translate3d plus a
-   scaleX off that base width, so no frame of the animation reads or writes
+   a written width off that measurement, so no frame of the animation reads
    layout. Geometry is measured on load, when the fonts land and on resize, and
    never inside the loop.
 
@@ -84,15 +84,16 @@
         });
         total += r.width;
       });
-      // the capsule is scaled rather than resized, so its own box is fixed. The
-      // base is the mean item width, which keeps every scale factor near 1 and
-      // the rounded ends from reading as ellipses at the extremes.
+      // Scott, 4 September: Developers read stretched and FHS compressed. The
+      // capsule used to be one fixed box scaled on x, and scaling a 999px
+      // radius on one axis turns the ends into ellipses whose eccentricity is
+      // the item's own width over the mean. The width is written straight now,
+      // so the radius resolves against the real box on every item and all five
+      // ends are the same half circle. The base survives as the spring's
+      // starting length and nothing else.
       base = Math.max(1, total / links.length);
       capH = geo.get(links[0]).h;
-      if (cap) {
-        cap.style.width = base + 'px';
-        cap.style.height = capH + 'px';
-      }
+      if (cap) { cap.style.height = capH + 'px'; }
       measured = true;
       if (shown && anchor) target(anchor, drift);
     }
@@ -105,8 +106,8 @@
     var raf = 0, last = 0, shown = false, anchor = null, drift = 0;
 
     function paint() {
-      cap.style.transform = 'translate3d(' + sx.p + 'px,' + ty + 'px,0) scaleX('
-        + (sw.p / base) + ')';
+      cap.style.transform = 'translate3d(' + sx.p + 'px,' + ty + 'px,0)';
+      cap.style.width = sw.p + 'px';
     }
 
     function settled() {

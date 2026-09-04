@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gryd homepage, rough draft</title>
+<link rel="icon" href="../assets/img/icon/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="../assets/img/icon/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/icon/icon-32.png">
+<link rel="apple-touch-icon" href="../assets/img/icon/icon-180.png">
+<link rel="manifest" href="../assets/img/icon/site.webmanifest">
+<meta name="theme-color" content="#FF5532">
 <style>
 /* The pill is the first thing on the screen and it must never depend on a
    stylesheet arriving to be the right size. Safari sizes artwork that carries
@@ -866,7 +872,7 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
 
    Everything the loop touches is transform and opacity. The capsule's box is
    sized once, off a cached measurement, and the travel is translate3d plus a
-   scaleX off that base width, so no frame of the animation reads or writes
+   a written width off that measurement, so no frame of the animation reads
    layout. Geometry is measured on load, when the fonts land and on resize, and
    never inside the loop.
 
@@ -927,15 +933,16 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
         });
         total += r.width;
       });
-      // the capsule is scaled rather than resized, so its own box is fixed. The
-      // base is the mean item width, which keeps every scale factor near 1 and
-      // the rounded ends from reading as ellipses at the extremes.
+      // Scott, 4 September: Developers read stretched and FHS compressed. The
+      // capsule used to be one fixed box scaled on x, and scaling a 999px
+      // radius on one axis turns the ends into ellipses whose eccentricity is
+      // the item's own width over the mean. The width is written straight now,
+      // so the radius resolves against the real box on every item and all five
+      // ends are the same half circle. The base survives as the spring's
+      // starting length and nothing else.
       base = Math.max(1, total / links.length);
       capH = geo.get(links[0]).h;
-      if (cap) {
-        cap.style.width = base + 'px';
-        cap.style.height = capH + 'px';
-      }
+      if (cap) { cap.style.height = capH + 'px'; }
       measured = true;
       if (shown && anchor) target(anchor, drift);
     }
@@ -948,8 +955,8 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
     var raf = 0, last = 0, shown = false, anchor = null, drift = 0;
 
     function paint() {
-      cap.style.transform = 'translate3d(' + sx.p + 'px,' + ty + 'px,0) scaleX('
-        + (sw.p / base) + ')';
+      cap.style.transform = 'translate3d(' + sx.p + 'px,' + ty + 'px,0)';
+      cap.style.width = sw.p + 'px';
     }
 
     function settled() {
@@ -1649,9 +1656,6 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
 </section>
 
 <section class="sec tight a-seen">
-  <div class="wrap">
-    <span class="eyebrow sec-label">Seen in</span>
-  </div>
   <div class="press">
     <div class="p-rail rail-soft">
       <div class="p-track">
@@ -1664,22 +1668,24 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
 
 <section class="sec sys" id="developers"
          aria-label="The Gryd process, five steps from drawings to a home that powers itself">
-  <div class="wrap">
-    <span class="eyebrow sec-label">The Gryd process</span>
-    <h2 class="sec-head">Five steps, from your drawings to a home that powers itself.</h2>
-  </div>
   <div class="sys-track" id="sysTrack">
     <div class="sys-pin" id="sysPin" data-step="1"
          data-duration="20.0417" data-windows='[[0.0, 3.75], [3.75, 8.875], [8.875, 14.75], [14.75, 16.0417], [16.0417, 20.0417]]'
          data-curve='[[0.0, 0.0], [0.025, 0.15], [0.354721, 7.25], [0.379721, 7.55], [0.64907, 13.35], [0.67407, 13.65], [0.771208, 15.7417], [0.796208, 16.0417], [0.975, 19.8917], [1.0, 20.0417]]'>
-      <ol class="sys-steps"><li class="sys-step sys-row"><div class="txt"><span class="n">01</span><h3>Assess</h3><p>Send us your planning drawings and we&rsquo;ll model the optimal solar and battery system, bespoke for every plot. We&rsquo;ll share an indicative proposal including system design, energy performance, savings and subscriptions, usually within a week.</p><div class="labs"><span><em>Site postcode</em>NR20, received</span><span><em>Turnaround</em>Numbers back in a week</span></div></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state1-1600.webp"><img src="../assets/img/system/state1-1600.png" alt="" width="1600" height="893" decoding="async" fetchpriority="high"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">02</span><h3>Design</h3><p>Gryd solar and battery systems are optimally designed for each home&rsquo;s size, orientation and expected demand. We typically achieve over 70% coverage of a home&rsquo;s annual energy demand, and 10 to 15 SAP points gained.</p><div class="labs"><span><em>Array size</em>Sized in kWp, plot by plot</span><span><em>SAP uplift</em>+10 to 15 points</span></div></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state2-1600.webp"><img src="../assets/img/system/state2-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">03</span><h3>Deploy</h3><p>We fund 100% of the hardware, panels, battery and hybrid inverter You install it as part of the build programme using your own team or our trusted partners. Gryd works around your construction programme, everything arrives on site exactly when it is needed.</p><div class="labs"><span><em>Hardware cost</em>&pound;0 to the developer</span><span><em>Install</em>Your team or our partners</span></div></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state3-1600.webp"><img src="../assets/img/system/state3-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">04</span><h3>Handover</h3><p>Your buyers can choose to subscribe to our fixed price energy-as-a-service contract or buy-out the system at any stage at a lower cost than a retrofit. Either way they are getting a high quality home that costs less to run.</p><div class="labs"><span><em>Plot status</em>Sold, no price premium</span><span><em>Subscription</em>&pound;74 fixed monthly</span></div></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state4-1600.webp"><img src="../assets/img/system/state4-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">05</span><h3>Operate and Optimise</h3><p>For those who subscribe, Gryd monitors every system 24/7 and intelligently optimises them around each home&rsquo;s usage and tariff. Gryd maintains the hardware under the Gryd Guarantee for the life of the subscription. Homeowners get full visibility in the Gryd app, plus recommendations on how to reduce whatever they still buy from the grid. No maintenance calls come back to you.</p><div class="labs"><span><em>Generation</em>70%+ of the home covered</span><span><em>Gryd Guarantee</em>For the life of the subscription</span></div></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state5-1600.webp"><img src="../assets/img/system/state5-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li></ol>
-      <div class="sys-lineholder sys-row">
-        <div class="sys-rail">
-          <span class="sys-bar" aria-hidden="true"><i></i></span>
-          <nav class="sys-ticks" aria-label="Jump to a step"><button type="button" data-step-to="0" class="on" aria-label="Go to step 01, Assess">01</button><button type="button" data-step-to="1" aria-label="Go to step 02, Design">02</button><button type="button" data-step-to="2" aria-label="Go to step 03, Deploy">03</button><button type="button" data-step-to="3" aria-label="Go to step 04, Handover">04</button><button type="button" data-step-to="4" aria-label="Go to step 05, Operate and Optimise">05</button></nav>
-        </div>
-        <div class="sys-frame" aria-hidden="true">
-          <video class="sys-film" id="sysVideo" muted playsinline preload="auto" disablepictureinpicture poster="../assets/img/system/state1-1600.png"><source src="../assets/video/system/system-scroll-720.mp4" type="video/mp4" media="(max-width: 1000px)"><source src="../assets/video/system/system-scroll.mp4" type="video/mp4"></video>
+      <div class="wrap sys-head">
+        <span class="eyebrow sec-label">The Gryd process</span>
+        <h2 class="sec-head">Five steps, from your drawings to a home that powers itself.</h2>
+      </div>
+      <div class="sys-stage">
+        <ol class="sys-steps"><li class="sys-step sys-row"><div class="txt"><span class="n">01</span><h3>Assess</h3><p>Send us your planning drawings and we&rsquo;ll model the optimal solar and battery system, bespoke for every plot. We&rsquo;ll share an indicative proposal including system design, energy performance, savings and subscriptions, usually within a week.</p></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state1-1600.webp"><img src="../assets/img/system/state1-1600.png" alt="" width="1600" height="893" decoding="async" fetchpriority="high"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">02</span><h3>Design</h3><p>Gryd solar and battery systems are optimally designed for each home&rsquo;s size, orientation and expected demand. We typically achieve over 70% coverage of a home&rsquo;s annual energy demand, and 10 to 15 SAP points gained.</p></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state2-1600.webp"><img src="../assets/img/system/state2-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">03</span><h3>Deploy</h3><p>We fund 100% of the hardware, panels, battery and hybrid inverter You install it as part of the build programme using your own team or our trusted partners. Gryd works around your construction programme, everything arrives on site exactly when it is needed.</p></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state3-1600.webp"><img src="../assets/img/system/state3-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">04</span><h3>Handover</h3><p>Your buyers can choose to subscribe to our fixed price energy-as-a-service contract or buy-out the system at any stage at a lower cost than a retrofit. Either way they are getting a high quality home that costs less to run.</p></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state4-1600.webp"><img src="../assets/img/system/state4-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li><li class="sys-step sys-row"><div class="txt"><span class="n">05</span><h3>Operate and Optimise</h3><p>For those who subscribe, Gryd monitors every system 24/7 and intelligently optimises them around each home&rsquo;s usage and tariff. Gryd maintains the hardware under the Gryd Guarantee for the life of the subscription. Homeowners get full visibility in the Gryd app, plus recommendations on how to reduce whatever they still buy from the grid. No maintenance calls come back to you.</p></div><div class="sys-frame"><picture class="sys-plate"><source type="image/webp" srcset="../assets/img/system/state5-1600.webp"><img src="../assets/img/system/state5-1600.png" alt="" width="1600" height="893" decoding="async" loading="lazy"></picture></div></li></ol>
+        <div class="sys-lineholder sys-row">
+          <div class="sys-rail">
+            <span class="sys-bar" aria-hidden="true"><i></i></span>
+            <nav class="sys-ticks" aria-label="Jump to a step"><button type="button" data-step-to="0" class="on" aria-label="Go to step 01, Assess">01</button><button type="button" data-step-to="1" aria-label="Go to step 02, Design">02</button><button type="button" data-step-to="2" aria-label="Go to step 03, Deploy">03</button><button type="button" data-step-to="3" aria-label="Go to step 04, Handover">04</button><button type="button" data-step-to="4" aria-label="Go to step 05, Operate and Optimise">05</button></nav>
+          </div>
+          <div class="sys-frame" aria-hidden="true">
+            <video class="sys-film" id="sysVideo" muted playsinline preload="auto" disablepictureinpicture poster="../assets/img/system/state1-1600.png"><source src="../assets/video/system/system-scroll-720.mp4" type="video/mp4" media="(max-width: 1000px)"><source src="../assets/video/system/system-scroll.mp4" type="video/mp4"></video>
+          </div>
         </div>
       </div>
     </div>
@@ -1748,6 +1754,8 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
         </div>
         <div class="showcase-side">
           <a class="btn showcase-case" href="../../hub-directions/g/projects/lower-farm-mews.html">Lower Farm Mews case study</a>
+          <a class="btn ghost showcase-film" href="https://youtu.be/TmPOK0nzkcc?si=nbX0GdFrsO_u4mDf"
+             target="_blank" rel="noopener">Watch the full video</a>
         </div>
       </div>
       
@@ -1876,7 +1884,7 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
       </div>
       <div class="f-base">
         <span>&copy; 2026 Gryd Energy Ltd. Company no. 15092056</span>
-        <span class="f-policy"><a href="../../hub-directions/g/privacy-policy.html">Privacy policy</a><span aria-hidden="true">·</span><a href="../../hub-directions/g/cookie-policy.html">Cookie policy</a></span>
+        <span class="f-policy"><a href="../../hub-directions/g/privacy-policy.html">Privacy policy</a><span class="f-dot" aria-hidden="true"> · </span><a href="../../hub-directions/g/cookie-policy.html">Cookie policy</a></span>
       </div>
     </div>
   </div>

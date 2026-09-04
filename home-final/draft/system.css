@@ -18,7 +18,25 @@
    moving frames; a shorter track raises the motion density again, so a
    hand's worth of scrolling is always worth a visible change. */
 .sys-track { position: relative; height: var(--sys-track-height); }
-.sys-pin { position: sticky; top: 0; height: var(--sys-pin-height); overflow: hidden; }
+.sys-pin {
+  position: sticky; top: 0; height: var(--sys-pin-height); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+/* Scott, 4 September: the eyebrow and the heading belong to the pinned block
+   rather than to a band above it, so they ride the whole scroll with the steps
+   instead of scrolling away on the first screen. The intro takes its own line
+   at the top of the pin and the stage takes the rest, which is what the five
+   absolute rows and the film now measure themselves against. */
+/* width 100%, because .wrap centres itself with auto side margins and auto
+   margins beat a flex item's stretch: without this the intro shrinks to its
+   own text and stops sitting on the content column every other band uses. */
+.sys-head { flex: none; width: 100%; padding-top: max(9vh, 72px); padding-bottom: 10px; }
+/* Mehdi, 4 September: the intro reads as the copy column's own header, so
+   its measure is held inside the half of the screen the words live in
+   rather than running to the shared heading measure and finishing over
+   the film. */
+.sys-head .sec-head { margin-bottom: 0; max-width: 17ch; }
+.sys-stage { position: relative; flex: 1 1 auto; min-height: 0; }
 
 /* one row, five times over, plus the line's own.
 
@@ -200,18 +218,6 @@
   font-size: 20px; line-height: 1.68; color: var(--ink-soft);
   max-width: 37ch; margin: 22px 0 0;
 }
-/* The pairs share the paragraph's measure, so their rules start and stop on the
-   same two verticals the text does. At 34ch they stopped short of it, which read
-   as a third margin in a column that only has two. */
-.sys-step .labs { display: grid; gap: 0; margin-top: 30px; max-width: 37ch; }
-.sys-step .labs span {
-  font-size: 15px; color: var(--warm-grey);
-  border-top: 1px solid var(--stone-mid); padding: 13px 0;
-}
-.sys-step .labs em {
-  display: block; font-style: normal; color: var(--red110); font-weight: 500;
-}
-
 /* ------------------------------------------- the copy column's own left edge */
 /* The rail is not a separate bar parked at the bottom of the screen any more.
    It is the edge of the copy column: a vertical spine carrying the progress
@@ -291,7 +297,9 @@
    its own words, in order. No pin, no line, nothing to scrub. */
 @media (max-width: 900px), (prefers-reduced-motion: reduce) {
   .sys-track { height: auto; }
-  .sys-pin { position: static; height: auto; overflow: visible; padding: 8px 0 64px; }
+  .sys-pin { position: static; height: auto; overflow: visible; padding: 8px 0 64px; display: block; }
+  .sys-head { padding-top: 0; padding-bottom: 22px; }
+  .sys-stage { position: static; }
   .sys-steps { display: grid; gap: 56px; padding: 0 max(20px, calc((100% - var(--measure)) / 2)); }
   /* the artwork leads each block, the way it leads each step on the pin */
   /* the grid placement of the pinned layout has to go with the grid itself,

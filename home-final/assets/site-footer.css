@@ -35,12 +35,20 @@ footer.foot .wrap { display: block; }
 /* the company line, with the two policy pages on their own small row beneath.
    Mehdi, 4 September: both lines sit on the right hand edge of the content
    column, stacked, and the policy line is held on one line. */
+/* One column at every width, so the two lines stack on the right edge rather
+   than splitting into a left and a right half on a wide window. Named rather
+   than left to grid's default, because a default is what a later rule takes
+   away by accident. */
 .foot .f-base { margin-top: 46px; padding-top: 22px;
-  border-top: 1px solid var(--stone-mid); display: grid; justify-items: end;
+  border-top: 1px solid var(--stone-mid);
+  display: grid; grid-template-columns: minmax(0, 1fr); justify-items: end;
   text-align: right;
   gap: 10px; font-size: 13px; color: var(--ink-soft, #6B4A3E); }
-.foot .f-policy { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+.foot .f-policy { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap;
   white-space: nowrap; }
+/* the separator carries its own air as well as the gap, so the line reads the
+   same whether or not the flex gap is what is drawing it */
+.foot .f-dot { padding: 0 3px; }
 @media (max-width: 900px) { .foot .f-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) {
   .foot .f-grid { grid-template-columns: 1fr; }
