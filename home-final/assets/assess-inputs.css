@@ -1,0 +1,140 @@
+/* The three question screens. No selector here names the popup or the page, so
+   the same sheet dresses both. Colours fall back to tokens.css names, and to
+   the literal palette where tokens.css is not on the page. */
+
+.ai-root {
+  --ai-paper: var(--paper, #F8F6F2);
+  --ai-plate: var(--stonelight, #EFEAE3);
+  --ai-ink: var(--red110, #4E251B);
+  --ai-grey: var(--warm-grey, #8A776E);
+  --ai-line: var(--stone-mid, #D8CFC5);
+  --ai-flare: var(--flare, #FF5532);
+  color: var(--ai-ink);
+}
+
+.ai-screen[hidden] { display: none; }
+
+.ai-eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ai-grey);
+  margin-bottom: 6px;
+}
+.ai-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 1.5px;
+  background: var(--ai-flare);
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.ai-screen h2 { font-size: 20px; line-height: 1.2; margin: 0 0 6px; font-weight: 500; }
+.ai-stand { font-size: 13px; color: var(--ai-grey); margin: 0 0 16px; max-width: 60ch; }
+
+/* one hairline per field, and the label sits above it rather than in a box */
+.ai-field { margin: 16px 0 4px; max-width: 320px; }
+.ai-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ai-grey);
+  margin-bottom: 2px;
+}
+.ai-field input {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  background: transparent;
+  color: var(--ai-ink);
+  border: 0;
+  border-bottom: 1px solid var(--ai-line);
+  border-radius: 0;
+  padding: 6px 0 7px;
+  transition: border-color .2s ease;
+}
+.ai-field input:focus { outline: 0; border-bottom-color: var(--ai-flare); }
+.ai-field ::placeholder { color: var(--ai-grey); opacity: .8; }
+.ai-note { display: block; font-size: 12px; color: var(--ai-flare); margin-top: 5px; }
+.ai-note[hidden] { display: none; }
+
+/* the tap tiles */
+.ai-tiles { display: grid; gap: 16px; margin: 4px 0 8px; }
+.ai-tiles-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 520px; }
+.ai-tiles-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 400px; }
+.ai-tiles-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 300px; }
+.ai-tiles-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 260px; }
+.ai-tiles-wide { margin-top: 18px; }
+
+.ai-tile {
+  font: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0 0 10px;
+  margin: 0;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  color: var(--ai-grey);
+}
+.ai-tile img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: saturate(.35) opacity(.55);
+  transition: filter .25s ease, transform .25s ease;
+}
+.ai-tile .ai-tile-name {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.ai-compass, .ai-glyph { width: 38px; height: 38px; display: block; margin: 4px auto 2px; opacity: .55; transition: opacity .25s ease; }
+.ai-tile-plain .ai-band-n {
+  display: block;
+  font-size: 13px;
+  padding: 12px 4px 10px;
+  border-radius: 12px;
+  background: var(--ai-plate);
+  transition: color .2s ease;
+}
+.ai-tile-plain .ai-tile-name { display: none; }
+.ai-tile-glyph .ai-tile-name { font-size: 10px; }
+.ai-tile::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ai-flare);
+  transform: translateX(-50%);
+  transition: width .25s cubic-bezier(.22,.61,.36,1);
+}
+.ai-tile:hover img { filter: saturate(.7) opacity(.85); }
+.ai-tile:hover .ai-compass, .ai-tile:hover .ai-glyph { opacity: .85; }
+.ai-tile[aria-pressed="true"] { color: var(--ai-ink); }
+.ai-tile[aria-pressed="true"] img { filter: none; transform: translateY(-2px); }
+.ai-tile[aria-pressed="true"] .ai-compass,
+.ai-tile[aria-pressed="true"] .ai-glyph { opacity: 1; color: var(--ai-flare); }
+.ai-tile[aria-pressed="true"]::after { width: 20px; }
+.ai-tile:focus-visible { outline: 2px solid var(--ai-flare); outline-offset: 3px; }
+
+/* the split */
+.ai-sliders { margin: 14px 0 4px; max-width: 420px; }
+.ai-slider { display: grid; grid-template-columns: 92px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 3px 0; }
+.ai-slider label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ai-grey); }
+.ai-slider output { font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.ai-slider input[type="range"] { width: 100%; accent-color: var(--ai-flare); background: transparent; }
+.ai-sum { font-size: 12px; color: var(--ai-grey); margin: 6px 0 0; }
+
+@media (max-width: 720px) {
+  .ai-tiles-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ai-tiles-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ai-slider { grid-template-columns: 80px minmax(0, 1fr) 40px; }
+}

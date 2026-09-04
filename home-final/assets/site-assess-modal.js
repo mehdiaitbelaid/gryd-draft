@@ -1,161 +1,135 @@
 /* The site assessment popup. Hand written, injected on every page by
-   site-nav.js alongside site-assess-modal.css.
+   site-nav.js.
+
+   Since 4 September the popup is the whole tool: three screens of questions,
+   then a name and an email, then the full assessment summary. There is no
+   teaser in between. The questions come from assess-inputs.js and the summary
+   from assess-result.js, both of which the tools page mounts too, so this file
+   only orchestrates: it owns the plate, the stage dash, the nav buttons and the
+   gate, and nothing else.
 
    Every Request a site assessment button on the site, the nav's included, keeps
    its href to hub-directions/g/request-site-assessment.html so a reader without
-   this script, or one following a shared link, still lands somewhere real. With
-   the script running the click opens this modal in place instead: the same
-   three stages and the same twelve questions as the tools page, at the site's
-   body sizes, in a plate that closes on Escape and hands focus back to the
-   button that opened it.
+   this script, or one following a shared link, still lands somewhere real.
 
-   Nothing is posted anywhere yet. A chosen file is named back, never read. */
+   Nothing is posted anywhere yet. sendLead is the one seam for that. */
 (function () {
   "use strict";
 
   var me = document.currentScript;
   var BASE = me ? me.src : location.href;
-  var IMG = new URL("img/site-assess/", BASE).href;
   var HREF = "request-site-assessment.html";
+  var STAGES = ["Your scheme", "Your details", "Your results"];
 
-  /* The stylesheet is fetched on the first open, not with the script. Every
-     page on the site carries this file, and a sheet in the head is a sheet the
+  function url(file) { return new URL(file, BASE).href; }
+
+  /* Stylesheets are fetched on the first open, not with the script. Every page
+     on the site carries this file, and a sheet in the head is a sheet the
      browser waits on before it paints: the popup is behind a click and has no
      claim on the first frame of a page nobody has clicked yet. */
-  function sheet(then) {
-    var link = document.querySelector("link[data-assess-modal-css]");
-    if (link) { return then(); }
-    link = document.createElement("link");
+  function css(file) {
+    if (document.querySelector('link[data-assess-css="' + file + '"]')) { return; }
+    var link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = new URL("site-assess-modal.css", BASE).href;
-    link.setAttribute("data-assess-modal-css", "");
-    var done = false;
-    function go() { if (!done) { done = true; then(); } }
-    link.onload = go;
-    link.onerror = go;
+    link.href = url(file);
+    link.setAttribute("data-assess-css", file);
     document.head.appendChild(link);
-    /* a sheet that never answers must not cost the reader the popup */
-    window.setTimeout(go, 400);
   }
 
-  var BEDS = ["1 bed", "2 bed", "3 bed", "4 bed", "5 bed"];
-  var TYPES = [["Detached", "type-detached"], ["Semi detached", "type-semi"],
-               ["Terrace", "type-terrace"], ["Bungalow", "type-bungalow"],
-               ["Apartments", "type-apartments"]];
-  var PLANNING = ["Pre application", "Outline consent", "Reserved matters",
-                  "Full consent", "On site"];
-  var RETURNS = ["Indicative system design per plot", "Projected build cost savings",
-                 "Energy performance modelling", "Simulated energy bill impact"];
-  var STAGES = ["Introduction", "Details", "Your scheme"];
-
-  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
-
-  function row(lab, field, hint) {
-    return '<div class="sam-row"><span class="sam-lab">' + esc(lab) + '</span><div>' + field
-      + (hint ? '<p class="sam-hint">' + esc(hint) + "</p>" : "") + "</div></div>";
+  function script(file, then, fallback) {
+    var s = document.createElement("script");
+    s.src = url(file);
+    s.onload = function () { then(); };
+    s.onerror = function () {
+      s.remove();
+      if (fallback) { script(fallback, then, null); } else { then(); }
+    };
+    document.head.appendChild(s);
   }
-  function text(key, type, ph, extra) {
-    return '<input type="' + type + '" data-key="' + key + '" aria-label="' + esc(ph || key)
-      + '" placeholder="' + esc(ph || "") + '"' + (extra || "") + ">";
+
+  /* The one swap point for the figures. The preview runs on the stub, which is
+     why the summary says so under its footnote. assess-engine.js is on the
+     server already but it only formats an API response and would put a live
+     call, and a stored record, behind every click, so it is deliberately not
+     loaded here. A later agent changes this one string and nothing else, as
+     long as whatever it names leaves a compute on window.GrydAssess. */
+  var ENGINE = "assess-engine.stub.js";
+
+  var loading = false, loaded = false, waiting = [];
+  function deps(then) {
+    if (loaded) { return then(); }
+    waiting.push(then);
+    if (loading) { return; }
+    loading = true;
+    css("site-assess-modal.css");
+    css("assess-inputs.css");
+    css("assess-result.css");
+    var left = 3;
+    function one() {
+      if (--left) { return; }
+      loaded = true;
+      waiting.splice(0).forEach(function (f) { f(); });
+    }
+    script("assess-inputs.js", one);
+    script("assess-result.js", one);
+    script(ENGINE, one);
   }
-  function tiles(key, label, list) {
-    return '<div class="sam-tiles" data-tiles="' + key + '" role="group" aria-label="' + esc(label) + '">'
-      + list.map(function (it) {
-          var val = it[0], img = it[1];
-          return '<button type="button" class="sam-tile" aria-pressed="false" data-value="' + esc(val) + '">'
-            + '<img src="' + IMG + img + '.png" alt="" width="300" height="300" decoding="async">'
-            + '<span class="t-name">' + esc(val) + "</span></button>";
-        }).join("") + "</div>";
+
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  }
+
+  function field(key, type, label, ph) {
+    return '<div class="sam-field"><label for="sam-' + key + '">' + esc(label) + "</label>"
+      + '<input type="' + type + '" id="sam-' + key + '" data-key="' + key
+      + '" placeholder="' + esc(ph) + '"></div>';
   }
 
   function markup() {
-    var beds = BEDS.map(function (v, i) { return [v, "beds-" + (i + 1)]; });
-    var one = row("Site postcode", text("postcode", "text", "NR20 5DF"), "The postcode is enough to place it.")
-      + row("Bedrooms", tiles("bedrooms", "Bedrooms", beds), "Pick every size on the scheme.")
-      + row("Number of plots", text("plots", "number", "42", ' min="1" step="1" inputmode="numeric"'));
-    var two = row("Full name", text("name", "text", "Jane Smith"))
-      + row("Work email", text("email", "email", "jane@company.co.uk"))
-      + row("Phone", text("phone", "tel", "07XXX XXX XXX"), "Optional.")
-      + row("Company", text("company", "text", "Acme Homes"));
-    var three = row("House types", tiles("types", "House types", TYPES),
-                    "Pick every type on the scheme.")
-      + row("Programme date", text("programme", "date", ""), "Roughly when construction starts.")
-      + row("Planning status",
-            '<div class="sam-seg-group" data-seg="planning" role="group" aria-label="Planning status">'
-            + PLANNING.map(function (v) {
-                return '<button type="button" class="sam-opt" aria-pressed="false" data-value="'
-                  + esc(v) + '">' + esc(v) + "</button>";
-              }).join("") + "</div>")
-      + row("Site plan",
-            '<div class="sam-drop" data-drop="plan" tabindex="0" role="button" aria-label="Add your site plan">'
-            + '<div class="inner"><p class="d-line">Drop your site plan here, or choose a file</p>'
-            + '<p class="d-sub">A PDF or an image of the layout is enough to start.</p>'
-            + '<input type="file" hidden></div></div>')
-      + row("Tell us about your site",
-            '<textarea data-key="notes" aria-label="Tell us about your site"'
-            + ' placeholder="Where is it? How many units? When does construction start?"></textarea>',
-            "Optional, and a sentence is plenty.");
-
-    var returns = '<ul class="sam-returns">' + RETURNS.map(function (t, i) {
-      return '<li><span class="n">0' + (i + 1) + "</span><span>" + esc(t) + "</span></li>";
-    }).join("") + "</ul>";
-
     return '<div class="sam-box" role="dialog" aria-modal="true" aria-labelledby="samTitle">'
       + '<button type="button" class="sam-close" data-close aria-label="Close">&times;</button>'
       + '<div class="sam-prog">' + STAGES.map(function (s) {
-          return '<div class="sam-seg"><span class="s-lab">' + esc(s) + '</span>'
+          return '<div class="sam-seg"><span class="s-lab">' + esc(s) + "</span>"
             + '<span class="s-bar"><i></i></span></div>';
         }).join("") + "</div>"
       + '<div class="sam-body">'
-      + '<section class="sam-pane" data-pane="0" hidden><span class="sam-eyebrow">Introduction</span>'
-      + '<h2 id="samTitle">Where the site is and how big</h2>' + one + "</section>"
+      + '<section class="sam-pane" data-pane="0" hidden><h2 id="samTitle" class="sam-sr">'
+      + "Site assessment</h2><div data-inputs></div></section>"
 
-      /* What three answers buy, said plainly, and what they do not. No figure
-         is put on the scheme here because none can be: the sizing is drawn off
-         the roofs, and the roofs come with the drawings. */
-      + '<section class="sam-pane sam-partial" data-pane="1" hidden>'
-      + '<span class="sam-eyebrow">Partial response</span>'
-      + "<h2>What we can say so far</h2>"
-      + '<p class="sam-read" data-read></p>'
-      + '<p class="sam-short">This is a partial answer. The four things below are drawn off the'
-      + " roofs on your drawings, so they come with the full assessment:</p>"
-      + returns
-      + '<p class="sam-hint">Leave us a way to reach you and we will take it from there.</p>'
+      + '<section class="sam-pane" data-pane="1" hidden>'
+      + '<span class="sam-eyebrow">Your details</span>'
+      + "<h2>Where should the assessment go?</h2>"
+      + '<p class="sam-stand">The full summary opens as soon as you tell us who you are.</p>'
+      + field("name", "text", "Full name", "Jane Smith")
+      + field("email", "email", "Work email", "jane@company.co.uk")
+      + '<p class="sam-gate" data-gate hidden>A name and a work email are all we need.</p>'
       + "</section>"
 
-      + '<section class="sam-pane" data-pane="2" hidden><span class="sam-eyebrow">Details</span>'
-      + "<h2>Who we send the numbers to</h2>" + two
-      + '<p class="sam-gate" data-gate hidden>A name and a work email are all we need to reply.</p>'
-      + "</section>"
-
-      + '<section class="sam-pane" data-pane="3" hidden><span class="sam-eyebrow">Your scheme, optional</span>'
-      + "<h2>The drawings and the programme</h2>"
-      + '<p class="sam-short">Every answer here sharpens the assessment. None of them holds it up.</p>'
-      + three + "</section>"
-
-      + '<section class="sam-pane sam-done" data-pane="4" hidden><span class="sam-eyebrow">Request received</span>'
-      + '<h2>Gryd will get back to <span class="flare">you.</span></h2>'
-      + '<p class="stand">We have what we need to start. Here is what comes back:</p>'
-      + returns + "</section>"
+      + '<section class="sam-pane" data-pane="2" hidden><div data-result></div></section>'
       + "</div>"
-      + '<div class="sam-nav"><button type="button" class="sam-go" data-go>Continue</button>'
-      + '<button type="button" class="sam-send" data-send hidden>Send now</button>'
-      + '<button type="button" class="sam-back" data-back hidden>Back</button>'
+      + '<div class="sam-nav"><button type="button" class="sam-back" data-back hidden>Back</button>'
+      + '<button type="button" class="sam-go" data-go>Continue</button>'
       + '<span class="sam-count"></span></div>'
-      + '<p class="sam-consent" hidden>By submitting you agree to be contacted about your scheme.'
-      + " We’ll never share your details.</p>"
+      + '<p class="sam-consent" hidden>By submitting you agree to be contacted about your'
+      + " scheme. We’ll never share your details.</p>"
       + "</div>";
   }
 
   /* ------------------------------------------------------------------ state */
 
-  var root = null, box, panes, segs, go, send, back, count, consent, gate;
-  var at = 0, opener = null;
-  /* the dash has three marks and the flow has five panes: the partial answer
-     belongs to the questions that produced it, the confirmation to the last mark */
-  var SEG_OF = [0, 0, 1, 2, 2];
-  var PANE_DONE = 4, PANE_CONTACT = 2, PANE_SCHEME = 3;
-  var values = {};
+  var root = null, box, panes, segs, go, back, count, consent, gate;
+  var inputs = null, at = 0, opener = null, answers = null, lead = {};
+  var PANE_INPUTS = 0, PANE_GATE = 1, PANE_RESULT = 2;
+
+  /* The one seam to a CRM, deliberately inert. TODO: post the lead to HubSpot
+     portal 144906745 in region eu1 once the form id exists. It does not yet: the
+     live tool posts to Gryd's own API and that calls HubSpot server side, so
+     there is no form to name here and no HubSpot form is embedded. Until then
+     the lead is held in memory and nothing leaves the browser. */
+  function sendLead(payload) {
+    window.grydAssessLead = payload;
+  }
 
   function build() {
     root = document.createElement("div");
@@ -167,11 +141,16 @@
     panes = [].slice.call(root.querySelectorAll(".sam-pane"));
     segs = [].slice.call(root.querySelectorAll(".sam-seg"));
     go = root.querySelector("[data-go]");
-    send = root.querySelector("[data-send]");
     back = root.querySelector("[data-back]");
     gate = root.querySelector("[data-gate]");
     count = root.querySelector(".sam-count");
     consent = root.querySelector(".sam-consent");
+
+    inputs = window.GrydAssessInputs.mount(
+      root.querySelector("[data-inputs]"),
+      function (vals) { answers = vals; show(PANE_GATE); },
+      { onChange: function () { if (at === PANE_INPUTS) { paint(); } } });
+
     wire();
     show(0);
   }
@@ -179,66 +158,24 @@
   function wire() {
     root.addEventListener("input", function (ev) {
       var el = ev.target.closest("[data-key]");
-      if (!el) { return; }
-      values[el.getAttribute("data-key")] = el.value.trim();
-      if (at === PANE_CONTACT) { gated(); }
-    });
-    root.addEventListener("click", function (ev) {
-      if (ev.target === root) { close(); return; }
-      var t = ev.target;
-      if (t.closest("[data-close]")) { close(); return; }
-      var tile = t.closest(".sam-tile");
-      if (tile) {
-        var group = tile.closest("[data-tiles]");
-        tile.setAttribute("aria-pressed", tile.getAttribute("aria-pressed") === "true" ? "false" : "true");
-        values[group.getAttribute("data-tiles")] = [].slice
-          .call(group.querySelectorAll('.sam-tile[aria-pressed="true"]'))
-          .map(function (b) { return b.getAttribute("data-value"); }).join(", ");
-        return;
-      }
-      var opt = t.closest(".sam-opt");
-      if (opt) {
-        var seg = opt.closest("[data-seg]");
-        [].slice.call(seg.querySelectorAll(".sam-opt")).forEach(function (b) {
-          b.setAttribute("aria-pressed", String(b === opt));
-        });
-        values[seg.getAttribute("data-seg")] = opt.getAttribute("data-value");
-        return;
-      }
-      if (t.closest("[data-back]")) { show(at - 1); return; }
-      if (t.closest("[data-send]")) { show(PANE_DONE); return; }
-      if (t.closest("[data-go]")) { show(at + 1); }
+      if (!el || !el.id || el.id.indexOf("sam-") !== 0) { return; }
+      lead[el.getAttribute("data-key")] = el.value.trim();
+      if (at === PANE_GATE) { paint(); }
     });
 
-    /* the drop zone. A dropped or chosen file is named back, never read. */
-    var zone = root.querySelector("[data-drop]");
-    var input = zone.querySelector('input[type="file"]');
-    var line = zone.querySelector(".d-line");
-    function take(name) { zone.classList.add("has-file"); zone.classList.remove("is-over"); line.textContent = name; values.plan = name; }
-    zone.addEventListener("click", function () { input.click(); });
-    zone.addEventListener("keydown", function (ev) {
-      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); input.click(); }
-    });
-    input.addEventListener("click", function (ev) { ev.stopPropagation(); });
-    input.addEventListener("change", function () { if (input.files && input.files[0]) { take(input.files[0].name); } });
-    ["dragenter", "dragover"].forEach(function (t) {
-      zone.addEventListener(t, function (ev) { ev.preventDefault(); zone.classList.add("is-over"); });
-    });
-    ["dragleave", "dragend"].forEach(function (t) {
-      zone.addEventListener(t, function () { zone.classList.remove("is-over"); });
-    });
-    zone.addEventListener("drop", function (ev) {
-      ev.preventDefault();
-      var f = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
-      take(f ? f.name : "Site plan added");
+    root.addEventListener("click", function (ev) {
+      if (ev.target === root) { close(); return; }
+      if (ev.target.closest("[data-close]")) { close(); return; }
+      if (ev.target.closest("[data-back]")) { goBack(); return; }
+      if (ev.target.closest("[data-go]")) { goNext(); }
     });
 
     root.addEventListener("keydown", function (ev) {
       if (ev.key === "Escape") { ev.preventDefault(); close(); return; }
       if (ev.key !== "Tab") { return; }
       var can = [].slice.call(box.querySelectorAll(
-        'button, [href], input:not([type="file"]), textarea, [tabindex]:not([tabindex="-1"])'))
-        .filter(function (el) { return !el.hidden && el.offsetParent !== null; });
+        'button, [href], input, textarea, [tabindex]:not([tabindex="-1"])'))
+        .filter(function (el) { return !el.hidden && !el.disabled && el.offsetParent !== null; });
       if (!can.length) { return; }
       var first = can[0], last = can[can.length - 1];
       if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
@@ -246,79 +183,107 @@
     });
   }
 
-  /* A name and a work email are the whole gate. Nothing past the contact pane
-     is reachable without them, because a scheme nobody can reply to is not a
-     lead, and the reader is told which one is missing rather than left with a
-     button that does nothing. */
   function ready() {
-    return !!(values.name && values.email && values.email.indexOf("@") > 0);
-  }
-  function gated() {
-    var ok = ready();
-    go.disabled = !ok;
-    send.disabled = !ok;
-    gate.hidden = ok;
+    return !!(lead.name && lead.email && /.+@.+\..+/.test(lead.email));
   }
 
-  /* The partial answer, in the reader's own terms: what they told us, read
-     back, and the line about what is still missing. */
-  function readback() {
-    var el = root.querySelector("[data-read]");
-    var has = [];
-    if (values.plots) { has.push("a scheme of " + values.plots + " plots"); }
-    if (values.bedrooms) { has.push("a " + values.bedrooms.toLowerCase() + " mix"); }
-    if (values.postcode) { has.push("at " + values.postcode.toUpperCase()); }
-    el.textContent = has.length
-      ? ("We have " + has.join(", ") + ". That places the site and tells us the shape of the mix.")
-      : "We have the start of it. Tell us where the site is and how big and we can place it.";
+  function goNext() {
+    if (at === PANE_INPUTS) { inputs.next(); return; }
+    if (at === PANE_GATE) {
+      if (!ready()) { gate.hidden = false; return; }
+      sendLead({ lead: lead, inputs: answers });
+      show(PANE_RESULT);
+      return;
+    }
+    close();
+  }
+
+  function goBack() {
+    if (at === PANE_INPUTS) { inputs.back(); paint(); return; }
+    if (at === PANE_GATE) { show(PANE_INPUTS); return; }
+    show(PANE_GATE);
+  }
+
+  function result() {
+    var res = window.GrydAssess.compute(answers);
+    var host = root.querySelector("[data-result]");
+    window.GrydAssessResult.render(host, res, answers, {
+      onRestart: function () { inputs.reset(); answers = null; show(PANE_INPUTS); }
+    });
+  }
+
+  /* The dash, the counter and the buttons, all read off the same two numbers:
+     which pane is open and, inside the questions, which screen. */
+  function paint() {
+    /* mount fires its first change while inputs is still being assigned, so
+       everything here reads through the same guard rather than assuming it */
+    if (!inputs) { return; }
+    var screen = inputs.screen();
+    var mark = at === PANE_INPUTS ? 0 : (at === PANE_GATE ? 1 : 2);
+    var within = at === PANE_INPUTS ? (screen + 1) / inputs.total : 1;
+    segs.forEach(function (seg, n) {
+      seg.querySelector("i").style.width = n < mark ? "100%"
+        : (n === mark ? Math.round(within * 100) + "%" : "0%");
+      seg.classList.toggle("on", n === mark);
+      seg.classList.toggle("done", n < mark);
+    });
+    back.hidden = at === PANE_INPUTS && screen === 0;
+    consent.hidden = at !== PANE_GATE;
+    gate.hidden = at !== PANE_GATE || ready() || !lead.name && !lead.email;
+    count.textContent = at === PANE_INPUTS
+      ? "Step 0" + (screen + 1) + " of 0" + inputs.total
+      : (at === PANE_GATE ? "Your details" : "Assessment summary");
+    go.textContent = at === PANE_RESULT ? "Close"
+      : (at === PANE_GATE ? "See my assessment" : "Continue");
+    go.disabled = at === PANE_GATE ? !ready() : false;
+    go.hidden = at === PANE_RESULT;
   }
 
   function show(i) {
     at = Math.max(0, Math.min(panes.length - 1, i));
     panes.forEach(function (p, n) { p.hidden = n !== at; });
-    var mark = SEG_OF[at];
-    segs.forEach(function (seg, n) {
-      var bar = seg.querySelector("i");
-      bar.style.width = n < mark ? "100%" : (n === mark ? (at === PANE_DONE ? "100%" : "50%") : "0%");
-      seg.classList.toggle("on", n === mark);
-      seg.classList.toggle("done", n < mark);
-    });
-    var done = at === PANE_DONE;
-    if (at === 1) { readback(); }
-    back.hidden = at === 0 || done;
-    send.hidden = at !== PANE_CONTACT;
-    consent.hidden = at !== PANE_CONTACT && at !== PANE_SCHEME;
-    count.textContent = done ? "" : ["Stage 01 of 03", "Partial answer", "Stage 02 of 03",
-                                     "Stage 03 of 03, optional"][at];
-    go.textContent = done ? "Close"
-      : (at === PANE_CONTACT ? "Add scheme details"
-        : (at === PANE_SCHEME ? "Send to Gryd" : "Continue"));
-    go.disabled = false;
-    send.disabled = false;
-    gate.hidden = true;
-    if (at === PANE_CONTACT) { gated(); }
-    if (done) { go.onclick = function () { close(); }; } else { go.onclick = null; }
+    if (at === PANE_RESULT) { result(); }
+    paint();
     root.querySelector(".sam-body").scrollTop = 0;
-    var first = panes[at].querySelector("input, textarea, button");
+    var first = panes[at].querySelector("input, button");
     if (first) { first.focus({ preventScroll: true }); }
   }
 
   /* ------------------------------------------------------------ open, close */
 
+  /* While the plate is up the page behind it is inert, not merely covered: a
+     scrim stops a pointer but leaves the page's own buttons in the tab order
+     and in every measurement taken of the screen. */
+  function behind(off) {
+    [].slice.call(document.body.children).forEach(function (el) {
+      if (el === root) { return; }
+      if (off) {
+        el.setAttribute("data-sam-inert", "");
+        el.setAttribute("inert", "");
+        el.style.pointerEvents = "none";
+      } else if (el.hasAttribute("data-sam-inert")) {
+        el.removeAttribute("data-sam-inert");
+        el.removeAttribute("inert");
+        el.style.pointerEvents = "";
+      }
+    });
+  }
+
   function open(trigger) {
-    sheet(function () {
+    deps(function () {
       if (!root) { build(); }
       opener = trigger || null;
       root.hidden = false;
+      behind(true);
       document.documentElement.style.overflow = "hidden";
       requestAnimationFrame(function () { root.classList.add("open"); });
-      show(at === 3 ? 0 : at);
     });
   }
 
   function close() {
     if (!root || root.hidden) { return; }
     root.classList.remove("open");
+    behind(false);
     document.documentElement.style.overflow = "";
     var back_to = opener;
     window.setTimeout(function () { root.hidden = true; }, 200);
