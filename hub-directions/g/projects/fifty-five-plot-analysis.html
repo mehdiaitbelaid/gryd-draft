@@ -141,11 +141,45 @@
     <section class="g-share">
       <h3>Share this case study</h3>
       <div class="row">
-        <a href="#" aria-label="Share on LinkedIn">in</a>
-        <a href="#" aria-label="Share on X">X</a>
-        <a href="#" aria-label="Copy link">&#128279;</a>
+        <a class="s-li" href="https://www.linkedin.com/company/grydenergy/" target="_blank" rel="noopener" aria-label="Share on LinkedIn">in</a>
+        <a class="s-x" href="https://x.com/intent/post" target="_blank" rel="noopener" aria-label="Share on X">X</a>
+        <button class="s-copy" type="button" aria-label="Copy link">&#128279;</button>
       </div>
     </section>
+    <script>
+    /* The two share destinations are the page's own url, which is only known
+       once the page is open, so the markup ships a working fallback and this
+       upgrades it in place. Copy is a button, not a link: it performs an action
+       and navigates nowhere. */
+    (function () {
+      var row = document.querySelector(".g-share .row");
+      if (!row) return;
+      var u = encodeURIComponent(location.href);
+      var t = encodeURIComponent(document.title);
+      var li = row.querySelector(".s-li"), x = row.querySelector(".s-x");
+      var copy = row.querySelector(".s-copy");
+      if (li) li.href = "https://www.linkedin.com/sharing/share-offsite/?url=" + u;
+      if (x) x.href = "https://x.com/intent/post?url=" + u + "&text=" + t;
+      if (copy) copy.addEventListener("click", function () {
+        var done = function () {
+          var was = copy.innerHTML;
+          copy.innerHTML = "\u2713";
+          setTimeout(function () { copy.innerHTML = was; }, 1400);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(location.href).then(done, function () {});
+          return;
+        }
+        /* clipboard is https only, and the draft is read over http in review */
+        var f = document.createElement("input");
+        f.value = location.href;
+        document.body.appendChild(f);
+        f.select();
+        try { document.execCommand("copy"); done(); } catch (e) {}
+        f.remove();
+      });
+    })();
+    </script>
 
   </div>
 
@@ -201,6 +235,8 @@
 <script src="../../../home-final/assets/site-footer.js"></script>
 
 </div>
+
+<script src="../download-gate.js"></script>
 
 </body>
 </html>

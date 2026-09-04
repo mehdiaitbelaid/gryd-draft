@@ -22,19 +22,24 @@
 
 /* ---------- listing masthead ---------- */
 
+/* The masthead sits on the same left edge as a homepage section header: label,
+   heading and standfirst all start at the content column, not centred on it. */
 .g-mast {
-  text-align: center;
+  text-align: left;
   padding: 0 0 64px;
 }
-.g-mast .eyebrow { justify-content: center; }
+/* A masthead that is its own content column has to keep the column's side
+   padding, which this rule's shorthand would otherwise drop. */
+.g-mast.wrap { padding-left: var(--gutter); padding-right: var(--gutter); }
+.g-mast .eyebrow { justify-content: flex-start; }
 .g-mast h1 {
   font-size: clamp(44px, 6.6vw, 82px);
   max-width: 15ch;
-  margin: 26px auto 0;
+  margin: 26px 0 0;
 }
 .g-mast .stand {
   max-width: 58ch;
-  margin: 24px auto 0;
+  margin: 24px 0 0;
   font-size: 18px;
   color: #6B4A3E;
 }
@@ -296,6 +301,9 @@
 
 /* ---------- centred pagination ---------- */
 
+/* display beats the hidden attribute, so the filtered view can put the pager
+   away only if the attribute is answered here. */
+.g-pager[hidden] { display: none; }
 .g-pager {
   display: flex;
   justify-content: center;
@@ -401,7 +409,7 @@
 
 /* Header actions, sharing the button row's spacing rather than setting their own. */
 .g-actions { display: flex; flex-wrap: wrap; gap: 14px; }
-.g-mast .g-actions { justify-content: center; }
+.g-mast .g-actions { justify-content: flex-start; }
 /* the PDF's opener and its closing plate; the screen page has its own. */
 .p-open, .p-end { display: none; }
 .g-byline {
@@ -519,7 +527,12 @@
 .g-share { text-align: center; margin-top: 84px; }
 .g-share h3 { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 17px; letter-spacing: 0; }
 .g-share .row { display: flex; justify-content: center; gap: 16px; margin-top: 18px; }
-.g-share .row a {
+.g-share .row a,
+.g-share .row button {
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
   width: 42px;
   height: 42px;
   border-radius: 999px;
@@ -608,3 +621,83 @@
   white-space: nowrap;
 }
 .g-table tbody td:first-child { font-weight: 500; }
+
+/* ---------- download gate ---------- */
+
+/* Every PDF sits behind the same HubSpot lead capture form the live site uses,
+   so the Download button opens this panel and the file opens only on submit. */
+.dl-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.dl-gate[hidden] { display: none; }
+.dl-scrim { position: absolute; inset: 0; background: rgba(30, 12, 8, 0.55); }
+.dl-panel {
+  position: relative;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  background: var(--paper);
+  border-radius: var(--radius-panel);
+  padding: 44px 40px 36px;
+}
+.dl-note { margin: 0; font-size: 15px; color: #6B4A3E; }
+.dl-form { margin-top: 8px; }
+.dl-x {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--red110);
+}
+.dl-x:hover { color: var(--flare); }
+.dl-x:focus-visible { outline: 2px solid var(--flare); outline-offset: 2px; }
+html.dl-open { overflow: hidden; }
+
+/* The embed brings its own markup, so only the parts it leaves open to a host
+   sheet are set: the field rules, the type and the submit button. */
+.dl-form input[type="text"], .dl-form input[type="email"], .dl-form input[type="tel"],
+.dl-form select, .dl-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--stone-mid);
+  border-radius: 0;
+  padding: 10px 0;
+  font: inherit;
+  font-size: 16px;
+  color: var(--red110);
+}
+.dl-form input:focus, .dl-form select:focus, .dl-form textarea:focus {
+  outline: none;
+  border-bottom-color: var(--flare);
+}
+.dl-form label { font-size: 13px; color: #6B4A3E; }
+.dl-form .hs-form-field { margin-bottom: 18px; }
+.dl-form input[type="submit"] {
+  border: 0;
+  border-radius: 999px;
+  background: var(--flare);
+  color: var(--paper);
+  padding: 13px 26px;
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .dl-panel { padding: 32px 22px 28px; }
+}
