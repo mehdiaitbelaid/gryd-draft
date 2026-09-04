@@ -24,22 +24,52 @@
 
 /* The lift and shade are a preference, so the reader keeps the switch next to
    the thing it changes rather than in a settings panel nobody opens. */
-.ar-hovertoggle {
+.ar-hoverswitch {
   flex: none;
-  appearance: none;
-  border: 0;
-  background: none;
-  padding: 2px 0;
-  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ar-hoverlab {
   font-size: 11px;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--ar-muted);
-  cursor: pointer;
-  border-bottom: 1px solid var(--ar-line);
 }
-.ar-hovertoggle:hover { color: var(--ar-ink); }
+.ar-hovertoggle {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  line-height: 0;
+  cursor: pointer;
+  border-radius: 999px;
+}
+.ar-hovertrack {
+  display: block;
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--ar-line);
+  transition: background .2s ease;
+}
+.ar-hoverknob {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 2px;
+  border-radius: 50%;
+  background: var(--ar-paper);
+  box-shadow: 0 1px 2px rgba(78, 37, 27, .25);
+  transition: transform .2s cubic-bezier(.22,.61,.36,1);
+}
+.ar-hovertoggle[aria-checked="true"] .ar-hovertrack { background: var(--ar-flare); }
+.ar-hovertoggle[aria-checked="true"] .ar-hoverknob { transform: translateX(14px); }
+.ar-hovertoggle:hover + .ar-hoverlab, .ar-hoverswitch:hover .ar-hoverlab { color: var(--ar-ink); }
 .ar-hovertoggle:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .ar-hovertrack, .ar-hoverknob { transition: none; }
+}
 .ar-sec { padding: 0; min-width: 0; margin-bottom: 14px; }
 .ar-sec h3 {
   font-size: 10px;
@@ -108,8 +138,31 @@
 .ar-fold summary::-webkit-details-marker { display: none; }
 .ar-fold summary h3 { margin: 0; }
 .ar-fold summary:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 2px; }
-.ar-show { font-size: 13px; color: var(--ar-ember); border-bottom: 1px solid currentColor; }
-.ar-fold[open] .ar-show { visibility: hidden; }
+.ar-fold summary:hover .ar-show { color: var(--ar-flare); }
+.ar-foldcue {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ar-ember);
+}
+.ar-show { font-size: 13px; color: inherit; }
+.ar-chev {
+  display: block;
+  transition: transform .42s cubic-bezier(.22,.61,.36,1);
+}
+.ar-fold[open] .ar-chev { transform: rotate(180deg); }
+/* the body opens on its own row track, which is the one thing that can be
+   animated from nothing to the content's own height */
+.ar-foldbody {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+.ar-foldbody[data-anim] {
+  transition: grid-template-rows .42s cubic-bezier(.22,.61,.36,1);
+}
+.ar-foldbody.is-open { grid-template-rows: 1fr; }
+.ar-foldinner { overflow: hidden; min-height: 0; }
 .ar-fold .ar-list { padding-bottom: 8px; }
 .ar-list { margin: 0; padding: 0; list-style: none; }
 .ar-list li {
@@ -267,4 +320,8 @@
 @media (prefers-reduced-motion: reduce) {
   .ar-list li, .ar-table tbody tr, .ar-stat { transition: none; }
   .ar-list li:hover, .ar-table tbody tr:hover, .ar-stat:hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-foldbody[data-anim], .ar-chev { transition: none; }
 }

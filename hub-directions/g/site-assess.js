@@ -263,10 +263,41 @@
     var panels = all(".sa-q", col);
     var marks = all(".sa-prog i", col);
     var at = 0;
+    /* how long the outgoing panel is left on screen. It matches the leave
+       animation in site-assess.css; shorter than the rise, so the arriving
+       question is never waiting on the one it replaced. */
+    var LEAVE = 280;
+    var leaving = null;
 
-    function show(i, moved) {
+    function show(i, moved, back) {
+      var prev = panels[at];
       at = Math.max(0, Math.min(panels.length - 1, i));
-      panels.forEach(function (s, n) { s.hidden = n !== at; });
+      var now = panels[at];
+      if (leaving) { leaving(); }
+      panels.forEach(function (s, n) {
+        s.hidden = n !== at;
+        s.classList.remove("sa-enter", "sa-leave", "sa-rev");
+      });
+      if (prev && prev !== now) {
+        /* pinned where the questions sit, read off the one now in the flow, so
+           lifting the old panel out does not slide it up over the progress
+           rail on its way out */
+        var top = now.offsetTop;
+        prev.hidden = false;
+        prev.style.top = top + "px";
+        prev.classList.add("sa-leave");
+        if (back) { prev.classList.add("sa-rev"); }
+        var t = setTimeout(function () { leaving(); }, LEAVE);
+        leaving = function () {
+          clearTimeout(t);
+          leaving = null;
+          prev.classList.remove("sa-leave", "sa-rev");
+          prev.style.top = "";
+          prev.hidden = true;
+        };
+      }
+      now.classList.add("sa-enter");
+      if (back) { now.classList.add("sa-rev"); }
       marks.forEach(function (m, n) {
         m.className = n < at ? "done" : (n === at ? "on" : "");
       });
@@ -293,7 +324,7 @@
       btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });
     });
     all("[data-back]", col).forEach(function (btn) {
-      btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true); });
+      btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true, true); });
     });
     col.addEventListener("keydown", function (ev) {
       if (ev.key !== "Enter") { return; }

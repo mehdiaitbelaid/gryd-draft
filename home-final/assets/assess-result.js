@@ -198,8 +198,10 @@
     }).join("");
 
     container.innerHTML = '<div class="ar-head"><h2 class="ar-title">Assessment Summary</h2>'
-      + '<button type="button" class="ar-hovertoggle" data-hover aria-pressed="false">'
-      + 'Hover effects: <span data-hover-state>off</span></button></div>'
+      + '<span class="ar-hoverswitch"><span class="ar-hoverlab" aria-hidden="true">Hover effects</span>'
+      + '<button type="button" class="ar-hovertoggle" data-hover role="switch"'
+      + ' aria-checked="false" aria-label="Hover effects">'
+      + '<span class="ar-hovertrack"><span class="ar-hoverknob"></span></span></button></span></div>'
 
       + '<section class="ar-sec ar-project" data-sec="details"><h3>Project Details</h3>'
       + '<dl class="ar-details">' + details + "</dl></section>"
@@ -227,12 +229,26 @@
       + rows + "</tbody></table></div></section>"
 
       + '<details class="ar-sec ar-fold" data-sec="dev"><summary>'
-      + "<h3>Developer additional benefits</h3><span class=\"ar-show\">Show</span></summary>"
-      + '<ul class="ar-list">' + dev + "</ul></details>"
+      + '<h3>Developer additional benefits</h3><span class="ar-foldcue">'
+      + '<span class="ar-show">Show the detail</span>'
+      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
+      + ' aria-hidden="true" focusable="false">'
+      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
+      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '</svg></span></summary>'
+      + '<div class="ar-foldbody"><div class="ar-foldinner">'
+      + '<ul class="ar-list">' + dev + '</ul></div></div></details>'
 
       + '<details class="ar-sec ar-fold" data-sec="home"><summary>'
-      + "<h3>Homeowner additional benefits</h3><span class=\"ar-show\">Show</span></summary>"
-      + '<ul class="ar-list">' + home + "</ul></details>"
+      + '<h3>Homeowner additional benefits</h3><span class="ar-foldcue">'
+      + '<span class="ar-show">Show the detail</span>'
+      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
+      + ' aria-hidden="true" focusable="false">'
+      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
+      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '</svg></span></summary>'
+      + '<div class="ar-foldbody"><div class="ar-foldinner">'
+      + '<ul class="ar-list">' + home + '</ul></div></div></details>'
 
       + '<p class="ar-foot">' + esc(FOOTNOTE) + "</p>"
       + '<div class="ar-acts"><button type="button" class="btn ar-btn" data-restart>Start Over</button>'
@@ -244,11 +260,11 @@
        write, so every touch of localStorage is guarded and the page simply
        falls back to the default. */
     var hoverBtn = container.querySelector("[data-hover]");
-    var hoverState = container.querySelector("[data-hover-state]");
     function applyHover(on) {
       container.classList.toggle("ar-nohover", !on);
-      hoverState.textContent = on ? "on" : "off";
-      hoverBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      /* role=switch, so aria-checked is the state, and the knob follows it in
+         CSS rather than being moved from here */
+      hoverBtn.setAttribute("aria-checked", on ? "true" : "false");
     }
     var hoverOn = false;
     try { hoverOn = localStorage.getItem(HOVER_KEY) === "on"; } catch (e) { hoverOn = false; }
@@ -257,6 +273,50 @@
       hoverOn = !hoverOn;
       applyHover(hoverOn);
       try { localStorage.setItem(HOVER_KEY, hoverOn ? "on" : "off"); } catch (e) { /* not stored */ }
+    });
+
+    /* The folds are the reader's own control, so the row reads as a control:
+       the whole width is the hit area, the label says what pressing it does,
+       and the chevron turns with it. The details element is kept, so anything
+       that opens a fold by setting open still works; the body animates on the
+       site curve, and only when a person did the opening, so a programmatic
+       open lands at full height at once. */
+    var FOLD_MS = 420;
+    Array.prototype.forEach.call(container.querySelectorAll(".ar-fold"), function (d) {
+      var sum = d.querySelector("summary");
+      var body = d.querySelector(".ar-foldbody");
+      var show = d.querySelector(".ar-show");
+      var shut = null;
+      function label() {
+        show.textContent = d.open ? "Hide the detail" : "Show the detail";
+        sum.setAttribute("aria-expanded", d.open ? "true" : "false");
+      }
+      d.addEventListener("toggle", function () {
+        if (d.open) {
+          /* the content is only laid out once the element is open, so the
+             starting row track needs a frame of its own or there is nothing
+             to animate from */
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () { body.classList.add("is-open"); });
+          });
+        } else {
+          body.classList.remove("is-open");
+        }
+        label();
+      });
+      sum.addEventListener("click", function (ev) {
+        body.setAttribute("data-anim", "");
+        if (!d.open) { return; }
+        /* closing runs the other way round, so the row collapses before the
+           element itself shuts and takes the content out of the flow */
+        ev.preventDefault();
+        body.classList.remove("is-open");
+        show.textContent = "Show the detail";
+        sum.setAttribute("aria-expanded", "false");
+        clearTimeout(shut);
+        shut = setTimeout(function () { d.open = false; }, FOLD_MS);
+      });
+      label();
     });
 
     var resultBox = container.closest ? container.closest(".sam-box") : null;

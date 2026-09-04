@@ -615,6 +615,9 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
    short rise on the site's standing cubic-bezier(.22,.61,.36,1). */
 
 .sa-stage {
+  /* the panel on its way out is taken out of the flow over this box, so the
+     two never stack and the column height never jumps mid step */
+  position: relative;
   padding-bottom: 24px;
   /* the question sits in the middle of whatever the masthead leaves it, so a
      tall screen is not a band of paper under the tiles */
@@ -633,12 +636,24 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
 }
 .sa-prog i {
   display: block;
+  position: relative;
+  overflow: hidden;
   width: 46px;
   height: 2px;
   background: var(--stone-mid);
-  transition: background .3s ease;
 }
-.sa-prog i.on, .sa-prog i.done { background: var(--flare); }
+/* the mark fills rather than switching colour, on the same curve as the rise,
+   so the rail reads as progress being made and not as a light coming on */
+.sa-prog i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--flare);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .42s cubic-bezier(.22,.61,.36,1);
+}
+.sa-prog i.on::after, .sa-prog i.done::after { transform: none; }
 .sa-prog i.on { opacity: .5; }
 
 /* one question, centred in the content column at every width */
@@ -706,16 +721,39 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   font-variant-numeric: tabular-nums;
 }
 
-/* the reveal: the question rises once, its tiles follow it one after another */
+/* the step change: the question on the way out slides 16px against the travel
+   and fades, the one arriving rises into its place and its tiles follow one
+   after another. Back runs the same move the other way round. */
 @keyframes sa-rise {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
 }
-.sa-q:not([hidden]) { animation: sa-rise .42s cubic-bezier(.22,.61,.36,1) both; }
-.sa-q:not([hidden]) .f-tile-cell {
+@keyframes sa-rise-back {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sa-leave {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(-16px); }
+}
+@keyframes sa-leave-back {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(16px); }
+}
+.sa-q.sa-enter { animation: sa-rise .42s cubic-bezier(.22,.61,.36,1) both; }
+.sa-q.sa-enter.sa-rev { animation-name: sa-rise-back; }
+.sa-q.sa-enter .f-tile-cell {
   animation: sa-rise .42s cubic-bezier(.22,.61,.36,1) both;
   animation-delay: calc(120ms + var(--i, 0) * 55ms);
 }
+.sa-q.sa-leave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  animation: sa-leave .28s cubic-bezier(.22,.61,.36,1) both;
+}
+.sa-q.sa-leave.sa-rev { animation-name: sa-leave-back; }
 
 /* the masthead stands down once the reader is answering, the way the FHS page
    gives the height back to the question */
@@ -728,6 +766,12 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   .sa-q .f-big { font-size: 28px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sa-q:not([hidden]), .sa-q:not([hidden]) .f-tile-cell { animation: none; }
-  .sa-prog i { transition: none; }
+  .sa-q.sa-enter, .sa-q.sa-enter .f-tile-cell, .sa-q.sa-leave { animation: none; }
+  /* nothing moves, so the outgoing panel simply goes rather than sliding */
+  .sa-q.sa-leave { display: none; }
+  .sa-prog i::after { transition: none; }
 }
+
+/* the hover switch keeps 12px off the summary's right edge on this page, which
+   is the shell's business: the renderer draws the same head in the popup */
+body.sa-tool .sa-result .ar-head { padding-right: 12px; }
