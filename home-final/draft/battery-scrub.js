@@ -9,7 +9,6 @@
      source is attached in either, so nothing is ever fetched for them. */
   if (small || calm) return;
 
-  var STEPS = 3;
   /* A browser paints whole frames, so a seek finer than one frame is a decode
      nobody sees. The clip runs at 24fps; a thirtieth of a second is under one
      frame and still kills the jitter of seeking on every tick. */
@@ -19,6 +18,22 @@
 
   var card = track.querySelector(".pin-card");
   var steps = track.querySelectorAll(".step");
+  /* The count is the markup's, so a step added or dropped in BATTERY_STEPS
+     needs nothing here. */
+  var STEPS = steps.length || 1;
+  /* The steps divide the scrub between them. Even shares are the default; a
+     band that wants uneven ones states its own cut points in data-bands, as
+     the n+1 edges of n steps. This band runs 40, 40, 20: the two long moves
+     take most of the travel and the night step holds the last fifth, which is
+     the part of the clip already at rest. */
+  var CUTS = (function () {
+    var raw = (track.dataset.bands || "").split(",")
+      .map(parseFloat).filter(function (v) { return !isNaN(v); });
+    if (raw.length === STEPS + 1) return raw;
+    var even = [];
+    for (var k = 0; k <= STEPS; k++) even.push(k / STEPS);
+    return even;
+  }());
   var visual = track.querySelector(".visual");
   var video = track.querySelector(".clip");
   var last = null, ready = false, armed = false;
@@ -29,6 +44,19 @@
      the step boundary in both directions, and an expo.out is steep at its own
      start, which reads as a snap when it is scrubbed. */
   function smooth(p) { p = clamp(p); return p * p * (3 - 2 * p); }
+
+  /* p on 0..1 remapped onto 0..STEPS, so a step's own share of the scrub reads
+     as one whole unit of raw whatever width that share is. With even cut
+     points this is exactly p * STEPS. */
+  function rawOf(p) {
+    for (var k = 0; k < STEPS; k++) {
+      if (p < CUTS[k + 1] || k === STEPS - 1) {
+        var w = CUTS[k + 1] - CUTS[k] || 1;
+        return k + clamp((p - CUTS[k]) / w);
+      }
+    }
+    return STEPS;
+  }
 
   /* The band is centred in the window for the whole of the scrub, which means
      the sticky offset is half of what the window's height leaves over. That is
@@ -108,7 +136,7 @@
     var p = progress();
     track.style.setProperty("--p", p.toFixed(4));
 
-    var raw = p * STEPS;
+    var raw = rawOf(p);
     var i = Math.min(STEPS - 1, Math.floor(raw));
 
     /* Every step stays readable: the scrub moves the emphasis, not the text.
