@@ -17,7 +17,7 @@ footer.foot .wrap { display: block; }
 .foot ul { list-style: none; margin: 0; padding: 0; }
 .foot .f-plate { background: var(--stonelight); border-radius: var(--radius-panel);
   padding: 52px 56px 30px; }
-.foot .f-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+.foot .f-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
 .foot .f-mark { height: 22px; width: auto; display: block; }
 .foot .f-say { font-family: "Borna", sans-serif; font-size: 21px; line-height: 1.18;
   letter-spacing: -0.02em; max-width: 22ch; margin: 20px 0 0; }
@@ -31,12 +31,16 @@ footer.foot .wrap { display: block; }
    list of separate things rather than one block that lights up under a
    wandering pointer. The prototype ran these at 12px, which lands at 15.3px
    between the boxes a pointer actually hits and misses the standing clearance. */
-.foot .f-contact { margin-top: 22px; display: grid; gap: 16px; font-size: 15px;
-  color: var(--ink-soft, #6B4A3E); }
 .foot .f-grid ul { display: grid; gap: 16px; margin-top: 18px; font-size: 15px; }
+/* the company line, with the two policy pages on their own small row beneath.
+   Mehdi, 4 September: both lines sit on the right hand edge of the content
+   column, stacked, and the policy line is held on one line. */
 .foot .f-base { margin-top: 46px; padding-top: 22px;
-  border-top: 1px solid var(--stone-mid); display: flex; justify-content: space-between;
-  gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--ink-soft, #6B4A3E); }
+  border-top: 1px solid var(--stone-mid); display: grid; justify-items: end;
+  text-align: right;
+  gap: 10px; font-size: 13px; color: var(--ink-soft, #6B4A3E); }
+.foot .f-policy { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+  white-space: nowrap; }
 @media (max-width: 900px) { .foot .f-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) {
   .foot .f-grid { grid-template-columns: 1fr; }

@@ -20,16 +20,25 @@
 
 /* The two columns. The card leads and the copy answers, both centred on each
    other, and the pair sits on the content column like every other band. */
+/* Scott, 4 September: the label and the heading open the left column above
+   the card, and the ladder starts level with the top of the picture. Explicit
+   areas keep that true without a spacer element. */
 .d-batt .band-grid {
   display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 60px; align-items: center;
+  grid-template-areas: "intro ." "card steps";
+  column-gap: 60px; row-gap: 30px; align-items: start;
 }
+.d-batt .band-intro { grid-area: intro; }
+.d-batt .card-live { grid-area: card; }
+.d-batt .steps { grid-area: steps; }
 
 /* The copy ---------------------------------------------------------------- */
 .d-batt .band-intro h2 {
   font-size: clamp(26px, 2.5vw, 35px);
   color: var(--red110);
-  max-width: 17ch;
+  /* Mehdi, 4 September: 17ch broke the sentence over four lines at 1440. The
+     measure is widened until it sets in three inside the same left column. */
+  max-width: 22ch;
   margin-top: var(--label-gap);
 }
 /* the label here matches every other section label rather than being set in
@@ -39,7 +48,7 @@
 /* The ladder. All three steps are readable the whole way through, because a
    band this short has nothing to gain from hiding two thirds of its copy: the
    loop moves the emphasis, not the text. */
-.d-batt .steps-stack { margin-top: 30px; }
+.d-batt .steps-stack { margin-top: 0; }
 .d-batt .rung {
   display: grid; grid-template-columns: 3.4rem 1fr; gap: 20px;
   padding: 18px 0; border-top: 1px solid var(--stone-mid);
@@ -129,7 +138,11 @@
    download for a picture the width cannot carry, so the band collapses to the
    copy and the evening still. */
 @media (max-width: 900px) {
-  .d-batt .band-grid { grid-template-columns: 1fr; gap: 32px; }
+  .d-batt .band-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "intro" "card" "steps";
+    column-gap: 0; row-gap: 32px;
+  }
   .d-batt .rung { opacity: 1; }
   .d-batt .visual .clip { display: none; }
   .d-batt .visual .poster { display: none; }
