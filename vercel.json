@@ -1,0 +1,32 @@
+{
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/home-final/draft/index.html",
+      "permanent": true
+    }
+  ],
+  "rewrites": [],
+  "headers": [
+    {
+      "source": "/home-final/assets/(.*).(jpg|jpeg|png|webp|avif|gif|svg|ico|mp4|webm|woff2)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
