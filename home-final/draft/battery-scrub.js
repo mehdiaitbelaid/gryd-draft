@@ -9,23 +9,12 @@
      source is attached in either, so nothing is ever fetched for them. */
   if (small || calm) return;
 
-  /* A browser paints whole frames, so a seek finer than one frame is a decode
-     nobody sees. The clip runs at 24fps; a thirtieth of a second is under one
-     frame and still kills the jitter of seeking on every tick. */
-  var SEEK_EPS = 1 / 30;
-  /* The nav pill ends at 72px. Below this the band would be held under it. */
-  var MIN_TOP = 88;
-
-  var card = track.querySelector(".pin-card");
   var steps = track.querySelectorAll(".step");
-  /* The count is the markup's, so a step added or dropped in BATTERY_STEPS
-     needs nothing here. */
   var STEPS = steps.length || 1;
-  /* The steps divide the scrub between them. Even shares are the default; a
-     band that wants uneven ones states its own cut points in data-bands, as
-     the n+1 edges of n steps. This band runs 40, 40, 20: the two long moves
-     take most of the travel and the night step holds the last fifth, which is
-     the part of the clip already at rest. */
+  /* The steps divide the loop between them, as the n+1 edges of n steps. The
+     band runs 40, 40, 20: the two long moves take most of the clip and the
+     night step holds the last fifth, which is the part already at rest. Same
+     cut the scrub used, so the copy still lands with the light it describes. */
   var CUTS = (function () {
     var raw = (track.dataset.bands || "").split(",")
       .map(parseFloat).filter(function (v) { return !isNaN(v); });
@@ -34,20 +23,16 @@
     for (var k = 0; k <= STEPS; k++) even.push(k / STEPS);
     return even;
   }());
+
   var visual = track.querySelector(".visual");
   var video = track.querySelector(".clip");
-  var last = null, ready = false, armed = false;
-  var span = 1, pinTop = MIN_TOP;
+  var armed = false, ready = false, near = false, shown = -1;
 
   function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-  /* Smoothstep rather than an expo. The weights have to be continuous through
-     the step boundary in both directions, and an expo.out is steep at its own
-     start, which reads as a snap when it is scrubbed. */
   function smooth(p) { p = clamp(p); return p * p * (3 - 2 * p); }
 
-  /* p on 0..1 remapped onto 0..STEPS, so a step's own share of the scrub reads
-     as one whole unit of raw whatever width that share is. With even cut
-     points this is exactly p * STEPS. */
+  /* p on 0..1 remapped onto 0..STEPS, so a step's own share of the loop reads
+     as one whole unit whatever width that share is. */
   function rawOf(p) {
     for (var k = 0; k < STEPS; k++) {
       if (p < CUTS[k + 1] || k === STEPS - 1) {
@@ -56,25 +41,6 @@
       }
     }
     return STEPS;
-  }
-
-  /* The band is centred in the window for the whole of the scrub, which means
-     the sticky offset is half of what the window's height leaves over. That is
-     two numbers the sheet does not have, so it is written from here, and the
-     track is measured from the band rather than stated in screens: the runway
-     is the band's own height and one step of the three more. */
-  function measure() {
-    track.style.height = "";
-    var h = card.getBoundingClientRect().height;
-    pinTop = Math.max(MIN_TOP, Math.round((window.innerHeight - h) / 2));
-    track.style.setProperty("--pin-top", pinTop + "px");
-    span = Math.max(1, Math.round(h * (4 / 3)));
-    track.style.height = Math.round(h + span) + "px";
-  }
-
-  function progress() {
-    var box = track.getBoundingClientRect();
-    return clamp((-box.top + pinTop) / span);
   }
 
   /* The clip is fetched when the band is within a viewport of the reader and
@@ -95,105 +61,86 @@
     video.load();
   }
 
-  /* The clip has to be decoded and holding a frame before the band pins, or
-     the first seek paints black. Playing muted for a moment and pausing is the
-     one request every browser honours as a request to decode; the poster
-     covers the frame until it lands. */
+  /* The poster covers the frame until the clip has decoded something it can
+     paint, then the two swap and the loop runs. */
   function arm() {
     if (ready) return;
-    var p = video.play();
-    var settle = function () {
-      try { video.pause(); } catch (e) {}
-      video.currentTime = 0;
-      ready = true;
-      visual.classList.add("ready");
-      /* The loop only draws when the band has moved, so a clip that finishes
-         decoding after the reader has already stopped inside the band would
-         sit on its first frame until the next scroll. Draw once here. */
-      last = null;
-      draw();
-    };
-    if (p && p.then) { p.then(settle).catch(settle); } else { settle(); }
+    ready = true;
+    visual.classList.add("ready");
+    play();
+  }
+
+  function play() {
+    if (!ready || !near) return;
+    var pr = video.play();
+    if (pr && pr.catch) pr.catch(function () {});
   }
 
   video.muted = true;
+  video.loop = true;
   video.playsInline = true;
   video.addEventListener("loadeddata", arm);
   video.addEventListener("canplay", arm);
 
+  /* A band the reader has scrolled past is a decode nobody is watching, so the
+     loop is held off screen and picked up again on the way back. */
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(function (entries, obs) {
-      if (entries.some(function (e) { return e.isIntersecting; })) {
-        attach();
-        obs.disconnect();
-      }
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { near = true; attach(); play(); }
+        else if (near) { near = false; try { video.pause(); } catch (err) {} }
+      });
     }, {rootMargin: "100% 0px"}).observe(track);
   } else {
+    near = true;
     attach();
   }
 
+  /* Which rung the loop is on. Read off the clip's own playhead rather than
+     off a timer of our own, so the copy cannot drift away from the picture
+     however the browser schedules the decode. */
   function draw() {
-    var p = progress();
+    var d = video.duration;
+    var p = (ready && d) ? clamp(video.currentTime / d) : 0;
     track.style.setProperty("--p", p.toFixed(4));
 
     var raw = rawOf(p);
     var i = Math.min(STEPS - 1, Math.floor(raw));
-
-    /* Every step stays readable: the scrub moves the emphasis, not the text.
-       The weight sits on a triangular window centred on the step's own third,
-       so the band pins with its first step already at full weight rather than
-       with three dim rows and nothing to read. */
-    for (var s = 0; s < steps.length; s++) {
-      var d = Math.abs(raw - (s + 0.5));
-      steps[s].style.setProperty(
-        "--o", (1 - 0.55 * smooth(clamp((d - 0.5) / 0.5))).toFixed(3));
-      steps[s].toggleAttribute("data-on", s === i);
+    if (i !== shown) {
+      shown = i;
+      track.dataset.step = i;
     }
-    track.dataset.step = i;
-
-    /* The day to evening move runs across the whole band rather than inside one
-       step, with a short flat lead in and lead out so both end states can be
-       held and read. */
-    var lit = smooth((p - 0.08) / 0.80);
-    track.style.setProperty("--lit", lit.toFixed(4));
-
-    if (ready && video.duration) {
-      var want = lit * video.duration;
-      if (want > video.duration - 0.05) want = video.duration - 0.05;
-      if (Math.abs(want - video.currentTime) > SEEK_EPS) video.currentTime = want;
+    /* Every step stays readable: the loop moves the emphasis, not the text.
+       The weight sits on a triangular window centred on the step's own share,
+       so no rung is ever dimmer than 45 per cent. */
+    for (var s = 0; s < steps.length; s++) {
+      var dist = Math.abs(raw - (s + 0.5));
+      steps[s].style.setProperty(
+        "--o", (1 - 0.55 * smooth(clamp((dist - 0.5) / 0.5))).toFixed(3));
+      steps[s].toggleAttribute("data-on", s === i);
     }
   }
 
-  /* A persistent loop rather than a scroll listener. Momentum scrolling
-     delivers scroll events in bursts and a seek issued from a burst lands late;
-     polling the box every frame keeps the picture on the same clock as the
-     scroll. The compare guard means an idle page does no layout work beyond the
-     one read. */
   function tick() {
-    var top = track.getBoundingClientRect().top;
-    if (top !== last) { last = top; draw(); }
+    draw();
     requestAnimationFrame(tick);
   }
 
-  function remeasure() { measure(); last = null; draw(); }
-
-  /* The screenshot harness and the gates need the document scroll position of a
-     given progress, and it has to be the driver's own arithmetic rather than a
-     second copy of it, or the shots and the page disagree about what half way
-     through the band means. */
-  window.battTarget = function (p) {
-    var zero = window.scrollY + track.getBoundingClientRect().top - pinTop;
-    return Math.round(zero + p * span);
+  /* The gates and the screenshot harness read the loop's own position rather
+     than keeping a second copy of the arithmetic. */
+  window.battProgress = function () {
+    var d = video.duration;
+    return (ready && d) ? clamp(video.currentTime / d) : 0;
   };
-  window.battProgress = progress;
+  /* Park the loop at a fraction of itself, so a still can be taken of a known
+     beat without waiting for the clip to come round to it. */
+  window.battSeek = function (f) {
+    if (!video.duration) return false;
+    video.currentTime = clamp(f) * video.duration;
+    draw();
+    return true;
+  };
 
-  measure();
   draw();
-  window.addEventListener("resize", remeasure);
-  /* Web fonts land after first paint and change the copy column's height, which
-     changes both the centre and the runway. */
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(remeasure);
-  }
   requestAnimationFrame(tick);
 })();

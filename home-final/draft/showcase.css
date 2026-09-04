@@ -51,8 +51,10 @@
 }
 .showcase-copy .lede { margin: 0; }
 /* the right hand column, which is now the way in to the study and nothing else:
-   it sits in the space the stills used to hold */
-.showcase-side { display: flex; flex-direction: column; align-items: flex-start; }
+   it sits in the space the stills used to hold. Scott, 4 September: the button
+   finishes on the right edge of the photographs above it rather than starting
+   on their left, so the block closes on one line. */
+.showcase-side { display: flex; flex-direction: column; align-items: flex-end; }
 /* stacked, and as tall as the clip beside them, so the row finishes level */
 .showcase-pair {
   display: grid; grid-template-rows: 1fr 1fr; gap: 14px;
@@ -97,6 +99,8 @@
 
 @media (max-width: 900px) {
   .showcase-under { grid-template-columns: 1fr; }
+  /* stacked, there is no right edge to finish on */
+  .showcase-side { align-items: flex-start; }
   .showcase-who { text-align: start; }
   /* no room for a column beside the clip, so the stills go back under it, side
      by side on their own measured crop */
