@@ -696,9 +696,10 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
 .sa-q .q-gate .f-lab { text-align: left; }
 .sa-q .f-tiles { max-width: 620px; margin: 0 auto; gap: 20px; align-items: stretch; }
 /* the clay models are not all the same height, so the count field is pushed to
-   the foot of its cell and the five rules sit on one line */
-.sa-q .f-tile-cell { display: flex; flex-direction: column; }
-.sa-q .f-tile-cell .f-count { margin-top: auto; }
+   the foot of its cell and the five rules sit on one line. The FHS run asks the
+   same question with the same control, so it takes the same rule. */
+.sa-q .f-tile-cell, .fhs-q .f-tile-cell { display: flex; flex-direction: column; }
+.sa-q .f-tile-cell .f-count, .fhs-q .f-tile-cell .f-count { margin-top: auto; }
 .sa-q .f-tally { margin-top: 16px; }
 .sa-q .f-consent { margin-left: auto; margin-right: auto; text-align: center; }
 

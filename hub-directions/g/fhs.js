@@ -66,6 +66,11 @@
   var STATE = { green: "Pass", amber: "Close", red: "Fails" };
 
   var a = null;      /* the answer set the model reads */
+  /* Bedrooms are picked the way the site assessment picks them: every size on
+     the scheme, then how many plots of each. beds holds the sizes in tile
+     order and bedCounts holds the plots against each size. */
+  var beds = [];
+  var bedCounts = {};
   var contact = { name: "", email: "" };
   var at = 0;
 
@@ -199,6 +204,31 @@
       + tiles(field, list, current, opt) + "</div>";
   }
 
+  /* The bedroom tiles are the site assessment's control, markup and classes
+     included: a cell a size, the clay tile inside it and the plot count under
+     the tile, revealed when the size is picked. */
+  function bedGroup() {
+    var cells = O.bedrooms.map(function (v, i) {
+      var on = beds.indexOf(v) >= 0;
+      var art = '<img src="' + IMG + BED_ART[v] + '.png" alt="" width="300" height="300" decoding="async">';
+      var has = bedCounts[v] !== undefined;
+      return '<div class="f-tile-cell" style="--i:' + i + '">'
+        + tile("bedrooms", v, v + " bed", art, on)
+        + '<input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="'
+        + v + '" aria-label="' + v + ' bed plots" placeholder="0"'
+        + (has ? ' value="' + bedCounts[v] + '"' : "")
+        + (on ? "" : " hidden") + "></div>";
+    }).join("");
+    return '<div class="f-tiles cols-5 beds" role="group" aria-label="Bedrooms">' + cells + "</div>";
+  }
+
+  function sizeLine() {
+    return beds.map(function (b) { return b + " bed x " + plotsFor(b); }).join(", ");
+  }
+  /* A size left blank is one plot of that size, which is what the reader who
+     picked the tile and typed nothing meant. */
+  function plotsFor(b) { return bedCounts[b] || 1; }
+
   function yesNo(field, current) {
     return '<div class="f-tiles cols-2 narrow" role="group">'
       + ["Yes", "No"].map(function (v) {
@@ -217,10 +247,11 @@
       stand: "Tell us about the house type you're assessing.",
       body: function () { return group("houseType", O.houseTypes, a.houseType); } },
     { key: "bedrooms", head: "Number of bedrooms",
+      stand: "Pick every size on the scheme, then say how many of each.",
       body: function () {
-        return group("bedrooms", O.bedrooms, a.bedrooms,
-                     { cls: "beds", name: function (v) { return v + " bed"; } })
-          + '<p class="fm-flag" data-odd hidden>This combination is unusual — '
+        return bedGroup()
+          + '<p class="fm-flag" data-odd hidden><span data-odd-sizes></span>'
+          + "This combination is unusual — "
           + "please contact us for a bespoke assessment.</p>";
       } },
     { key: "storeys", head: "Number of storeys",
@@ -377,11 +408,17 @@
     Array.prototype.forEach.call(prog.children, function (seg, i) {
       seg.className = "fm-seg" + (i < at ? " done" : (i === at ? " on" : ""));
     });
-    el("[data-count]").textContent = onGate()
+    /* the plot count fields carry data-count too, so the step label is read by
+       its own class rather than by the attribute */
+    el(".fm-count").textContent = onGate()
       ? "Your details" : "Step " + pad(at + 1) + " of " + pad(n);
 
     el("[data-back]").hidden = at === 0;
-    el("[data-go]").hidden = !onGate();
+    /* The bedroom step takes several answers, so it is the one question with a
+       Continue under it. It is the same button the gate uses. */
+    var go = el("[data-go]");
+    go.hidden = !onGate() && q.key !== "bedrooms";
+    go.textContent = onGate() ? "See your readiness check" : "Continue";
     if (q.key === "bedrooms") { flagOdd(); }
     gate();
     revealPane(dir || "fwd");
@@ -390,12 +427,29 @@
   /* The live tool's guard: some house type and bedroom pairs have no published
      floor area, and the run stops on the bedroom question until the pair is one
      the model can size. */
+  function unsupportedBeds() {
+    return beds.filter(function (b) {
+      return !G.isSupported({ houseType: a.houseType, bedrooms: b });
+    });
+  }
+
   function flagOdd() {
     var odd = el("[data-odd]");
-    if (odd) { odd.hidden = !a.houseType || !a.bedrooms || G.isSupported(a); }
+    if (!odd) { return; }
+    var bad = unsupportedBeds();
+    odd.hidden = !a.houseType || !beds.length || !bad.length;
+    var names = el("[data-odd-sizes]");
+    if (names) {
+      names.textContent = bad.length
+        ? bad.map(function (b) { return b + " bed"; }).join(", ") + ". "
+        : "";
+    }
   }
 
   function ready() {
+    if (paneAt(at).key === "bedrooms") {
+      return beds.length > 0 && unsupportedBeds().length === 0;
+    }
     return !onGate() || !!(contact.name && contact.email.indexOf("@") > 0);
   }
   function gate() {
@@ -412,6 +466,7 @@
     a.heating = null; a.partL = null; a.ventilation = null;
     a.airtightness = null; a.glazing = null;
     a.hasSolar = false; a.panels = 0; a.hasBattery = false; a.hasWWHR = false;
+    beds = []; bedCounts = {};
     contact = { name: "", email: "" };
     at = 0;
     el("[data-check]").hidden = false;
@@ -444,10 +499,11 @@
 
   /* The check as plain text: what was answered, the verdict, every measure with
      its state word, and the two coverage figures. */
-  function leadNotes(m, r) {
+  function leadNotes(runs, best) {
+    var m = best.m, r = best.r;
     var lines = [
       "House type: " + a.houseType,
-      "Bedrooms: " + a.bedrooms,
+      "Bed sizes: " + sizeLine(),
       "Storeys: " + a.storeys,
       "Heating: " + a.heating,
       "Part L target: " + a.partL,
@@ -458,24 +514,29 @@
       "Battery in spec: " + (a.hasBattery ? "Yes" : "No"),
       "Wastewater heat recovery: " + (a.hasWWHR ? "Yes" : "No"),
       "",
-      "Verdict: " + m.heading,
+      "Verdict (" + best.bed + " bed): " + m.heading,
       "Summary: " + m.sub,
       ""
     ];
+    runs.forEach(function (x) {
+      lines.push(x.bed + " bed x " + x.count + ": " + x.m.heading);
+    });
+    lines.push("");
     m.measures.forEach(function (x) { lines.push(x.name + ": " + x.state); });
     lines.push("");
     lines.push("Energy covered on your spec: " + r.user.coverage + "%");
     lines.push("Energy covered on a Gryd system: " + r.gryd.coverage + "%");
+    lines.push("Figures are for the " + best.bed + " bed size.");
     return lines.join("\n");
   }
 
-  function leadPayload(m, r) {
+  function leadPayload(runs, best) {
     var n = splitName(contact.name);
     var fields = [
       { objectTypeId: "0-1", name: "email", value: contact.email },
       { objectTypeId: "0-1", name: "firstname", value: n.first },
       { objectTypeId: "0-1", name: "lastname", value: n.last },
-      { objectTypeId: "0-1", name: "fhs_assessment_notes", value: leadNotes(m, r) }
+      { objectTypeId: "0-1", name: "fhs_assessment_notes", value: leadNotes(runs, best) }
     ];
     return {
       fields: fields,
@@ -489,11 +550,11 @@
     };
   }
 
-  function sendLead(m, r) {
+  function sendLead(runs, best) {
     return w.fetch(HS_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(leadPayload(m, r))
+      body: JSON.stringify(leadPayload(runs, best))
     }).then(function (res) {
       if (!res.ok) { throw new Error("hubspot " + res.status); }
       return true;
@@ -504,6 +565,7 @@
 
   function specRows() {
     var rows = [
+      ["Bed sizes", sizeLine()],
       ["Heating", a.heating],
       ["Storeys", a.storeys],
       ["Part L target", a.partL],
@@ -587,9 +649,42 @@
      plates pinned at the top of it, the eight measures as hairline rows, and
      the detail folded away. assess-result.css supplies the plates, the rows,
      the fold and the hover; nothing is redeclared here. */
-  function renderResult() {
-    var m = modelParts(a);
-    var r = G.estimate(a);
+  /* The model answers one bed size at a time, and a scheme can carry several.
+     So the check is run once for every size picked, with its plot count beside
+     it. The headline is the worst performing size, because a scheme is only as
+     ready as the size that misses, and the fold below lists every size with its
+     count and its own verdict. */
+  var BAND_RANK = { green: 0, amber: 1, red: 2 };
+
+  function bedRuns() {
+    return beds.map(function (b) {
+      var spec = {};
+      for (var k in a) {
+        if (Object.prototype.hasOwnProperty.call(a, k)) { spec[k] = a[k]; }
+      }
+      spec.bedrooms = b;
+      return { bed: b, count: plotsFor(b), m: modelParts(spec), r: G.estimate(spec) };
+    });
+  }
+
+  function worstRun(runs) {
+    return runs.reduce(function (worst, x) {
+      return BAND_RANK[x.m.band] > BAND_RANK[worst.m.band] ? x : worst;
+    }, runs[0]);
+  }
+
+  function sizeBlock(runs) {
+    var rows = runs.map(function (x) {
+      return '<div class="s-row"><dt>' + esc(x.bed + " bed x " + x.count)
+        + "</dt><dd>" + esc(x.m.heading) + "</dd></div>";
+    }).join("");
+    return '<section class="fhs-spec"><h4>Every size on the scheme</h4><dl>'
+      + rows + "</dl></section>";
+  }
+
+  function renderResult(runs, best) {
+    var m = best.m;
+    var r = best.r;
     var host = el("[data-result]");
 
     var rows = m.measures.map(function (x, i) {
@@ -605,7 +700,7 @@
 
     host.innerHTML = '<div class="ar-root">'
       + '<header class="fhs-verdict band-' + esc(m.band) + '">'
-      + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(a.bedrooms) + " bed</span>"
+      + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(sizeLine()) + "</span>"
       + '<h2 class="ar-title" data-live>' + esc(m.heading) + "</h2></header>"
 
       + '<section class="ar-chartcard"><div class="ar-pins"><div class="ar-plates">'
@@ -626,7 +721,7 @@
       + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
       + "</svg></span></summary>"
       + '<div class="ar-foldbody"><div class="ar-foldinner">'
-      + '<div class="r-detail-in" data-summary>' + m.flags + specBlock() + m.table
+      + '<div class="r-detail-in" data-summary>' + m.flags + sizeBlock(runs) + specBlock() + m.table
       + "</div></div></div></details>"
 
       + '<p class="ar-foot note rise" style="--d:' + (STAGGER * 11) + 'ms" data-live>' + esc(m.disclaimer) + "</p>"
@@ -682,8 +777,8 @@
     });
   }
 
-  function show() {
-    renderResult();
+  function show(runs, best) {
+    renderResult(runs, best);
     hideCheck();
     w.setTimeout(function () {
       el("[data-result]").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -693,11 +788,11 @@
   /* The send is not allowed to cost the reader their result. It is tried, and
      if it does not go the gate says so once and the check is drawn anyway. */
   function finish() {
-    var m = modelParts(a);
-    var r = G.estimate(a);
+    var runs = bedRuns();
+    var best = worstRun(runs);
     var go = el("[data-go]");
     go.disabled = true;
-    sendLead(m, r).then(show, function () {
+    sendLead(runs, best).then(function () { show(runs, best); }, function () {
       var note = el("[data-sent]");
       if (!note) {
         note = d.createElement("p");
@@ -707,7 +802,7 @@
       }
       note.textContent = "We could not send this just now, your result is below.";
       note.hidden = false;
-      w.setTimeout(show, 1400);
+      w.setTimeout(function () { show(runs, best); }, 1400);
     });
   }
 
@@ -751,11 +846,33 @@
     if (field === "hasSolar" || field === "hasBattery" || field === "hasWWHR") {
       a[field] = raw === "Yes";
       if (field === "hasSolar" && !a.hasSolar) { a.panels = 0; }
-    } else if (field === "bedrooms" || field === "storeys" || field === "panels") {
+    } else if (field === "storeys" || field === "panels") {
       a[field] = Number(raw);
     } else {
       a[field] = raw;
     }
+  }
+
+  /* A bedroom tile toggles rather than answers, and reveals or clears its own
+     plot count. a.bedrooms holds the smallest size picked so the guard and the
+     model always have a number to work with. */
+  function toggleBed(btn) {
+    var v = Number(btn.getAttribute("data-v"));
+    var on = btn.getAttribute("aria-pressed") === "true";
+    btn.setAttribute("aria-pressed", on ? "false" : "true");
+    var field = btn.parentNode.querySelector(".f-count");
+    if (on) {
+      beds = beds.filter(function (b) { return b !== v; });
+      delete bedCounts[v];
+      if (field) { field.hidden = true; field.value = ""; }
+    } else {
+      if (beds.indexOf(v) < 0) { beds.push(v); }
+      beds.sort(function (x, y) { return x - y; });
+      if (field) { field.hidden = false; }
+    }
+    a.bedrooms = beds.length ? beds[0] : null;
+    flagOdd();
+    gate();
   }
 
   function start() {
@@ -774,14 +891,11 @@
       var tileEl = t.closest(".fm .f-tile");
       if (tileEl) {
         var field = tileEl.getAttribute("data-f");
+        if (field === "bedrooms") { toggleBed(tileEl); return; }
         setField(field, tileEl.getAttribute("data-v"));
         var groupEls = tileEl.parentNode.querySelectorAll(".f-tile");
         for (var i = 0; i < groupEls.length; i++) {
           groupEls[i].setAttribute("aria-pressed", String(groupEls[i] === tileEl));
-        }
-        if (field === "bedrooms") {
-          flagOdd();
-          if (!G.isSupported(a)) { return; }
         }
         /* A single choice answers the question, so the run moves on by itself.
            The pause is one beat, long enough to see the tile take the answer
@@ -795,11 +909,20 @@
       if (t.closest("[data-back]")) { goTo(Math.max(0, at - 1), "back"); return; }
       if (t.closest("[data-go]")) {
         if (!gate()) { return; }
+        if (!onGate()) { goTo(at + 1, "fwd"); return; }
         finish();
       }
     });
 
     d.addEventListener("input", function (ev) {
+      var cf = ev.target && ev.target.closest ? ev.target.closest(".f-count") : null;
+      if (cf) {
+        var b = Number(cf.getAttribute("data-count"));
+        var n = parseInt(cf.value, 10);
+        if (!n || n < 1) { delete bedCounts[b]; } else { bedCounts[b] = n; }
+        gate();
+        return;
+      }
       var f = ev.target && ev.target.closest ? ev.target.closest("[data-k]") : null;
       if (!f) { return; }
       contact[f.getAttribute("data-k")] = f.value.trim();
