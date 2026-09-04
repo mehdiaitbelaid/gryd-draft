@@ -68,11 +68,15 @@
    menu-lab.html, so all four candidates live in menu-motion.css and a page
    picks one with data-menu-motion on the nav. This file only says where the
    panel sits and that it is hidden until its parent is open. */
+/* A shut panel is out of the hit test as well as out of sight. Opacity alone
+   left it lying over the page, and because visibility is inherited any rule
+   further down that says visible on a child brings the whole panel back as a
+   tap target under content it is invisible over. */
 .dnav .submenu {
   position: absolute; top: 100%; left: 0; padding-top: 12px;
-  min-width: 190px; opacity: 0; visibility: hidden;
+  min-width: 190px; opacity: 0; visibility: hidden; pointer-events: none;
 }
-.dnav .has-menu.open > .submenu { opacity: 1; visibility: visible; }
+.dnav .has-menu.open > .submenu { opacity: 1; visibility: visible; pointer-events: auto; }
 .dnav .submenu ul {
   list-style: none; margin: 0; padding: 8px;
   background: rgba(78,37,27,.94); backdrop-filter: blur(14px);
@@ -269,18 +273,22 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
     background: var(--red110);
     border-radius: 22px; box-shadow: 0 18px 44px rgba(46,12,8,.34);
     max-height: min(70vh, 520px); overflow-y: auto;
-    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-6px);
     transition: opacity .2s ease, transform .2s ease, visibility .2s;
   }
-  .dnav.menu-open .links { opacity: 1; visibility: visible; transform: none; }
+  .dnav.menu-open .links { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
   .dnav .link { width: 100%; justify-content: space-between; padding: 11px 14px; font-size: 15px; }
-  .dnav .caret { display: none; }
-  /* the children are always shown, so there is no second tap and no panel that
-     can push the pill's own panel taller mid gesture */
+  /* The children were shown unconditionally here, which put two panels' worth
+     of links on top of the page at phone width: the burger panel was only
+     transparent, and visibility: visible on the submenus inside it undid the
+     one thing keeping them out of the hit test. So a phone submenu is now shut
+     until its parent is tapped, taken out of the flow entirely rather than made
+     transparent, and the caret comes back because there is a state to show. */
   .dnav .submenu {
-    position: static; opacity: 1; visibility: visible; transform: none;
-    padding-top: 0; min-width: 0;
+    position: static; display: none; opacity: 1; visibility: visible;
+    transform: none; padding-top: 0; min-width: 0; pointer-events: auto;
   }
+  .dnav .has-menu.open > .submenu { display: block; }
   .dnav .submenu ul { background: none; box-shadow: none; padding: 0 0 6px 14px; border-radius: 0; }
   .dnav .submenu a { font-size: 14px; color: rgba(255,255,255,.7); padding: 8px 14px; }
 
