@@ -148,6 +148,7 @@ html.gryd-js.intro-done .d-hero .b1 { filter: opacity(1); }
 <link rel="stylesheet" href="system-live.css">
 <link rel="stylesheet" href="battery-scrub.css">
 <link rel="stylesheet" href="menu-spotlight.css">
+<link rel="stylesheet" href="../assets/site-modal.css">
 <link rel="stylesheet" href="contact-modal.css">
 <link rel="stylesheet" href="../assets/site-footer.css">
 <script>
@@ -226,6 +227,7 @@ html.gryd-js.intro-done .d-hero .b1 { filter: opacity(1); }
   addEventListener('pagehide', save);
 })();
 </script>
+<script src="../assets/hubspot-frame.js"></script>
 <script src="../assets/page-fade.js"></script>
 <script src="../assets/site-assess-modal.js" defer></script>
 <style>
@@ -301,9 +303,7 @@ body.intro-rise .hero-scrim{opacity:1}
 html.pointer-live .field{transform:translate3d(0,calc(var(--sy) * -4vh),0) scale(calc(1 + var(--sy) * .06));
   transform-origin:50% 42%}
 .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
-.btn{display:inline-block;text-decoration:none;font-size:15px;font-weight:500;padding:14px 26px;
-  border-radius:999px;background:var(--flare);color:#ffffff}
-.btn.ghost{background:transparent;color:var(--red110);box-shadow:inset 0 0 0 1px var(--stone-mid)}
+/* .btn and .btn.ghost are tokens.css's, one definition for the site. */
 /* reversed hero, for the fields dark or saturated enough to need it. Every pair
    here is one the guide's contrast table already approves. */
 body.rev-hero .stub h1{color:#ffffff}
@@ -457,8 +457,8 @@ body.intro-rise .gryd-nav{opacity:1}
 @keyframes vdriftC{0%{opacity:0}33%{opacity:0}61%{opacity:1}88%{opacity:0}100%{opacity:0}}
 
 body.on-flare .stub .btn:not(.ghost){display:inline-flex;align-items:center;gap:14px;
-  background:#ffffff;color:var(--ember);font-family:"Borna","DM Sans",sans-serif;
-  font-weight:500;font-size:16px;line-height:16px;
+  background:#ffffff;color:var(--ember);font-family:"DM Sans",ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;
+  font-weight:500;font-size:15px;line-height:16px;
   padding:2px 2px 2px 16px;border-radius:44px;
   box-shadow:0 12px 30px rgba(46,12,8,.26);
   transition:background-color .3s, color .3s, box-shadow .3s, transform .3s}

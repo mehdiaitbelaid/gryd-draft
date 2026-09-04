@@ -108,9 +108,15 @@ html, body { overflow-x: visible; }
 /* the burger only exists on the narrow layout */
 .dnav-burger { display: none; }
 
+/* The nav call to action: the site's primary button at the pill's own size.
+   Same face, same weight, same flare on white, same fully rounded edge; 14px
+   in a 44px bar rather than 15px on the page. The one deliberate second size,
+   and the only one. */
 .dnav .cta {
   flex: none; margin-left: 6px; text-decoration: none; white-space: nowrap;
-  background: var(--flare); color: #fff; font-size: 14px; font-weight: 500;
+  background: var(--flare); color: #fff;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px; font-weight: 500;
   padding: 10px 18px; border-radius: 999px;
 }
 .dnav .cta:hover, .dnav .cta:focus-visible { background: #fff; color: var(--ember); }

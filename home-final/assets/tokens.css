@@ -186,15 +186,33 @@ h1, h2, h3, h4, .display {
   white-space: nowrap;
 }
 
+/* The primary action, and the reference every other button on the site is held
+   against: 15px DM Sans at 500, 14px by 26px, fully rounded, flare on white.
+   The same geometry is restated for the buttons inside a modal in
+   home-final/assets/site-modal.css, so a change here has to be made there in
+   the same commit.
+
+   The element rules are what the Get in touch button was missing. A <button>
+   takes none of the page's font, carries a UA border and reads its own
+   line-height, so .btn on a <button> drew a different object from .btn on an
+   <a>: system type, a ring around the pill and a taller box. Stated here once,
+   so no caller has to know which element it is on. */
 .btn {
   display: inline-block;
   text-decoration: none;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
   font-weight: 500;
+  line-height: 1.55;
   padding: 14px 26px;
+  border: 0;
   border-radius: 999px;
   background: var(--flare);
   color: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: center;
 }
 .btn.ghost { background: transparent; color: var(--red110); box-shadow: inset 0 0 0 1px var(--stone-mid); }
 /* One spacing rule for every button, so no page sets its own. A row of buttons
