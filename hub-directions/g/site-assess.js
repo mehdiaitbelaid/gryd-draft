@@ -22,6 +22,15 @@
   /* the bed sizes as picked, which the engine needs as a split rather than
      as the line the rail prints */
   var beds = [];
+  /* plots per bed size, and the one the reader touched last, which is the one
+     that gives way when a plot total is typed over the top of the counts */
+  var counts = {};
+  var lastCount = null;
+
+  function countTotal() {
+    return Object.keys(counts).reduce(function (n, k) { return n + (counts[k] || 0); }, 0);
+  }
+  function hasCounts() { return countTotal() > 0; }
 
   function set(key, val) {
     if (!key) { return; }
@@ -50,6 +59,48 @@
     }
   });
 
+  var plotsField = doc.querySelector('[data-key="plots"]');
+
+  function tally() {
+    var line = doc.querySelector("[data-tally]");
+    if (!line) { return; }
+    var total = countTotal();
+    line.hidden = !total;
+    if (!total) { return; }
+    var target = parseInt(values.plots, 10) || total;
+    line.textContent = total + " of " + target + " plots counted";
+    line.classList.toggle("is-off", total !== target);
+  }
+
+  function fillPlots() {
+    var total = countTotal();
+    if (!total || !plotsField) { return; }
+    plotsField.value = String(total);
+    set("plots", String(total));
+  }
+
+  /* the plot counts under the chosen tiles */
+  all("[data-count]").forEach(function (f) {
+    var bed = f.getAttribute("data-count");
+    f.addEventListener("input", function () {
+      var n = parseInt(f.value, 10);
+      if (!n || n < 1) { delete counts[bed]; } else { counts[bed] = n; lastCount = bed; }
+      fillPlots();
+      tally();
+    });
+  });
+
+  if (plotsField) {
+    plotsField.addEventListener("input", function () {
+      var want = parseInt(plotsField.value, 10);
+      if (!want || !lastCount || !hasCounts()) { tally(); return; }
+      counts[lastCount] = Math.max(1, want - (countTotal() - counts[lastCount]));
+      var f = doc.querySelector('[data-count="' + lastCount + '"]');
+      if (f) { f.value = String(counts[lastCount]); }
+      tally();
+    });
+  }
+
   /* clay house type tiles, multi select */
   all("[data-tile-group]").forEach(function (group) {
     var key = group.getAttribute("data-tile-group");
@@ -61,7 +112,23 @@
       var picked = all('.f-tile[aria-pressed="true"]', group).map(function (b) {
         return b.getAttribute("data-value");
       });
-      if (key === "bedrooms") { beds = picked; }
+      if (key === "bedrooms") {
+        beds = picked;
+        var bed = btn.getAttribute("data-value");
+        var field = btn.parentNode.querySelector(".f-count");
+        if (field) {
+          if (on) {
+            field.hidden = true;
+            field.value = "";
+            delete counts[bed];
+            if (lastCount === bed) { lastCount = null; }
+          } else {
+            field.hidden = false;
+          }
+        }
+        fillPlots();
+        tally();
+      }
       set(key, picked.join(", "));
     });
   });
@@ -133,11 +200,13 @@
 
   function engineInputs() {
     var api = window.GrydAssessInputs || {};
-    return { homes: parseInt(values.plots, 10) || 1,
+    var counted = hasCounts() && api.splitFromCounts;
+    return { homes: counted ? countTotal() : (parseInt(values.plots, 10) || 1),
              postcode: String(values.postcode || "").toUpperCase().trim(),
              orientation: api.ORIENTATION || "South",
              energy: api.ENERGY || "All Electric",
-             split: api.shareOut ? api.shareOut(beds) : { small: 100, mid: 0, large: 0 } };
+             split: counted ? api.splitFromCounts(counts)
+                    : (api.shareOut ? api.shareOut(beds) : { small: 100, mid: 0, large: 0 }) };
   }
 
   function gateReady() {

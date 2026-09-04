@@ -1,0 +1,30 @@
+# Gryd
+
+> At Gryd, we make solar simple. Gryd offers developers and homeowners a smarter way to power new-build homes by providing fully-funded solar and storage that exceeds regulations and expectations.
+
+Fully funded solar and batteries. Meeting compliance. Reducing build cost. Unlocking developments.
+
+Homes that are cheaper to build and more affordable to run.
+
+## Tools
+
+Three tools. Each answers a question before you commit a plot. One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.
+
+- [Tools](https://gryd.energy/hub-directions/g/tools.html): the three tools, and what each one answers.
+- [Site assessment](https://gryd.energy/hub-directions/g/site-assessment.html): roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.
+- [Future Homes Standard readiness check](https://gryd.energy/hub-directions/g/fhs.html): three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.
+- [Council Solar Index](https://gryd.energy/hub-directions/g/council-solar-index.html): interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.
+
+## Key pages
+
+- [Home](https://gryd.energy/home-final/draft/index.html)
+- [Projects](https://gryd.energy/hub-directions/g/projects.html)
+- [Knowledge Hub](https://gryd.energy/hub-directions/g/blog.html)
+- [News](https://gryd.energy/hub-directions/g/news.html)
+- [FAQs](https://gryd.energy/hub-directions/g/faq.html)
+- [Request a site assessment](https://gryd.energy/hub-directions/g/request-site-assessment.html)
+
+## Legal
+
+- [Privacy policy](https://gryd.energy/hub-directions/g/privacy-policy.html)
+- [Cookie policy](https://gryd.energy/hub-directions/g/cookie-policy.html)

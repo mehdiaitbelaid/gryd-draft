@@ -46,9 +46,13 @@
   }
 
   function bedTile(b) {
-    return '<button type="button" class="ai-tile" aria-pressed="false" data-value="'
+    return '<div class="ai-tile-cell">'
+      + '<button type="button" class="ai-tile" aria-pressed="false" data-value="'
       + esc(b[0]) + '"><img src="' + IMG + b[2] + '.png" alt="" width="300" height="300"'
-      + ' decoding="async"><span class="ai-tile-name">' + esc(b[0]) + "</span></button>";
+      + ' decoding="async"><span class="ai-tile-name">' + esc(b[0]) + "</span></button>"
+      + '<input class="ai-count" type="number" min="1" step="1" inputmode="numeric"'
+      + ' data-count="' + esc(b[0]) + '" aria-label="' + esc(b[0]) + ' plots"'
+      + ' placeholder="0" hidden></div>';
   }
 
   function row(label, inner) {
@@ -71,7 +75,9 @@
       + row("Bedrooms",
             '<div class="ai-tiles" data-tiles="bedrooms" role="group" aria-label="Bedrooms">'
             + beds + "</div>"
-            + '<p class="ai-hint">Pick every size on the scheme.</p>')
+            + '<p class="ai-hint">Pick every size on the scheme, then say how many'
+            + " of each.</p>"
+            + '<p class="ai-tally" data-tally hidden></p>')
       + row("Number of plots",
             '<input class="ai-text" type="number" id="aiHomes" data-key="homes"'
             + ' aria-label="Number of plots" placeholder="42" min="1" step="1"'
@@ -96,6 +102,35 @@
     return split;
   }
 
+  /* The split straight off the plot counts. Percentages are what the engine and
+     the summary read, so the three are rounded down and the leftover points go
+     to the largest fractional parts first, which keeps them reading as 100. */
+  function splitFromCounts(counts) {
+    var split = { small: 0, mid: 0, large: 0 };
+    var raw = { small: 0, mid: 0, large: 0 };
+    var total = 0;
+    Object.keys(counts).forEach(function (name) {
+      var n = counts[name] || 0;
+      if (n <= 0) { return; }
+      BEDS.forEach(function (b) { if (b[0] === name) { raw[b[1]] += n; total += n; } });
+    });
+    if (!total) { return split; }
+    var rest = 100;
+    var parts = BANDS.map(function (k) {
+      var exact = raw[k] * 100 / total;
+      split[k] = Math.floor(exact);
+      rest -= split[k];
+      return { k: k, frac: exact - Math.floor(exact) };
+    });
+    parts.sort(function (a, b) { return b.frac - a.frac; });
+    for (var i = 0; i < rest; i++) { split[parts[i % parts.length].k] += 1; }
+    return split;
+  }
+
+  function countTotal(counts) {
+    return Object.keys(counts).reduce(function (n, k) { return n + (counts[k] || 0); }, 0);
+  }
+
   function mount(container, onComplete, opts) {
     opts = opts || {};
     container.classList.add("ai-root");
@@ -103,16 +138,41 @@
 
     var screens = [].slice.call(container.querySelectorAll(".ai-screen"));
     var at = 0;
-    var v = { homes: null, postcode: "", beds: [] };
+    var v = { homes: null, postcode: "", beds: [], counts: {} };
+    /* the count the reader touched last, which is the one that gives way when
+       the plot total is typed over the top of the counts */
+    var lastCount = null;
+
+    function hasCounts() { return countTotal(v.counts) > 0; }
+
+    function tally() {
+      var line = container.querySelector("[data-tally]");
+      var total = countTotal(v.counts);
+      line.hidden = !total;
+      if (!total) { return; }
+      var target = v.homes || total;
+      line.textContent = total + " of " + target + " plots counted";
+      line.classList.toggle("is-off", total !== target);
+    }
+
+    function fillHomes() {
+      var total = countTotal(v.counts);
+      if (!total) { return; }
+      v.homes = total;
+      container.querySelector("#aiHomes").value = String(total);
+    }
 
     function canAdvance() {
       return POSTCODE.test(v.postcode) && v.beds.length > 0 && !!(v.homes && v.homes > 0);
     }
 
     function values() {
-      return { homes: v.homes, postcode: v.postcode.toUpperCase().trim(),
+      var counted = hasCounts();
+      return { homes: counted ? countTotal(v.counts) : v.homes,
+               postcode: v.postcode.toUpperCase().trim(),
                orientation: ORIENTATION, energy: ENERGY, beds: v.beds.slice(),
-               split: shareOut(v.beds) };
+               counts: JSON.parse(JSON.stringify(v.counts)),
+               split: counted ? splitFromCounts(v.counts) : shareOut(v.beds) };
     }
 
     function changed() {
@@ -137,13 +197,45 @@
       t.setAttribute("aria-pressed", on ? "false" : "true");
       v.beds = [].slice.call(container.querySelectorAll('.ai-tile[aria-pressed="true"]'))
         .map(function (b) { return b.getAttribute("data-value"); });
+      var name = t.getAttribute("data-value");
+      var field = t.parentNode.querySelector(".ai-count");
+      if (on) {
+        field.hidden = true;
+        field.value = "";
+        delete v.counts[name];
+        if (lastCount === name) { lastCount = null; }
+      } else {
+        field.hidden = false;
+      }
+      fillHomes();
+      tally();
       changed();
     }
 
     function onInput(ev) {
+      var bed = ev.target.getAttribute("data-count");
+      if (bed) {
+        var n = parseInt(ev.target.value, 10);
+        if (!n || n < 1) { delete v.counts[bed]; } else { v.counts[bed] = n; lastCount = bed; }
+        fillHomes();
+        tally();
+        changed();
+        return;
+      }
       var key = ev.target.getAttribute("data-key");
       if (!key) { return; }
-      if (key === "homes") { v.homes = parseInt(ev.target.value, 10) || null; }
+      if (key === "homes") {
+        v.homes = parseInt(ev.target.value, 10) || null;
+        /* plots typed over the counts: the count touched last gives way so the
+           two agree, and it never falls under one plot */
+        if (v.homes && lastCount && hasCounts()) {
+          var want = v.homes - (countTotal(v.counts) - v.counts[lastCount]);
+          v.counts[lastCount] = Math.max(1, want);
+          var f = container.querySelector('[data-count="' + lastCount + '"]');
+          if (f) { f.value = String(v.counts[lastCount]); }
+        }
+        tally();
+      }
       if (key === "postcode") {
         v.postcode = ev.target.value;
         var note = container.querySelector("[data-postcode-note]");
@@ -172,7 +264,13 @@
         return true;
       },
       reset: function () {
-        v = { homes: null, postcode: "", beds: [] };
+        v = { homes: null, postcode: "", beds: [], counts: {} };
+        lastCount = null;
+        [].slice.call(container.querySelectorAll(".ai-count")).forEach(function (f) {
+          f.value = "";
+          f.hidden = true;
+        });
+        container.querySelector("[data-tally]").hidden = true;
         [].slice.call(container.querySelectorAll(".ai-tile")).forEach(function (b) {
           b.setAttribute("aria-pressed", "false");
         });
@@ -193,6 +291,7 @@
   }
 
   window.GrydAssessInputs = { mount: mount, POSTCODE: POSTCODE,
-                              shareOut: shareOut, BEDS: BEDS,
+                              shareOut: shareOut, splitFromCounts: splitFromCounts,
+                              countTotal: countTotal, BEDS: BEDS,
                               ENERGY: ENERGY, ORIENTATION: ORIENTATION };
 })();
