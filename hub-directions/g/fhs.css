@@ -1,10 +1,12 @@
-/* The FHS readiness tool, in the hub's Daylight skin.
+/* The FHS readiness page, in the hub's Daylight skin.
 
-   Nothing here invents a surface. The clay tiles, the hairline field, the
-   segmented rule and the numbered returns are site-assess.css; the plate, the
-   pill and the closing band are g.css. This file adds three things that page
-   did not need: the tile screens laid out one to a view, the assumed spec
-   ledger, and the result the model returns.
+   Two surfaces. The page is the live FHS page's copy in Build G's layout: a
+   masthead, then sections that carry the heading in the content column and the
+   label with its orange rule in the right column. The check itself runs in a
+   popup, and that popup borrows its whole visual vocabulary from the site
+   assessment modal: paper plate, segmented stage dash, hairline gate fields,
+   pill go button. Those rules are copied here under an fm- prefix rather than
+   shared, so the assessment modal's own file is not touched.
 
    There is no green anywhere in the palette, so a measure carries a word for
    its state (Pass, Close, Fails) and a warm chip behind it. Colour alone never
@@ -15,7 +17,7 @@
 
 /* ------------------------------------------------------------------ masthead */
 
-.fhs-mast { padding-bottom: 64px; }
+.fhs-mast { padding-bottom: 24px; }
 .fhs-mast h1 {
   font-size: clamp(40px, 5.6vw, 74px);
   max-width: 17ch;
@@ -26,298 +28,434 @@
   font-size: 19px;
   line-height: 1.6;
   color: var(--ink-soft);
-  max-width: 56ch;
+  max-width: 62ch;
 }
+.fhs-mast .g-actions { margin-top: var(--btn-gap-top); }
 
-/* --------------------------------------------------------- the section header */
-/* The homepage device: the heading holds the content column and the label with
-   its orange rule sits in the right column, over the line that says what the
-   step is for. */
+/* ------------------------------------------------------------ three facts */
+/* The three things the standard asks for, in the live page's own words and
+   titles only. One row, hairline above each, no bodies. */
 
-.fhs-head {
+.fhs-facts {
+  list-style: none;
+  margin: 56px 0 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  gap: var(--gutter) 56px;
-  align-items: end;
-  padding-bottom: 40px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
 }
-.fhs-head h2 {
-  font-size: clamp(26px, 2.6vw, 38px);
-  max-width: 20ch;
-  margin: 0;
-}
-.fhs-head .col-r { display: flex; flex-direction: column; align-items: flex-start; }
-.fhs-head .col-r .eyebrow { margin-bottom: 12px; }
-.fhs-head .col-r p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--warm-grey);
-  max-width: 40ch;
+.fhs-facts li {
+  border-top: 1px solid var(--stone-mid);
+  padding-top: 14px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--ink-soft);
 }
 
-/* --------------------------------------------- the questions, one at a time */
-/* Build G's layout: the page runs full width, one question sits centred in it
-   at a time, and the card under it is empty until the third tap. */
+/* ================================================================== the popup */
+/* The site assessment modal's plate, copied rather than shared. */
 
-.fhs-stage { padding-bottom: 20px; }
-.fhs-quiz { max-width: 720px; margin: 0 auto; text-align: center; }
-.fhs-quiz .eyebrow { justify-content: center; }
-.fhs-quiz h2 {
-  font-size: clamp(26px, 2.8vw, 34px);
-  max-width: 22ch;
-  margin: var(--label-gap) auto 0;
-}
-.fhs-quiz .q-sub {
-  margin: 14px auto 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--warm-grey);
-  max-width: 46ch;
-}
-.fhs-quiz .f-tiles { max-width: 620px; margin: 32px auto 0; }
-
-/* the progress rule, three marks on one line, the site's own orange */
-.fhs-prog {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 0 0 26px;
-}
-.fhs-prog i {
-  display: block;
-  width: 46px;
-  height: 2px;
-  background: var(--stone-mid);
-  transition: background .3s ease;
-}
-.fhs-prog i.on, .fhs-prog i.done { background: var(--flare); }
-.fhs-prog i.on { opacity: .5; }
-
-.fhs-nav {
+.fm {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 22px;
-  padding-top: 32px;
+  padding: 24px;
+  background: rgba(40, 18, 12, .46);
+  opacity: 0;
+  transition: opacity .22s ease;
+  color: var(--red110);
 }
-.fhs-back {
-  font: inherit;
+.fm.open { opacity: 1; }
+.fm[hidden] { display: none; }
+
+.fm-box {
+  position: relative;
+  text-align: left;
+  width: min(640px, 100%);
+  min-height: 430px;
+  max-height: calc(100vh - 48px);
+  background: var(--paper);
+  border-radius: var(--radius-panel);
+  padding: 26px 34px 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--panel-shadow);
+  transform: translateY(10px) scale(.985);
+  transition: transform .22s cubic-bezier(.22,.61,.36,1);
+}
+.fm.open .fm-box { transform: none; }
+
+/* the progress dash, one segment per question in this run */
+.fm-prog {
+  display: flex;
+  gap: 6px;
+  margin: 0 46px 18px 0;
+  flex: none;
+}
+.fm-seg {
+  flex: 1 1 0;
+  height: 2px;
+  background: var(--stone-mid);
+  border-radius: 2px;
+}
+.fm-seg.done, .fm-seg.on { background: var(--flare); }
+.fm-seg.on { opacity: .55; }
+
+.fm-close {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--stonelight);
+  color: var(--red110);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+  z-index: 3;
+}
+.fm-close:hover { background: var(--flare); color: #ffffff; }
+.fm-close:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
+
+/* One question to a screen, so nothing inside the popup ever scrolls. The
+   plate holds one height across the run, and the question sits in the middle of
+   it, so answering does not make the box jump. */
+.fm-body {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.fm .fhs-q { overflow: hidden; }
+.fm .fhs-q h2 { font-size: 34px; letter-spacing: -0.025em; line-height: 1.25; margin: 0 0 18px; max-width: 22ch; }
+.fm-stand { font-size: 13px; color: var(--warm-grey); margin: -12px 0 18px; max-width: 60ch; }
+.fm-stand[hidden] { display: none; }
+
+/* one question to a labelled band of tiles */
+.fm-field { padding: 0 0 22px; }
+.fm-lab {
+  display: block;
   font-size: 12px;
-  letter-spacing: 0.16em;
+  font-weight: 500;
+  letter-spacing: .16em;
   text-transform: uppercase;
+  color: var(--warm-grey);
+  margin-bottom: 10px;
+}
+.fm .f-tiles { max-width: none; gap: 12px; }
+.fm .f-tiles.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fm .f-tiles.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fm .f-tiles.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fm .f-tiles.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.fm .f-tiles.narrow { max-width: 260px; }
+.fm .f-tile { padding-bottom: 12px; }
+.fm .f-tile .t-name { font-size: 12px; line-height: 1.25; letter-spacing: .08em; overflow-wrap: anywhere; }
+
+/* the drawn glyphs, held at the clay tiles' own scale and dimming */
+.fm .f-tile .t-art {
+  display: block;
+  margin: 6px auto 6px;
+  width: 72px;
+  height: 72px;
+  opacity: .55;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.fm .f-tile .t-art .lit { stroke: var(--ember); }
+.fm .f-tile:hover .t-art { opacity: .85; }
+.fm .f-tile[aria-pressed="true"] .t-art { opacity: 1; transform: translateY(-2px); }
+.fm .f-tile[aria-pressed="true"] .t-art .lit { stroke: var(--flare); }
+.fm .f-tile img {
+  filter: saturate(.35) opacity(.55);
+  width: 72px;
+  height: 72px;
+  margin: 4px auto 4px;
+}
+
+.fm-hint { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: var(--warm-grey); max-width: 62ch; }
+.fm-flag { margin: 4px 0 12px; font-size: 12px; color: var(--ember); }
+.fm-flag[hidden] { display: none; }
+[data-panels][hidden] { display: none; }
+
+/* the gate: one hairline per field, no box */
+.fm-gate { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 620px; }
+.fm-in label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
+  margin-bottom: 2px;
+}
+.fm-in input {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: 22px;
+  width: 100%;
+  background: transparent;
+  color: var(--red110);
+  border: 0;
+  border-bottom: 1px solid var(--stone-mid);
+  border-radius: 0;
+  padding: 6px 0 7px;
+  transition: border-color .2s ease;
+}
+.fm-in input:focus { outline: 0; border-bottom-color: var(--flare); }
+.fm-in ::placeholder { color: var(--warm-grey); opacity: .8; }
+
+/* the nav row */
+.fm-nav { display: flex; align-items: center; gap: 18px; padding-top: 16px; flex: none; }
+/* The primary action is the site's own .btn, so the popup's button is the same
+   shape, size and colour as every other button on the hub. Only the stacking
+   order and the standing button margin are set here. */
+.fm-go {
+  border: 0;
+  cursor: pointer;
+  order: 2;
+  margin: 0;
+}
+.fm-go:hover { background: var(--flare-dark); }
+.fm-go[disabled] { opacity: .45; cursor: not-allowed; }
+.fm-go[disabled]:hover { background: var(--flare); }
+.fm-back {
+  font: inherit;
+  font-size: 13px;
   background: transparent;
   border: 0;
-  padding: 6px 0;
-  cursor: pointer;
   color: var(--warm-grey);
+  cursor: pointer;
+  padding: 0;
+  order: 1;
 }
-.fhs-back:hover { color: var(--red110); }
-.fhs-back:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
-.fhs-count {
-  font-size: 12px;
-  letter-spacing: 0.16em;
+.fm-back:hover { color: var(--red110); }
+.fm-back[hidden] { display: none; }
+.fm-count {
+  margin-left: auto;
+  order: 3;
+  font-size: 11px;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--warm-grey);
   font-variant-numeric: tabular-nums;
 }
-
-/* The plot bands have no clay model, so the tile draws the band instead: a
-   field of plots with the band's own share of them lit. */
-.fhs-plots {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 4px;
-  padding: 10px 12px 12px;
-  background: var(--stonelight);
-  border-radius: var(--radius-chip);
-}
-.fhs-plots span {
-  display: block;
-  aspect-ratio: 1;
-  border-radius: 2px;
-  background: var(--stone-mid);
-  transition: background .25s ease;
-}
-.fhs-plots span.lit { background: var(--ember); }
-.f-tile:hover .fhs-plots span.lit,
-.f-tile[aria-pressed="true"] .fhs-plots span.lit { background: var(--flare); }
-.f-tile[aria-pressed="true"] .fhs-plots { background: var(--blush); }
-
-/* ------------------------------------------------ the card under the questions */
-/* Nothing sits under the questions until the third tap. Then the card arrives
-   carrying the two fields, and the result renders in place of it. */
-
-.fhs-card {
-  max-width: 720px;
-  margin: 46px auto 0;
-  background: var(--stonelight);
-  border-radius: var(--radius-panel);
-  padding: 32px 40px 34px;
-}
-.fhs-card h2 { font-size: 28px; max-width: 20ch; margin-top: var(--label-gap); }
-.fhs-card .q-sub {
-  margin: 14px 0 6px;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-  max-width: 48ch;
-}
-.fhs-card .f-row { grid-template-columns: 160px minmax(0, 1fr); padding: 18px 0 14px; }
-.fhs-card .f-text { font-size: 22px; }
-.fhs-card .f-submit { margin-top: 22px; }
-.fhs-card .f-submit[disabled] { opacity: .4; cursor: not-allowed; }
-.fhs-card .f-consent { margin-top: 18px; }
+.fm-go:focus-visible, .fm-back:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
 
 /* ------------------------------------------------------------------ the result */
+/* The check comes back on the page in the vocabulary the site assessment
+   result already ships in: assess-result.css supplies the plates, the hairline
+   rows, the fold, the table and the hover, and only the parts the FHS check has
+   and the assessment does not are declared here. */
 
-.fhs-result { padding-bottom: 20px; }
+.fhs-result { padding-top: var(--sec-pad); padding-bottom: 20px; }
+.fhs-result .ar-root { --ar-paper: var(--paper); }
 
-/* The verdict band. Three warm grounds, one for each state, and the state is
-   spelled out in the heading rather than left to the ground. */
-.fhs-result .sum-head {
-  border-radius: var(--radius-panel);
-  padding: 34px 36px 30px;
-  background: var(--stonelight);
+/* the verdict card: the model's heading, then the two coverage plates, then
+   the model's one line summary under them */
+.fhs-verdict { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.fhs-verdict .ar-title { font-size: clamp(28px, 3vw, 44px); max-width: 20ch; margin: 0; }
+.fhs-verdict .eyebrow { color: var(--warm-grey); }
+.fhs-result .ar-chartcard { margin-top: 22px; }
+.fhs-result .ar-stat { padding: 20px 22px 18px; }
+.fhs-result .ar-fig { font-size: clamp(40px, 4vw, 52px); }
+.fhs-result .ar-stat .f-lab {
+  display: block;
+  margin: 10px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
 }
-.fhs-result .sum-head.band-amber { background: var(--blush); }
-.fhs-result .sum-head.band-red { background: var(--dark-card); color: var(--paper); }
-.fhs-result .sum-head.band-red .note { color: var(--dark-secondary); }
-.fhs-result .sum-head h3 { font-size: clamp(28px, 3vw, 42px); max-width: 18ch; }
-.fhs-result .sum-head > p {
-  margin: 18px 0 0;
-  font-size: 17px;
-  line-height: 1.6;
+.fhs-sub {
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
   max-width: 62ch;
 }
-.fhs-result .note {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--warm-grey);
-  max-width: 68ch;
-}
-.fhs-result .sum-head .note { margin-top: 20px; }
-.fhs-result > .note { margin: 24px 0 0; }
-.fhs-result .note.flag { color: var(--ember); }
 
-.fhs-result .sum-block { padding-top: 56px; }
-.fhs-result .sum-block > h4 {
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 500;
-  color: var(--warm-grey);
-  margin: 0 0 8px;
-}
-
-/* One measure to a hairline row. The state word is the signal; the chip behind
-   it only warms it. */
-.fhs-result .scores { border-top: 1px solid var(--stone-mid); }
-.fhs-result .score {
-  border-bottom: 1px solid var(--stone-mid);
-  padding: 22px 0 20px;
+/* the eight measures, hairline rows in two columns */
+.fhs-measures { margin-top: 30px; }
+.ar-list.fhs-rows {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 28px;
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 48px;
+  align-content: start;
 }
-.fhs-result .score-top { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.fhs-result .score-top h4 { font-size: 21px; margin: 0; }
-.fhs-result .score p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--ink-soft); }
-
-.fhs-result .m-state {
-  font-size: 12px;
-  letter-spacing: 0.16em;
+.ar-list.fhs-rows > li {
+  display: block;
+  padding: 0;
+  border-top: 1px solid var(--ar-line, var(--stone-mid));
+}
+.r-chip {
+  font: inherit;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  color: var(--red110);
+  padding: 11px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.r-chip .c-name { font-size: 15px; line-height: 1.3; flex: 1 1 auto; }
+.r-chip .c-state {
+  flex: none;
+  font-size: 10px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-weight: 500;
-  padding: 6px 12px;
+  padding: 3px 9px;
   border-radius: 999px;
   background: var(--stonelight);
   color: var(--red110);
+  white-space: nowrap;
 }
-.fhs-result .score-amber .m-state { background: var(--blush); color: var(--ember); }
-.fhs-result .score-red .m-state { background: var(--flare); color: #ffffff; }
-.fhs-result .pill {
-  font-size: 12px;
-  letter-spacing: 0.08em;
+.r-chip.state-close .c-state { background: var(--blush); color: var(--ember); }
+.r-chip.state-fails .c-state { background: var(--flare); color: #ffffff; }
+.r-chip:focus-visible { outline: 2px solid var(--flare); outline-offset: 2px; }
+.r-chip[aria-expanded="true"] .c-name { color: var(--ember); }
+
+.r-note { padding: 0 0 12px; }
+.r-note[hidden] { display: none; }
+.r-note p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+/* the fold, the ledger and the model's comparison table */
+.fhs-result .ar-fold { margin-top: 26px; }
+.fhs-result .ar-fold summary h3 { font-size: 12px; letter-spacing: 0.16em; }
+.r-detail-in { padding: 6px 0 10px; }
+.fhs-spec { margin-top: 18px; }
+.fhs-spec h4 {
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--warm-grey);
+  font-weight: 500;
+  margin: 0 0 6px;
 }
-
-/* ------------------------------------------------------- the assumed spec ledger */
-
-.fhs-spec {
-  margin-top: 56px;
-  background: var(--stonelight);
-  border-radius: var(--radius-panel);
-  padding: 30px 34px 28px;
-}
-.fhs-spec h4 {
-  font-size: 21px;
-  margin: 10px 0 0;
-}
-.fhs-spec .lead { margin: 12px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-soft); max-width: 60ch; }
-.fhs-spec dl { margin: 22px 0 0; }
+.fhs-spec dl { margin: 0; border-top: 1px solid var(--stone-mid); }
 .fhs-spec .s-row {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   gap: 20px;
-  padding: 12px 0;
-  border-top: 1px solid var(--stone-mid);
-}
-.fhs-spec dt {
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--warm-grey);
-}
-.fhs-spec dd { margin: 0; font-size: 16px; }
-.fhs-adjust {
-  font: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  margin-top: 22px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid var(--flare);
-  cursor: pointer;
-  color: var(--red110);
-}
-.fhs-adjust:focus-visible { outline: 2px solid var(--flare); outline-offset: 4px; }
-.fhs-opts { margin-top: 30px; border-top: 1px solid var(--stone-mid); }
-.fhs-opts .f-row { grid-template-columns: 240px minmax(0, 1fr); }
-.fhs-opts .f-seg { border-bottom-color: var(--stone-mid); }
-
-/* ------------------------------------------------------------ the comparison table */
-
-.fhs-result .tbl-wrap { overflow-x: auto; }
-.fhs-result .tbl { width: 100%; border-collapse: collapse; font-size: 16px; }
-.fhs-result .tbl th, .fhs-result .tbl td {
-  text-align: left;
-  padding: 14px 20px 13px 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--stone-mid);
-  vertical-align: top;
 }
-.fhs-result .tbl th {
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 500;
-  color: var(--warm-grey);
-}
-.fhs-result .tbl .sub { display: block; font-size: 13px; color: var(--warm-grey); }
-
-.fhs-result .sum-acts { padding-top: 34px; }
+.fhs-spec dt { font-size: 10px; color: var(--warm-grey); letter-spacing: 0.04em; }
+.fhs-spec dd { margin: 0; font-size: 13px; line-height: 1.3; }
+.fhs-result .ar-table-wrap { margin-top: 22px; }
+.fhs-result .tbl .sub { display: block; font-size: 11px; color: var(--warm-grey); }
 .fhs-result .num { font-variant-numeric: tabular-nums; }
+.fhs-result .note { font-size: 13px; line-height: 1.6; color: var(--warm-grey); max-width: 74ch; margin: 22px 0 0; }
+.fhs-result .note.flag { color: var(--ember); }
+.fhs-result .r-detail-in .note { margin: 0 0 14px; }
+.fhs-result .ar-acts { gap: 18px; margin-top: 26px; flex-wrap: wrap; }
+
+/* the send failed, said once and quietly, under the gate */
+.fm-sent { margin: 14px 0 0; font-size: 13px; line-height: 1.5; color: var(--ember); }
+.fm-sent[hidden] { display: none; }
 
 @media (max-width: 1080px) {
-  .fhs-head { grid-template-columns: 1fr; align-items: start; }
-  .fhs-result .score { grid-template-columns: 1fr; gap: 12px; }
+  .ar-list.fhs-rows { column-gap: 30px; }
   .fhs-spec .s-row { grid-template-columns: 1fr; gap: 4px; }
 }
 @media (max-width: 760px) {
-  .fhs-step .f-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .fhs-gate .f-row, .fhs-opts .f-row { grid-template-columns: 1fr; gap: 10px; }
+  .fhs-facts { grid-template-columns: 1fr; gap: 0; }
+  .fhs-facts li { margin-top: 12px; }
+  .ar-list.fhs-rows { grid-template-columns: minmax(0, 1fr); }
+  .fhs-result .ar-stat { padding: 16px 16px 14px; }
+  .fm { padding: 12px; }
+  .fm-box { padding: 20px 18px 18px; max-height: calc(100vh - 24px); }
+  .fm .fhs-q h2 { font-size: 19px; }
+  .fm .f-tiles.cols-4, .fm .f-tiles.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fm .f-tile .t-art, .fm .f-tile img { width: 56px; height: 56px; }
+  .fm-gate { grid-template-columns: 1fr; gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fm, .fm-box, .fm .f-tile .t-art, .fm-seg i, .r-chip { transition: none; }
+}
+
+/* ------------------------------------------------- the row is a control */
+/* Mehdi, 4 September: the measure rows read as a table until you happen to
+   click one. They now say what they are: a chevron at the end that turns when
+   the note is open, the pointer, the lift and the plate shade already declared
+   in assess-result.css, and a hint line under the section eyebrow. */
+
+.fhs-measures .fhs-hint {
+  margin: 0 0 2px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warm-grey);
+}
+
+.ar-list.fhs-rows > li:hover { cursor: pointer; }
+.r-chip .c-chev {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-left: 2px;
+  color: var(--warm-grey);
+  transition: transform .22s cubic-bezier(.2,.7,.3,1), color .22s cubic-bezier(.2,.7,.3,1);
+}
+.r-chip:hover .c-chev { color: var(--ember); }
+.r-chip[aria-expanded="true"] .c-chev { transform: rotate(180deg); color: var(--ember); }
+
+/* The note opens on its own height rather than appearing. The 0fr to 1fr row
+   is what lets a height the content decides be animated at all. */
+.r-note {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .22s cubic-bezier(.2,.7,.3,1);
+}
+.r-note.open { grid-template-rows: 1fr; }
+.r-note-in { overflow: hidden; }
+.r-note p { padding-bottom: 12px; }
+
+/* --------------------------------------------------------- the entry */
+/* The result arrives the way every other plate on the site arrives. The
+   keyframe is site-modal.css's own rise, repeated here because that sheet is
+   loaded only when the assessment popup is first opened and the check must not
+   wait on it. Same 12px, same .22s, same curve; only the delay differs, so the
+   plates, the rows, the fold and the buttons land in reading order. */
+@keyframes fhs-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+/* backwards, not both: the fill holds the start state through the delay and
+   then lets go, so the finished animation never freezes a transform on top of
+   the hover lift the rows and the plates carry. */
+.fhs-result .rise {
+  animation: fhs-rise .22s cubic-bezier(.2,.7,.3,1) backwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fhs-result .rise { animation: none; }
+  .r-chip .c-chev, .r-note { transition: none; }
+}
+
+/* the clay miniature at the head of a measure row, the same set as the house
+   type and bedroom tiles the assessment questions use */
+.r-chip .c-art {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: block;
+  object-fit: contain;
 }

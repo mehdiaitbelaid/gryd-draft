@@ -90,13 +90,14 @@
   function isSupported(a) { return floorArea(a) !== null; }
   function round1(n) { return Math.round(n * 10) / 10; }
 
-  /* Coverage is capped at the full demand, matching the live tool. */
+  /* Coverage is capped at the full demand, and comes off the unrounded
+     generation, matching the live tool. Only the printed kWh is rounded. */
   function energy(kwp, area, battery) {
-    var gen = Math.round(kwp * YIELD * LOSS);
+    var gen = kwp * YIELD * LOSS;
     var demand = area * DEMAND_PER_M2;
     var use = battery ? SELF_USE_BATT : SELF_USE;
     var cover = Math.min((gen * use) / demand, 1);
-    return { annualGeneration: gen, coverage: Math.round(cover * 100) };
+    return { annualGeneration: Math.round(gen), coverage: Math.round(cover * 100) };
   }
 
   /* Solar sizing. The panel count and the coverage ratio both come off the
@@ -243,7 +244,10 @@
     var apt = isApartment
       ? ' Note: The published FHS exempts high-rise buildings from mandatory solar. Apartments typically share roof space across the block. We recommend a site-specific assessment for accurate solar sizing.'
       : '';
-    return lead + ' ' + ph(r.requiredKwp) + ' kWp (~' + ph(r.minPanels) + ' panels) for this house type.' + tail + apt;
+    /* The amber sentence stops at the panel count; only red and green name the
+       house type. */
+    var closer = score === 'amber' ? ' panels).' : ' panels) for this house type.';
+    return lead + ' ' + ph(r.requiredKwp) + ' kWp (~' + ph(r.minPanels) + closer + tail + apt;
   }
 
   var ROWS = [
