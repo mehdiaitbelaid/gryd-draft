@@ -405,7 +405,7 @@
 
 .g-title { margin-top: 56px; }
 /* The pill is inline, so the heading's own top margin is the pill to title gap. */
-.g-title h2 { font-size: clamp(32px, 3.6vw, 46px); margin-top: var(--pill-gap); }
+.g-title h2, .g-title h1 { font-size: clamp(32px, 3.6vw, 46px); margin-top: var(--pill-gap); }
 
 /* Header actions, sharing the button row's spacing rather than setting their own. */
 .g-actions { display: flex; flex-wrap: wrap; gap: 14px; }
@@ -701,3 +701,19 @@ html.dl-open { overflow: hidden; }
 @media (max-width: 560px) {
   .dl-panel { padding: 32px 22px 28px; }
 }
+
+/* ---------- legal pages ---------- */
+
+/* The two policies run on the article page's own furniture: the label with its
+   rule, the title at the article's title size, the 660px measure and the
+   article body. They only add the levels an article never uses, and each one
+   takes the size of the article level above it, so the two pages read as one
+   family. Wording is the published policy, copied without change. */
+.g-legal h2 { font-size: 28px; margin: 46px 0 16px; }
+.g-legal h3 { font-size: 20px; margin: 32px 0 12px; }
+.g-legal ol { margin: 0 0 22px; padding-left: 22px; }
+.g-legal ol li { margin-bottom: 9px; }
+.g-legal em strong, .g-legal strong em { color: var(--ember); }
+.g-legal a { color: var(--ember); text-decoration: underline; text-underline-offset: 3px; }
+/* the policy's own date line, sitting where an article's byline sits */
+.g-title .dateline { margin: 22px 0 0; font-size: 15px; color: var(--warm-grey); }
