@@ -70,7 +70,19 @@
      retailer bill that is left, and over them the line the same home would have
      paid with no system at all. Everything is laid out in the viewBox, so the
      figure scales with its column and never needs a resize listener. */
-  var W = 760, H = 320, PAD_L = 56, PAD_R = 12, PAD_T = 14, PAD_B = 38;
+  var W = 760, H = 320, PAD_L = 64, PAD_R = 12, PAD_T = 14, PAD_B = 38;
+
+  /* Four ticks that land on round money, with a quarter of the plot left empty
+     over the tallest series so the curve never runs into the frame. */
+  var TICK_STEPS = [50, 100, 250, 500, 1000, 1500, 2000, 2500, 5000, 10000];
+
+  function axisTop(raw) {
+    var wanted = raw / 0.75;
+    for (var i = 0; i < TICK_STEPS.length; i++) {
+      if (TICK_STEPS[i] * 4 >= wanted) { return TICK_STEPS[i] * 4; }
+    }
+    return Math.ceil(wanted / 4 / 10000) * 40000;
+  }
 
   function chartSvg(c) {
     var n = c.years.length;
@@ -79,7 +91,7 @@
     for (var i = 0; i < n; i++) {
       top = Math.max(top, c.without[i], c.subscription[i] + c.retailer[i]);
     }
-    var max = Math.ceil(top / 500) * 500 || 500;
+    var max = axisTop(top) || 500;
     var step = plotW / n;
     var bw = Math.max(6, step * 0.62);
     var y = function (val) { return PAD_T + plotH - (val / max) * plotH; };
@@ -89,7 +101,7 @@
     for (var t = 0; t <= max; t += max / 4) {
       ticks += '<line class="ar-grid" x1="' + PAD_L + '" x2="' + (W - PAD_R)
         + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>'
-        + '<text class="ar-ytick" x="' + (PAD_L - 8) + '" y="' + (y(t) + 4).toFixed(1)
+        + '<text class="ar-ytick" x="' + (PAD_L - 10) + '" y="' + (y(t) + 4).toFixed(1)
         + '" text-anchor="end">£' + Math.round(t).toLocaleString("en-GB") + "</text>";
     }
 
@@ -127,9 +139,10 @@
       + '<ul class="ar-key"><li><span class="k k-sub"></span>Gryd Subscription</li>'
       + '<li><span class="k k-ret"></span>Remaining Traditional Retailer Bill</li>'
       + '<li><span class="k k-out"></span>Annual Energy Cost without Gryd</li></ul></div>'
-      + '<div class="ar-chart-plot"><svg viewBox="0 0 ' + W + " " + H + '" role="img"'
+      + '<div class="ar-chart-plot" data-plot-left="' + PAD_L + '" data-plot-w="' + W + '">'
+      + '<svg viewBox="0 0 ' + W + " " + H + '" role="img"'
       + ' aria-label="Annual energy cost by year, with and without Gryd">'
-      + '<text class="ar-axis" transform="translate(14 ' + (PAD_T + plotH / 2)
+      + '<text class="ar-axis" transform="translate(12 ' + (PAD_T + plotH / 2)
       + ') rotate(-90)" text-anchor="middle">Annual Energy Cost (£)</text>'
       + ticks
       + '<path class="ar-out-fill" d="' + area + '"/>'
@@ -174,34 +187,39 @@
     }).join("");
 
     container.innerHTML = '<h2 class="ar-title">Assessment Summary</h2>'
-      + '<section class="ar-sec ar-results" data-sec="results"><h3>Results</h3>'
-      + '<div class="ar-stats"><article class="ar-stat">'
-      + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
-      + '<p>As a Developer, working with Gryd, you could save ' + money(result.developerSaving)
-      + " in build cost</p></article>"
-      + '<article class="ar-stat"><span class="ar-fig" data-home>'
-      + money(result.homeownerLifetimeSaving) + "</span>"
-      + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
-      + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article></div></section>"
 
       + '<section class="ar-sec ar-project" data-sec="details"><h3>Project Details</h3>'
       + '<dl class="ar-details">' + details + "</dl></section>"
 
-      + '<div class="ar-benefits">'
-      + '<section class="ar-sec" data-sec="dev"><h3>Developer additional benefits</h3>'
-      + '<ul class="ar-list">' + dev + '</ul><button type="button" class="ar-more" data-more'
-      + ' aria-expanded="false">Show all</button></section>'
+      /* The chart is the view. The two figures ride across the top of the same
+         card as plates, in the flow above the chart head, so no bar, line,
+         legend, tick or tooltip can ever end up underneath them. */
+      + '<div class="ar-chartcard">'
+      + '<section class="ar-sec ar-pins" data-sec="results"><h3 class="ar-sr">Results</h3>'
+      + '<div class="ar-plates"><article class="ar-stat ar-pin">'
+      + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
+      + '<p>As a Developer, working with Gryd, you could save ' + money(result.developerSaving)
+      + " in build cost</p></article>"
+      + '<article class="ar-stat ar-pin"><span class="ar-fig" data-home>'
+      + money(result.homeownerLifetimeSaving) + "</span>"
+      + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
+      + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article></div></section>"
+      + '<section class="ar-sec ar-chart-sec" data-sec="chart">' + chartSvg(result.chart)
+      + "</section></div>"
 
-      + '<section class="ar-sec" data-sec="home"><h3>Homeowner additional benefits</h3>'
-      + '<ul class="ar-list">' + home + "</ul></section></div>"
-
-      + '<div class="ar-data"><section class="ar-sec" data-sec="table"><h3>Breakdown by House Size</h3>'
+      + '<section class="ar-sec" data-sec="table"><h3>Breakdown by House Size</h3>'
       + '<div class="ar-table-wrap"><table class="ar-table"><thead><tr>'
       + "<th>Home Size</th><th>Monthly Subscription</th><th>Lifetime Saving (£)</th>"
       + "<th>Lifetime Saving (%)</th><th>Hardware Supplied</th></tr></thead><tbody>"
       + rows + "</tbody></table></div></section>"
 
-      + '<section class="ar-sec" data-sec="chart">' + chartSvg(result.chart) + "</section></div>"
+      + '<details class="ar-sec ar-fold" data-sec="dev"><summary>'
+      + "<h3>Developer additional benefits</h3><span class=\"ar-show\">Show</span></summary>"
+      + '<ul class="ar-list">' + dev + "</ul></details>"
+
+      + '<details class="ar-sec ar-fold" data-sec="home"><summary>'
+      + "<h3>Homeowner additional benefits</h3><span class=\"ar-show\">Show</span></summary>"
+      + '<ul class="ar-list">' + home + "</ul></details>"
 
       + '<p class="ar-foot">' + esc(FOOTNOTE) + "</p>"
       + '<p class="ar-note" data-preview-note>Sample figures shown on this preview.</p>'
@@ -212,27 +230,6 @@
     var resultBox = container.closest ? container.closest(".sam-box") : null;
     if (resultBox) { resultBox.classList.add("sam-result-box"); }
 
-    /* Every benefit string is in the markup either way. The extra rows are
-       folded behind Show all only when leaving them out would push the popup
-       past 1.6 screens of scrolling, so a roomy window shows the lot. */
-    var more = container.querySelector("[data-more]");
-    function fold(on) {
-      if (!more) { return; }
-      var lis = [].slice.call(more.previousElementSibling.querySelectorAll("li"));
-      lis.forEach(function (li, i) { if (i > 2) { li.hidden = on; } });
-      more.hidden = !on;
-      more.setAttribute("aria-expanded", on ? "false" : "true");
-      more.textContent = on ? "Show all" : "Show less";
-    }
-    if (more) {
-      more.addEventListener("click", function () {
-        fold(more.getAttribute("aria-expanded") === "true");
-      });
-    }
-    var scroller = container.closest ? container.closest(".sam-body") : null;
-    fold(false);
-    if (scroller && scroller.scrollHeight > scroller.clientHeight * 1.6) { fold(true); }
-
     var tip = container.querySelector("[data-tip]");
     var c = result.chart;
     function showTip(g) {
@@ -242,9 +239,21 @@
         + money(c.subscription[i]) + "<br>Remaining Traditional Retailer Bill "
         + money(c.retailer[i]) + "<br>Without Gryd " + money(c.without[i]);
       tip.hidden = false;
-      var plot = container.querySelector(".ar-chart-plot").getBoundingClientRect();
+      /* The tooltip is measured against the drawing itself, not its box, so it
+         stays inside the plotting rectangle on a narrow screen where the chart
+         is wider than the column and scrolls. */
+      var plotEl = container.querySelector(".ar-chart-plot");
+      var svg = plotEl.querySelector("svg");
+      var plot = plotEl.getBoundingClientRect();
+      var draw = svg.getBoundingClientRect();
       var r = g.getBoundingClientRect();
-      tip.style.left = Math.min(plot.width - 190, Math.max(0, r.left - plot.left - 60)) + "px";
+      var scale = draw.width / parseFloat(plotEl.getAttribute("data-plot-w"));
+      var origin = draw.left - plot.left + plotEl.scrollLeft;
+      var wide = tip.getBoundingClientRect().width || 190;
+      var min = origin + parseFloat(plotEl.getAttribute("data-plot-left")) * scale + 4;
+      var max = Math.max(min, origin + draw.width - wide - 8);
+      var want = r.left - plot.left + plotEl.scrollLeft - 60;
+      tip.style.left = Math.max(min, Math.min(max, want)) + "px";
     }
     [].slice.call(container.querySelectorAll(".ar-bar")).forEach(function (g) {
       g.addEventListener("mouseenter", function () { showTip(g); });

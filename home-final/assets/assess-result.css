@@ -13,8 +13,8 @@
   color: var(--ar-ink);
 }
 
-.ar-title { font-size: 24px; font-weight: 500; margin: 0 0 10px; line-height: 1.1; }
-.ar-sec { padding: 12px 0 2px; min-width: 0; }
+.ar-title { font-size: 24px; font-weight: 500; margin: 0 0 12px; line-height: 1.1; }
+.ar-sec { padding: 0; min-width: 0; margin-bottom: 14px; }
 .ar-sec h3 {
   font-size: 10px;
   letter-spacing: .1em;
@@ -24,14 +24,32 @@
   margin: 0 0 8px;
 }
 
-.ar-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.ar-stat { background: var(--ar-plate); border-radius: 16px; padding: 14px 16px 13px; }
-.ar-stat p { font-size: 14px; line-height: 1.4; margin: 8px 0 0; max-width: 48ch; text-wrap: pretty; }
+/* The chart card: the two figures ride across its top as plates, then the
+   chart itself. Both are in the flow, so a plate can never cover a bar, the
+   line, the legend, a tick or the tooltip at any width. */
+.ar-chartcard { border-top: 1px solid var(--ar-line); padding-top: 12px; margin-bottom: 16px; }
+.ar-pins { margin-bottom: 14px; }
+.ar-plates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ar-stat { background: var(--ar-plate); border-radius: 16px; padding: 12px 15px 13px; }
+.ar-stat p { font-size: 13px; line-height: 1.4; margin: 6px 0 0; max-width: 46ch; text-wrap: pretty; }
+.ar-pin { box-shadow: 0 6px 20px rgba(40, 18, 12, .07); }
+.ar-chart-sec { margin-bottom: 0; }
+.ar-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .ar-fig {
   display: block;
   color: var(--ar-flare);
   font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(40px, 4.2vw, 50px);
+  font-size: clamp(34px, 3.6vw, 44px);
   font-weight: 500;
   line-height: .95;
   letter-spacing: -.035em;
@@ -50,7 +68,23 @@
 .ar-detail dt { font-size: 10px; color: var(--ar-muted); letter-spacing: .04em; }
 .ar-detail dd { margin: 2px 0 0; font-size: 13px; line-height: 1.3; overflow-wrap: break-word; }
 
-.ar-benefits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.ar-fold { border-top: 1px solid var(--ar-line); margin-bottom: 0; }
+.ar-fold + .ar-fold { margin-top: 0; }
+.ar-fold summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0 9px;
+  cursor: pointer;
+  list-style: none;
+}
+.ar-fold summary::-webkit-details-marker { display: none; }
+.ar-fold summary h3 { margin: 0; }
+.ar-fold summary:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 2px; }
+.ar-show { font-size: 13px; color: var(--ar-ember); border-bottom: 1px solid currentColor; }
+.ar-fold[open] .ar-show { visibility: hidden; }
+.ar-fold .ar-list { padding-bottom: 8px; }
 .ar-list { margin: 0; padding: 0; list-style: none; }
 .ar-list li {
   display: grid;
@@ -59,7 +93,7 @@
   align-items: start;
   padding: 7px 0;
   border-top: 1px solid var(--ar-line);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.35;
   text-wrap: pretty;
 }
@@ -71,24 +105,9 @@
   border: 1px solid var(--ar-flare);
   transform: rotate(45deg);
 }
-.ar-more {
-  min-height: 40px;
-  margin: 1px 0 0 21px;
-  padding: 0;
-  border: 0;
-  border-bottom: 1px solid currentColor;
-  background: transparent;
-  color: var(--ar-ember);
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-  text-underline-position: from-font;
-}
-.ar-more:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 3px; }
 
 .ar-table-wrap { overflow-x: auto; }
-.ar-data { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 28px; align-items: start; }
-.ar-table { border-collapse: collapse; table-layout: fixed; width: 100%; font-size: 11px; }
+.ar-table { border-collapse: collapse; table-layout: fixed; width: 100%; font-size: 12px; }
 .ar-table th:nth-child(1) { width: 16%; }
 .ar-table th:nth-child(2) { width: 19%; }
 .ar-table th:nth-child(3) { width: 19%; }
@@ -97,7 +116,7 @@
 .ar-table th {
   text-align: left;
   font-weight: 500;
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1.25;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -120,6 +139,7 @@
 .ar-chart-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 7px 18px; margin-bottom: 2px; }
 .ar-chart-head h4 { font-size: 14px; font-weight: 500; margin: 0; }
 .ar-chart-caption { margin: 2px 0 0; font-size: 11px; line-height: 1.35; color: var(--ar-muted); }
+.ar-chart-head { row-gap: 8px; }
 .ar-key { display: flex; flex-wrap: wrap; gap: 5px 10px; margin: 0; padding: 0; list-style: none; font-size: 9px; color: var(--ar-muted); }
 .ar-key li { display: flex; align-items: center; gap: 6px; }
 .ar-key .k { width: 9px; height: 9px; border-radius: 2px; display: block; }
@@ -127,7 +147,8 @@
 .ar-key .k-ret { background: var(--ar-ember); }
 .ar-key .k-out { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ar-ink); }
 
-.ar-chart-plot { position: relative; }
+.ar-chart-plot { position: relative; margin-top: 6px; }
+.ar-chart svg { min-height: 250px; }
 .ar-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
 .ar-grid { stroke: var(--ar-line); stroke-width: 1; }
 .ar-ytick, .ar-xtick { font-size: 10px; fill: var(--ar-muted); font-family: inherit; }
@@ -144,7 +165,7 @@
 
 .ar-tip {
   position: absolute;
-  top: 6px;
+  top: 4px;
   min-width: 170px;
   background: var(--ar-ink);
   color: var(--ar-paper);
@@ -171,23 +192,23 @@
 @media (max-width: 720px) {
   .sam-box.sam-result-box { max-height: calc(100vh - 24px); }
   .ar-title { font-size: 22px; }
-  .ar-stats { grid-template-columns: minmax(0, 1fr); }
+  .ar-plates { grid-template-columns: minmax(0, 1fr); }
   .ar-stat { padding: 12px 14px; }
-  .ar-fig { font-size: 40px; }
+  .ar-fig { font-size: 34px; }
   .ar-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ar-detail { padding: 7px 10px 7px 0; }
-  .ar-benefits { gap: 16px; }
-  .ar-list li { font-size: 15px; gap: 6px; }
-  .ar-data { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .ar-list li { font-size: 14px; gap: 6px; }
   .ar-table { min-width: 520px; font-size: 11px; }
   .ar-table th { font-size: 8px; }
   .ar-chart-head { display: block; }
   .ar-key { margin-top: 5px; }
+  /* A 25 year chart squeezed into a phone column has ticks nobody can read, so
+     it scrolls sideways at a legible size the way the table does. */
+  .ar-chart-plot { overflow-x: auto; }
+  .ar-chart svg { min-width: 700px; }
   .ar-acts { flex-wrap: wrap; }
 }
 
-/* Two benefit columns need room for a line of prose. Below that they stack. */
 @media (max-width: 560px) {
-  .ar-benefits { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .ar-details { grid-template-columns: minmax(0, 1fr); }
 }
