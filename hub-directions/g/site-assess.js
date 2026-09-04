@@ -1,9 +1,15 @@
 /* Site assessment request flow.
 
    The flow is static until there is somewhere to post to: it reads what has
-   been typed or tapped so the page can echo it back, walks one question at a
-   time, and swaps the form for the confirmation when the request is sent. The
-   file it is handed is named back, never read. */
+   been typed or tapped so the page can echo it back, walks one stage at a
+   time, and swaps the form for the assessment itself once a name and an email
+   are in.
+
+   Since 4 September the page runs the same tool the popup runs. Stage one is
+   the scheme, stage two is the reply address, and what follows is the full
+   summary rendered in place by assess-result.js off the same engine the popup
+   calls. The old drawings and programme stage is gone, and so is the receipt
+   that used to stand in for an answer. */
 (function () {
   "use strict";
 
@@ -13,6 +19,9 @@
   /* ---------------------------------------------------------------- values */
 
   var values = {};
+  /* the bed sizes as picked, which the engine needs as a split rather than
+     as the line the rail prints */
+  var beds = [];
 
   function set(key, val) {
     if (!key) { return; }
@@ -52,6 +61,7 @@
       var picked = all('.f-tile[aria-pressed="true"]', group).map(function (b) {
         return b.getAttribute("data-value");
       });
+      if (key === "bedrooms") { beds = picked; }
       set(key, picked.join(", "));
     });
   });
@@ -106,26 +116,64 @@
     });
   });
 
-  /* ------------------------------------------------------- submit and confirm */
+  /* --------------------------------------------------- the gate and the result */
+  /* The name and the email are the gate. Past it the page stops being a form
+     and becomes the assessment, drawn by the shared renderer off the shared
+     engine, so the page and the popup can never report different numbers.
+     Nothing is posted anywhere yet: the lead is held in memory, the way the
+     popup holds it, and sendLead is the one seam for a CRM. */
 
   var form = doc.getElementById("saForm");
-  var done = doc.getElementById("saDone");
+  var out = doc.getElementById("saResult");
   var submit = doc.getElementById("saSubmit");
-  if (submit && form && done) {
+
+  function ready() {
+    return !!(values.name && values.email && /.+@.+\..+/.test(values.email));
+  }
+
+  function engineInputs() {
+    var api = window.GrydAssessInputs || {};
+    return { homes: parseInt(values.plots, 10) || 1,
+             postcode: String(values.postcode || "").toUpperCase().trim(),
+             orientation: api.ORIENTATION || "South",
+             energy: api.ENERGY || "All Electric",
+             split: api.shareOut ? api.shareOut(beds) : { small: 100, mid: 0, large: 0 } };
+  }
+
+  function gateReady() {
+    if (submit) { submit.disabled = !ready(); }
+  }
+
+  if (submit && form && out) {
+    gateReady();
+    doc.addEventListener("input", gateReady);
+    doc.addEventListener("change", gateReady);
     submit.addEventListener("click", function (ev) {
       ev.preventDefault();
+      if (!ready()) { return; }
+      window.grydAssessLead = { lead: { name: values.name, email: values.email },
+                                inputs: engineInputs() };
+      var answers = engineInputs();
       form.hidden = true;
-      done.hidden = false;
-      /* the fit confirmation holds the whole screen, footer included, so the
-         reader has nothing to scroll past to read it */
+      out.hidden = false;
+      doc.body.classList.add("has-result");
+      window.GrydAssessResult.render(out, window.GrydAssess.compute(answers), answers, {
+        onRestart: function () {
+          out.hidden = true;
+          out.innerHTML = "";
+          form.hidden = false;
+          doc.body.classList.remove("has-result");
+          window.scrollTo(0, 0);
+        }
+      });
       window.scrollTo(0, 0);
     });
   }
 
-  /* ------------------------------------------------------- the three stages */
-  /* Both pages run the same gate: one stage on screen, every question in it
-     visible at once, nothing from a later stage rendered before its turn. The
-     rail beside it keeps the answers already given. */
+  /* --------------------------------------------------------- the two stages */
+  /* One stage on screen, every question in it visible at once, nothing from a
+     later stage rendered before its turn. The rail beside stage two keeps the
+     answers already given. */
 
   var col = doc.querySelector("[data-staged]");
   if (col) {
@@ -144,7 +192,7 @@
       });
       doc.body.classList.toggle("past-first", at > 0);
       col.classList.toggle("first", at === 0);
-      if (at === 0) { fitFirst(); }
+      fit();
       var first = stages[at].querySelector(".f-text, .f-area, .f-tile, .seg");
       if (first && first.focus) { first.focus({ preventScroll: true }); }
       /* the reader asked for the next stage, so put it under the nav rather
@@ -156,14 +204,14 @@
       }
     }
 
-    /* the first stage is centred in whatever the headline and the nav leave,
+    /* a stage is centred in whatever the headline and the nav leave it,
        measured rather than guessed so it never pushes the page into a scroll */
-    function fitFirst() {
+    function fit() {
       var top = col.getBoundingClientRect().top + window.scrollY;
       var room = window.innerHeight - top - 40;
       col.style.setProperty("--first-fill", Math.max(360, Math.round(room)) + "px");
     }
-    window.addEventListener("resize", function () { if (at === 0) { fitFirst(); } });
+    window.addEventListener("resize", fit);
 
     all("[data-next]", col).forEach(function (b) {
       b.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });

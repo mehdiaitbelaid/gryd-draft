@@ -1,6 +1,10 @@
-/* The three question screens. No selector here names the popup or the page, so
-   the same sheet dresses both. Colours fall back to tokens.css names, and to
-   the literal palette where tokens.css is not on the page. */
+/* The question screen. No selector here names the popup or the page, so the
+   same sheet dresses both. Colours fall back to tokens.css names, and to the
+   literal palette where tokens.css is not on the page.
+
+   The row is the tools page's own: a small caps label in the left column, the
+   answer on one hairline in the right, and the hint under it. Nothing is boxed
+   and no control announces itself as one. */
 
 .ai-root {
   --ai-paper: var(--paper, #F8F6F2);
@@ -32,43 +36,57 @@
   margin-right: 8px;
 }
 .ai-screen h2 { font-size: 20px; line-height: 1.2; margin: 0 0 6px; font-weight: 500; }
-.ai-stand { font-size: 13px; color: var(--ai-grey); margin: 0 0 16px; max-width: 60ch; }
 
-/* one hairline per field, and the label sits above it rather than in a box */
-.ai-field { margin: 16px 0 4px; max-width: 320px; }
-.ai-field label {
-  display: block;
+/* the hairline rows */
+.ai-rows { margin-top: 6px; }
+.ai-row {
+  display: grid;
+  grid-template-columns: 152px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 12px 0 10px;
+}
+.ai-lab {
   font-size: 10px;
-  letter-spacing: .1em;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--ai-grey);
-  margin-bottom: 2px;
+  padding-top: 8px;
 }
-.ai-field input {
+.ai-in { min-width: 0; max-width: 440px; }
+.ai-text {
   font: inherit;
-  font-size: 16px;
+  font-size: 20px;
+  line-height: 1.25;
   width: 100%;
+  display: block;
   background: transparent;
   color: var(--ai-ink);
   border: 0;
   border-bottom: 1px solid var(--ai-line);
   border-radius: 0;
-  padding: 6px 0 7px;
+  padding: 4px 0 8px;
+  appearance: none;
   transition: border-color .2s ease;
 }
-.ai-field input:focus { outline: 0; border-bottom-color: var(--ai-flare); }
-.ai-field ::placeholder { color: var(--ai-grey); opacity: .8; }
-.ai-note { display: block; font-size: 12px; color: var(--ai-flare); margin-top: 5px; }
+.ai-text:focus { outline: 0; border-bottom-color: var(--ai-flare); }
+.ai-text::placeholder { color: var(--ai-grey); opacity: .85; }
+.ai-text::-webkit-inner-spin-button,
+.ai-text::-webkit-outer-spin-button { appearance: none; margin: 0; }
+.ai-hint { margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: var(--ai-grey); }
+.ai-note { display: block; font-size: 12px; color: var(--ai-flare); margin-top: 4px; }
 .ai-note[hidden] { display: none; }
 
-/* the tap tiles */
-.ai-tiles { display: grid; gap: 16px; margin: 4px 0 8px; }
-.ai-tiles-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 520px; }
-.ai-tiles-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 400px; }
-.ai-tiles-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 300px; }
-.ai-tiles-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 260px; }
-.ai-tiles-wide { margin-top: 18px; }
-
+/* the clay bed tiles, the same art and the same selection dash the tools page
+   draws, at the size the popup has room for */
+.ai-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* 16px is the site's standing clearance between things that light up under a
+     pointer, and these five sit side by side */
+  gap: 16px;
+  max-width: 420px;
+}
 .ai-tile {
   font: inherit;
   background: transparent;
@@ -77,8 +95,10 @@
   margin: 0;
   cursor: pointer;
   text-align: center;
+  display: block;
   position: relative;
   color: var(--ai-grey);
+  transition: color .2s ease;
 }
 .ai-tile img {
   width: 100%;
@@ -89,22 +109,11 @@
 }
 .ai-tile .ai-tile-name {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
   font-size: 9px;
-  letter-spacing: .07em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
-.ai-compass, .ai-glyph { width: 38px; height: 38px; display: block; margin: 4px auto 2px; opacity: .55; transition: opacity .25s ease; }
-.ai-tile-plain .ai-band-n {
-  display: block;
-  font-size: 13px;
-  padding: 12px 4px 10px;
-  border-radius: 12px;
-  background: var(--ai-plate);
-  transition: color .2s ease;
-}
-.ai-tile-plain .ai-tile-name { display: none; }
-.ai-tile-glyph .ai-tile-name { font-size: 10px; }
 .ai-tile::after {
   content: "";
   position: absolute;
@@ -117,24 +126,15 @@
   transition: width .25s cubic-bezier(.22,.61,.36,1);
 }
 .ai-tile:hover img { filter: saturate(.7) opacity(.85); }
-.ai-tile:hover .ai-compass, .ai-tile:hover .ai-glyph { opacity: .85; }
 .ai-tile[aria-pressed="true"] { color: var(--ai-ink); }
 .ai-tile[aria-pressed="true"] img { filter: none; transform: translateY(-2px); }
-.ai-tile[aria-pressed="true"] .ai-compass,
-.ai-tile[aria-pressed="true"] .ai-glyph { opacity: 1; color: var(--ai-flare); }
 .ai-tile[aria-pressed="true"]::after { width: 20px; }
 .ai-tile:focus-visible { outline: 2px solid var(--ai-flare); outline-offset: 3px; }
 
-/* the split */
-.ai-sliders { margin: 14px 0 4px; max-width: 420px; }
-.ai-slider { display: grid; grid-template-columns: 92px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 3px 0; }
-.ai-slider label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ai-grey); }
-.ai-slider output { font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
-.ai-slider input[type="range"] { width: 100%; accent-color: var(--ai-flare); background: transparent; }
-.ai-sum { font-size: 12px; color: var(--ai-grey); margin: 6px 0 0; }
-
 @media (max-width: 720px) {
-  .ai-tiles-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .ai-tiles-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ai-slider { grid-template-columns: 80px minmax(0, 1fr) 40px; }
+  .ai-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .ai-lab { padding-top: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-tile img, .ai-tile::after { transition: none; }
 }

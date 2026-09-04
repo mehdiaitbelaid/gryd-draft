@@ -1,10 +1,16 @@
-/* The three question screens of the site assessment, as a mountable piece.
+/* The question screen of the site assessment, as a mountable piece.
 
-   The popup and the tools page ask the same questions in the same order, so the
-   questions live here and the two shells only differ in the chrome around them.
-   Nothing here draws a stage counter, a Continue button or a plate: the host
-   owns those and drives this through next, back and the change callback, which
-   is why the same three screens can sit in a 880px popup and on a full page.
+   The popup and the tools page ask the same three things in the same order, so
+   the questions live here and the two shells only differ in the chrome around
+   them. Nothing here draws a stage counter, a Continue button or a plate: the
+   host owns those and drives this through next, back and the change callback,
+   which is why the same questions can sit in an 880px popup and on a full page.
+
+   Since 4 September there is one screen, not three. The scheme is a postcode,
+   the bed sizes on it and the number of plots, which is what the tools page
+   already asked on its own first stage, so the popup asks it the same way and
+   in the same words. Orientation and the heating question are gone: every
+   scheme is priced all electric, and the stub does not read a compass.
 
    window.GrydAssessInputs.mount(container, onComplete, opts) -> controller
 
@@ -22,98 +28,72 @@
   var me = document.currentScript;
   var IMG = new URL("img/site-assess/", me ? me.src : location.href).href;
 
-  var PLOT_BANDS = [["Under 20", 12], ["20 to 50", 35], ["50 to 100", 75],
-                    ["100 to 250", 150], ["250 or more", 300]];
-  var SPLIT = [["small", "1 to 2 Bed", "beds-2"], ["mid", "3 to 4 Bed", "beds-4"],
-               ["large", "5+ Bed", "beds-5"]];
-  var ORIENT = ["North", "East", "South", "West"];
+  /* Five bed tiles, three engine bands. A tile is a size on the scheme, so the
+     picker is multi select, and the bands it touches share the scheme evenly
+     between them: two tiles inside one band are still one band. */
+  var BEDS = [["1 bed", "small", "beds-1"], ["2 bed", "small", "beds-2"],
+              ["3 bed", "mid", "beds-3"], ["4 bed", "mid", "beds-4"],
+              ["5 bed", "large", "beds-5"]];
+  var BANDS = ["small", "mid", "large"];
+  /* The engine reads both, and neither is asked any more: every scheme is
+     priced all electric, and the compass is not in the stub's arithmetic. */
+  var ENERGY = "All Electric";
+  var ORIENTATION = "South";
   var POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   }
 
-  /* the compass needle, turned to the face being offered */
-  function compass(dir) {
-    var turn = { North: 0, East: 90, South: 180, West: 270 }[dir] || 0;
-    return '<svg class="ai-compass" viewBox="0 0 48 48" aria-hidden="true" focusable="false">'
-      + '<circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".45"/>'
-      + '<g transform="rotate(' + turn + ' 24 24)">'
-      + '<path d="M24 8 L30 30 L24 26 L18 30 Z" fill="currentColor"/></g></svg>';
+  function bedTile(b) {
+    return '<button type="button" class="ai-tile" aria-pressed="false" data-value="'
+      + esc(b[0]) + '"><img src="' + IMG + b[2] + '.png" alt="" width="300" height="300"'
+      + ' decoding="async"><span class="ai-tile-name">' + esc(b[0]) + "</span></button>";
   }
 
-  function bolt() {
-    return '<svg class="ai-glyph" viewBox="0 0 48 48" aria-hidden="true" focusable="false">'
-      + '<path d="M27 6 L14 27 H23 L21 42 L34 21 H25 Z" fill="currentColor"/></svg>';
-  }
-  function flame() {
-    return '<svg class="ai-glyph" viewBox="0 0 48 48" aria-hidden="true" focusable="false">'
-      + '<path d="M24 5c7 9 13 12 13 21a13 13 0 0 1-26 0c0-5 3-8 5-12 1 3 3 5 5 5 2 0 3-2 3-5 0-3 0-6 0-9z"'
-      + ' fill="currentColor"/></svg>';
-  }
-
-  function tile(value, inner, cls) {
-    return '<button type="button" class="ai-tile' + (cls ? " " + cls : "") + '"'
-      + ' aria-pressed="false" data-value="' + esc(value) + '">' + inner
-      + '<span class="ai-tile-name">' + esc(value) + "</span></button>";
+  function row(label, inner) {
+    return '<div class="ai-row"><span class="ai-lab">' + esc(label) + "</span>"
+      + '<div class="ai-in">' + inner + "</div></div>";
   }
 
   function markup() {
-    var plots = PLOT_BANDS.map(function (b) {
-      return tile(b[0], '<span class="ai-band-n">' + esc(b[0]) + "</span>", "ai-tile-plain");
-    }).join("");
-
-    var dom = SPLIT.map(function (s) {
-      return tile(s[1], '<img src="' + IMG + s[2] + '.png" alt="" width="300" height="300"'
-        + ' decoding="async">');
-    }).join("");
-
-    var sliders = SPLIT.map(function (s) {
-      return '<div class="ai-slider"><label for="aiSplit-' + s[0] + '">' + esc(s[1])
-        + '</label><input type="range" id="aiSplit-' + s[0] + '" data-split="' + s[0]
-        + '" min="0" max="100" step="5" value="0">'
-        + '<output data-split-out="' + s[0] + '">0%</output></div>';
-    }).join("");
-
-    var energy = tile("All Electric", bolt(), "ai-tile-glyph")
-      + tile("Gas", flame(), "ai-tile-glyph");
-
-    var orient = ORIENT.map(function (d) { return tile(d, compass(d)); }).join("");
-
+    var beds = BEDS.map(bedTile).join("");
     return '<section class="ai-screen" data-screen="0" hidden>'
       + '<span class="ai-eyebrow">Your scheme</span>'
-      + "<h2>How many homes are you building?</h2>"
-      + '<p class="ai-stand">Pick the band you are in, then set the exact figure if you have it.</p>'
-      + '<div class="ai-tiles ai-tiles-5" data-tiles="plotBand" role="group"'
-      + ' aria-label="Number of homes">' + plots + "</div>"
-      + '<div class="ai-field"><label for="aiHomes">Exact number of homes</label>'
-      + '<input type="number" id="aiHomes" data-key="homes" min="1" step="1"'
-      + ' inputmode="numeric" placeholder="100"></div>'
-      + "</section>"
+      + "<h2>Where the site is and how big</h2>"
+      + '<div class="ai-rows">'
+      + row("Site postcode",
+            '<input class="ai-text" type="text" id="aiPostcode" data-key="postcode"'
+            + ' aria-label="Site postcode" placeholder="NR20 5DF" autocomplete="postal-code">'
+            + '<p class="ai-hint">The postcode is enough to place it.</p>'
+            + '<span class="ai-note" data-postcode-note hidden>'
+            + "That is not a UK postcode yet.</span>")
+      + row("Bedrooms",
+            '<div class="ai-tiles" data-tiles="bedrooms" role="group" aria-label="Bedrooms">'
+            + beds + "</div>"
+            + '<p class="ai-hint">Pick every size on the scheme.</p>')
+      + row("Number of plots",
+            '<input class="ai-text" type="number" id="aiHomes" data-key="homes"'
+            + ' aria-label="Number of plots" placeholder="42" min="1" step="1"'
+            + ' inputmode="numeric">')
+      + "</div></section>";
+  }
 
-      + '<section class="ai-screen" data-screen="1" hidden>'
-      + '<span class="ai-eyebrow">Your scheme</span>'
-      + "<h2>What is the mix, and how are the homes heated?</h2>"
-      + '<p class="ai-stand">Choose the size that dominates, then fine tune the split.</p>'
-      + '<div class="ai-tiles ai-tiles-3" data-tiles="dominant" role="group"'
-      + ' aria-label="Dominant home size">' + dom + "</div>"
-      + '<div class="ai-sliders" role="group" aria-label="Home size split">' + sliders
-      + '<p class="ai-sum" data-sum>Adds up to 100%</p></div>'
-      + '<div class="ai-tiles ai-tiles-2 ai-tiles-wide" data-tiles="energy" role="group"'
-      + ' aria-label="Energy type">' + energy + "</div>"
-      + "</section>"
-
-      + '<section class="ai-screen" data-screen="2" hidden>'
-      + '<span class="ai-eyebrow">Your scheme</span>'
-      + "<h2>Where is the site, and which way do the roofs face?</h2>"
-      + '<p class="ai-stand">The postcode places it. The average orientation sizes it.</p>'
-      + '<div class="ai-field"><label for="aiPostcode">Site postcode</label>'
-      + '<input type="text" id="aiPostcode" data-key="postcode" autocomplete="postal-code"'
-      + ' placeholder="SW5 0PX"><span class="ai-note" data-postcode-note hidden>'
-      + "That is not a UK postcode yet.</span></div>"
-      + '<div class="ai-tiles ai-tiles-4" data-tiles="orientation" role="group"'
-      + ' aria-label="Average orientation">' + orient + "</div>"
-      + "</section>";
+  /* An even share of the scheme to every band a chosen bed size lands in. The
+     remainder goes to the first band rather than being dropped, so the three
+     always read as 100. */
+  function shareOut(picked) {
+    var split = { small: 0, mid: 0, large: 0 };
+    var hit = BANDS.filter(function (k) {
+      return picked.some(function (name) {
+        return BEDS.some(function (b) { return b[0] === name && b[1] === k; });
+      });
+    });
+    if (!hit.length) { return split; }
+    var each = Math.floor(100 / hit.length);
+    hit.forEach(function (k) { split[k] = each; });
+    split[hit[0]] += 100 - each * hit.length;
+    return split;
   }
 
   function mount(container, onComplete, opts) {
@@ -123,58 +103,16 @@
 
     var screens = [].slice.call(container.querySelectorAll(".ai-screen"));
     var at = 0;
-    var v = { homes: null, postcode: "", orientation: "", energy: "",
-              split: { small: 0, mid: 0, large: 0 } };
-
-    function press(group, value) {
-      [].slice.call(container.querySelectorAll('[data-tiles="' + group + '"] .ai-tile'))
-        .forEach(function (b) {
-          b.setAttribute("aria-pressed", String(b.getAttribute("data-value") === value));
-        });
-    }
-
-    function paintSplit() {
-      SPLIT.forEach(function (s) {
-        var r = container.querySelector('[data-split="' + s[0] + '"]');
-        var o = container.querySelector('[data-split-out="' + s[0] + '"]');
-        r.value = String(v.split[s[0]]);
-        o.textContent = v.split[s[0]] + "%";
-      });
-      var total = v.split.small + v.split.mid + v.split.large;
-      container.querySelector("[data-sum]").textContent = total === 100
-        ? "Adds up to 100%" : "Adds up to " + total + "%, it needs to be 100%";
-    }
-
-    /* One slider is the one the reader moved; the other two absorb the change
-       in the proportion they already stood in, so the split always sums to 100
-       without the reader having to do the arithmetic. */
-    function rebalance(moved, value) {
-      var keys = ["small", "mid", "large"].filter(function (k) { return k !== moved; });
-      var rest = 100 - value;
-      var had = v.split[keys[0]] + v.split[keys[1]];
-      v.split[moved] = value;
-      if (had <= 0) {
-        v.split[keys[0]] = rest;
-        v.split[keys[1]] = 0;
-      } else {
-        v.split[keys[0]] = Math.round(v.split[keys[0]] / had * rest);
-        v.split[keys[1]] = rest - v.split[keys[0]];
-      }
-      paintSplit();
-    }
-
-    function splitTotal() { return v.split.small + v.split.mid + v.split.large; }
+    var v = { homes: null, postcode: "", beds: [] };
 
     function canAdvance() {
-      if (at === 0) { return !!(v.homes && v.homes > 0); }
-      if (at === 1) { return splitTotal() === 100 && !!v.energy; }
-      return POSTCODE.test(v.postcode) && !!v.orientation;
+      return POSTCODE.test(v.postcode) && v.beds.length > 0 && !!(v.homes && v.homes > 0);
     }
 
     function values() {
       return { homes: v.homes, postcode: v.postcode.toUpperCase().trim(),
-               orientation: v.orientation, energy: v.energy,
-               split: { small: v.split.small, mid: v.split.mid, large: v.split.large } };
+               orientation: ORIENTATION, energy: ENERGY, beds: v.beds.slice(),
+               split: shareOut(v.beds) };
     }
 
     function changed() {
@@ -193,42 +131,23 @@
     }
 
     function onClick(ev) {
-      var t = ev.target.closest(".ai-tile");
-      if (!t) { return; }
-      var group = t.closest("[data-tiles]").getAttribute("data-tiles");
-      var value = t.getAttribute("data-value");
-      press(group, value);
-      if (group === "plotBand") {
-        var band = PLOT_BANDS.filter(function (b) { return b[0] === value; })[0];
-        v.homes = band[1];
-        container.querySelector("#aiHomes").value = String(band[1]);
-      } else if (group === "dominant") {
-        var key = SPLIT.filter(function (s) { return s[1] === value; })[0][0];
-        v.split = { small: 0, mid: 0, large: 0 };
-        ["small", "mid", "large"].forEach(function (k) { v.split[k] = k === key ? 60 : 20; });
-        paintSplit();
-      } else if (group === "energy") {
-        v.energy = value;
-      } else if (group === "orientation") {
-        v.orientation = value;
-      }
+      var t = ev.target.closest ? ev.target.closest(".ai-tile") : null;
+      if (!t || !container.contains(t)) { return; }
+      var on = t.getAttribute("aria-pressed") === "true";
+      t.setAttribute("aria-pressed", on ? "false" : "true");
+      v.beds = [].slice.call(container.querySelectorAll('.ai-tile[aria-pressed="true"]'))
+        .map(function (b) { return b.getAttribute("data-value"); });
       changed();
     }
 
     function onInput(ev) {
-      var el = ev.target;
-      if (el.hasAttribute("data-split")) {
-        rebalance(el.getAttribute("data-split"), parseInt(el.value, 10) || 0);
-        changed();
-        return;
-      }
-      var key = el.getAttribute("data-key");
+      var key = ev.target.getAttribute("data-key");
       if (!key) { return; }
-      if (key === "homes") { v.homes = parseInt(el.value, 10) || null; }
+      if (key === "homes") { v.homes = parseInt(ev.target.value, 10) || null; }
       if (key === "postcode") {
-        v.postcode = el.value;
+        v.postcode = ev.target.value;
         var note = container.querySelector("[data-postcode-note]");
-        note.hidden = !el.value || POSTCODE.test(el.value);
+        note.hidden = !ev.target.value || POSTCODE.test(ev.target.value);
       }
       changed();
     }
@@ -253,15 +172,13 @@
         return true;
       },
       reset: function () {
-        v = { homes: null, postcode: "", orientation: "", energy: "",
-              split: { small: 0, mid: 0, large: 0 } };
+        v = { homes: null, postcode: "", beds: [] };
         [].slice.call(container.querySelectorAll(".ai-tile")).forEach(function (b) {
           b.setAttribute("aria-pressed", "false");
         });
         container.querySelector("#aiHomes").value = "";
         container.querySelector("#aiPostcode").value = "";
         container.querySelector("[data-postcode-note]").hidden = true;
-        paintSplit();
         show(0);
       },
       destroy: function () {
@@ -271,10 +188,11 @@
       }
     };
 
-    paintSplit();
     show(0);
     return api;
   }
 
-  window.GrydAssessInputs = { mount: mount, POSTCODE: POSTCODE };
+  window.GrydAssessInputs = { mount: mount, POSTCODE: POSTCODE,
+                              shareOut: shareOut, BEDS: BEDS,
+                              ENERGY: ENERGY, ORIENTATION: ORIENTATION };
 })();

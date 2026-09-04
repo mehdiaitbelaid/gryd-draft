@@ -22,10 +22,16 @@
   function money(n) { return "£" + Math.round(n).toLocaleString("en-GB"); }
   function pct(n) { return (Math.round(n * 100) / 100).toFixed(2) + "%"; }
 
+  /* Every sentence below is the live tool's own, quoted character for character
+     off gryd.energy: "Co2" for CO2, "Future homes Standard", the hyphen in
+     "flat-rate", the "~£8000", the missing apostrophe in "the homes energy
+     demand", the middle dots in the footnote and the band labels "1 - 2 Beds"
+     and "1-2 Bed". None of it is corrected here. The site's own no dash rule
+     covers the copy this project writes; it does not reach Gryd's. */
   var DEV_BENEFITS = [
-    function (r) { return "You'll eliminate " + r.co2TonnesPerYear + " tonnes of CO2 per year."; },
+    function (r) { return "You'll eliminate " + r.co2TonnesPerYear + " tonnes of Co2 per year."; },
     function (r) { return "You'll save an average " + money(r.savingPerUnit) + " per unit."; },
-    function () { return "You'll meet and exceed the minimum requirements of the Future Homes Standard."; },
+    function () { return "You'll meet and exceed the minimum requirements of the Future homes Standard."; },
     function () { return "You'll deliver future proofed homes that exceed buyers expectations,"
       + " differentiating you from the market and helping to accelerate sales velocity."; },
     function () { return "Battery storage provided for every home, which can reduce your grid"
@@ -33,25 +39,28 @@
   ];
 
   var HOME_BENEFITS = [
-    "The homeowner will enjoy a simple flat rate subscription, fixed with no hidden costs"
+    "The homeowner will enjoy a simple flat-rate subscription, fixed with no hidden costs"
       + " for the life of the system.",
     "Their monthly rate includes all servicing, maintenance and replacement parts, helping"
-      + " them save about £8,000 more in upkeep costs.",
-    "The system will serve 70% or more of the home's energy demand, shielding the homeowner"
+      + " them save an additional ~£8000 in upkeep costs.",
+    "The system will serve 70%+ of the homes energy demand, shielding the homeowner"
       + " from volatile energy prices."
   ];
 
-  var FOOTNOTE = "Calculation based on MCS standard method. Assumed roof pitch of 35 degrees."
-    + " 25 year system lifetime. Forecast electricity prices from GOV.UK";
+  var FOOTNOTE = "*Calculation based on MCS standard method · Assumed roof pitch of 35 degrees"
+    + " · 25 year system lifetime · Forecast electricity prices from GOV.UK";
 
+  /* Orientation is not a row any more: the questions stopped asking which way
+     the roofs face, so the summary stops reporting an answer nobody gave. The
+     energy type stays, the way the live tool's own Project Details carries it,
+     and every scheme now reads All Electric. */
   function detailRows(result, inputs) {
     var s = inputs.split || { small: 0, mid: 0, large: 0 };
-    var split = "1 to 2 Bed " + s.small + "%, 3 to 4 Bed " + s.mid + "%, 5+ Bed " + s.large + "%";
+    var split = "1-2 Bed - " + s.small + "%, 3-4 Bed - " + s.mid + "%, 5+ Bed - " + s.large + "%";
     var loc = result.location || {};
     return [
       ["Homes count", String(inputs.homes)],
       ["Location", [loc.postcode, loc.town].filter(Boolean).join(", ")],
-      ["Average orientation", inputs.orientation || ""],
       ["Home size split", split],
       ["Energy type", inputs.energy || ""]
     ];
@@ -188,7 +197,7 @@
 
       + '<p class="ar-foot">' + esc(FOOTNOTE) + "</p>"
       + '<p class="ar-note" data-preview-note>Sample figures shown on this preview.</p>'
-      + '<div class="ar-acts"><button type="button" class="ar-btn" data-restart>Start over</button>'
+      + '<div class="ar-acts"><button type="button" class="ar-btn" data-restart>Start Over</button>'
       + '<button type="button" class="ar-btn ar-btn-quiet" data-share>Share</button>'
       + '<span class="ar-said" data-said role="status"></span></div>';
 
@@ -221,7 +230,7 @@
       if (opts.onShare) { opts.onShare(text); }
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function () {
-          said.textContent = "Summary copied";
+          said.textContent = "Share link has been copied";
         }, function () { said.textContent = "Copy it from the page"; });
       } else {
         said.textContent = "Copy it from the page";

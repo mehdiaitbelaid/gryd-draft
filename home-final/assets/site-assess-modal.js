@@ -1,7 +1,7 @@
 /* The site assessment popup. Hand written, injected on every page by
    site-nav.js.
 
-   Since 4 September the popup is the whole tool: three screens of questions,
+   Since 4 September the popup is the whole tool: one screen of questions,
    then a name and an email, then the full assessment summary. There is no
    teaser in between. The questions come from assess-inputs.js and the summary
    from assess-result.js, both of which the tools page mounts too, so this file
@@ -61,6 +61,7 @@
     waiting.push(then);
     if (loading) { return; }
     loading = true;
+    css("site-modal.css");
     css("site-assess-modal.css");
     css("assess-inputs.css");
     css("assess-result.css");
@@ -230,8 +231,10 @@
     back.hidden = at === PANE_INPUTS && screen === 0;
     consent.hidden = at !== PANE_GATE;
     gate.hidden = at !== PANE_GATE || ready() || !lead.name && !lead.email;
+    /* The scheme is one screen now, so a step counter would count to one. It
+       only appears if the questions are ever split again. */
     count.textContent = at === PANE_INPUTS
-      ? "Step 0" + (screen + 1) + " of 0" + inputs.total
+      ? (inputs.total > 1 ? "Step 0" + (screen + 1) + " of 0" + inputs.total : "Your scheme")
       : (at === PANE_GATE ? "Your details" : "Assessment summary");
     go.textContent = at === PANE_RESULT ? "Close"
       : (at === PANE_GATE ? "See my assessment" : "Continue");

@@ -365,7 +365,10 @@
    height under the headline to sit in */
 .a-cols.first { grid-template-columns: minmax(0, 1fr); }
 .a-cols.first .a-rail { display: none; }
-.a-cols.first .a-col {
+/* every stage is centred in the height the headline and the nav leave it, so a
+   two question stage does not sit in a band of paper with the page empty under
+   it */
+.a-cols .a-col {
   min-height: var(--first-fill, 520px);
   display: flex;
   flex-direction: column;
@@ -538,3 +541,13 @@ body.sa-flow .sa { padding-top: 104px; }
 @media (prefers-reduced-motion: reduce) {
   .f-tile img, .f-tile::after, .e-seg .s-bar i { transition: none; }
 }
+
+/* ------------------------------------------------------ the assessment in place */
+/* Past the gate the page is the summary, so the headline band that sold the
+   form stands down and the result gets the column to itself. The summary is
+   long by design and scrolls; only the questions have to hold one screen. */
+
+.sa-result { padding: 0 0 40px; }
+body.sa-tool.has-result .sa-mast { display: none; }
+body.sa-tool.has-result .sa { padding-top: 128px; }
+.f-submit:disabled { opacity: .45; cursor: not-allowed; }
