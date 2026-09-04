@@ -38,7 +38,7 @@
   /* The engine reads both, and neither is asked any more: every scheme is
      priced all electric, and the compass is not in the stub's arithmetic. */
   var ENERGY = "All Electric";
-  var ORIENTATION = "South";
+  var ORIENTATION = "South West";
   var POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
   function esc(s) {

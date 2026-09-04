@@ -179,7 +179,6 @@
 .ar-tip[hidden] { display: none; }
 
 .ar-foot { font-size: 10px; line-height: 1.4; color: var(--ar-muted); margin: 10px 0 0; max-width: 88ch; }
-.ar-note { font-size: 11px; color: var(--ar-flare); margin: 4px 0 0; }
 
 .ar-acts { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
 

@@ -70,35 +70,42 @@
      retailer bill that is left, and over them the line the same home would have
      paid with no system at all. Everything is laid out in the viewBox, so the
      figure scales with its column and never needs a resize listener. */
-  var W = 760, H = 320, PAD_L = 64, PAD_R = 12, PAD_T = 14, PAD_B = 38;
+  var W = 760, PAD_L = 64, PAD_R = 12, PAD_T = 14, PAD_B = 38;
 
-  /* Four ticks that land on round money, with a quarter of the plot left empty
-     over the tallest series so the curve never runs into the frame. */
-  var TICK_STEPS = [50, 100, 250, 500, 1000, 1500, 2000, 2500, 5000, 10000];
+  /* The plot is a fixed number of pixels tall in each shell, so a wider column
+     widens the chart and never makes it taller: the sections under it stay put.
+     260 in the popup, where the box has a scroll of its own to spend, 320 in
+     the page column. */
+  var PLOT_H = { popup: 260, page: 320 };
+
+  /* The axis follows the data. It stops at the first £500 above the tallest
+     value on the run, in £500 steps while that is £3,000 or less and £1,000
+     steps above it, so a gas scheme keeps a fine ladder and an all electric
+     5+ bed run tops out at £5,000 rather than a decorative £8,000. */
+  function axisStep(raw) { return Math.ceil(raw / 500) * 500 <= 3000 ? 500 : 1000; }
 
   function axisTop(raw) {
-    var wanted = raw / 0.75;
-    for (var i = 0; i < TICK_STEPS.length; i++) {
-      if (TICK_STEPS[i] * 4 >= wanted) { return TICK_STEPS[i] * 4; }
-    }
-    return Math.ceil(wanted / 4 / 10000) * 40000;
+    var step = axisStep(raw);
+    return Math.max(step, Math.ceil(raw / step) * step);
   }
 
-  function chartSvg(c) {
+  function chartSvg(c, plotH) {
     var n = c.years.length;
-    var plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+    var H = plotH + PAD_T + PAD_B;
+    var plotW = W - PAD_L - PAD_R;
     var top = 0;
     for (var i = 0; i < n; i++) {
       top = Math.max(top, c.without[i], c.subscription[i] + c.retailer[i]);
     }
-    var max = axisTop(top) || 500;
+    var max = axisTop(top);
+    var tickStep = axisStep(top);
     var step = plotW / n;
     var bw = Math.max(6, step * 0.62);
     var y = function (val) { return PAD_T + plotH - (val / max) * plotH; };
     var cx = function (i) { return PAD_L + step * i + step / 2; };
 
     var ticks = "";
-    for (var t = 0; t <= max; t += max / 4) {
+    for (var t = 0; t <= max + 0.5; t += tickStep) {
       ticks += '<line class="ar-grid" x1="' + PAD_L + '" x2="' + (W - PAD_R)
         + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>'
         + '<text class="ar-ytick" x="' + (PAD_L - 10) + '" y="' + (y(t) + 4).toFixed(1)
@@ -139,8 +146,9 @@
       + '<ul class="ar-key"><li><span class="k k-sub"></span>Gryd Subscription</li>'
       + '<li><span class="k k-ret"></span>Remaining Traditional Retailer Bill</li>'
       + '<li><span class="k k-out"></span>Annual Energy Cost without Gryd</li></ul></div>'
-      + '<div class="ar-chart-plot" data-plot-left="' + PAD_L + '" data-plot-w="' + W + '">'
+      + '<div class="ar-chart-plot" data-plot-left="' + PAD_L + '" data-plot-w="' + W + '" data-plot-h="' + H + '">'
       + '<svg viewBox="0 0 ' + W + " " + H + '" role="img"'
+      + ' preserveAspectRatio="xMidYMid meet" style="height:' + H + 'px"'
       + ' aria-label="Annual energy cost by year, with and without Gryd">'
       + '<text class="ar-axis" transform="translate(12 ' + (PAD_T + plotH / 2)
       + ') rotate(-90)" text-anchor="middle">Annual Energy Cost (£)</text>'
@@ -167,6 +175,7 @@
   function render(container, result, inputs, opts) {
     opts = opts || {};
     container.classList.add("ar-root");
+    var plotH = (container.closest && container.closest(".sam")) ? PLOT_H.popup : PLOT_H.page;
 
     var details = detailRows(result, inputs).map(function (r) {
       return '<div class="ar-detail"><dt>' + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>";
@@ -204,7 +213,7 @@
       + money(result.homeownerLifetimeSaving) + "</span>"
       + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
       + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article></div></section>"
-      + '<section class="ar-sec ar-chart-sec" data-sec="chart">' + chartSvg(result.chart)
+      + '<section class="ar-sec ar-chart-sec" data-sec="chart">' + chartSvg(result.chart, plotH)
       + "</section></div>"
 
       + '<section class="ar-sec" data-sec="table"><h3>Breakdown by House Size</h3>'
@@ -222,7 +231,6 @@
       + '<ul class="ar-list">' + home + "</ul></details>"
 
       + '<p class="ar-foot">' + esc(FOOTNOTE) + "</p>"
-      + '<p class="ar-note" data-preview-note>Sample figures shown on this preview.</p>'
       + '<div class="ar-acts"><button type="button" class="btn ar-btn" data-restart>Start Over</button>'
       + '<button type="button" class="btn ghost ar-btn ar-btn-quiet" data-share>Share</button>'
       + '<span class="ar-said" data-said role="status"></span></div>';
@@ -247,11 +255,17 @@
       var plot = plotEl.getBoundingClientRect();
       var draw = svg.getBoundingClientRect();
       var r = g.getBoundingClientRect();
-      var scale = draw.width / parseFloat(plotEl.getAttribute("data-plot-w"));
-      var origin = draw.left - plot.left + plotEl.scrollLeft;
+      /* The drawing keeps its aspect inside a box of fixed height, so it can
+         be narrower than the svg element and centred in it. Both the scale and
+         the left edge come from the drawn content, not the element. */
+      var vw = parseFloat(plotEl.getAttribute("data-plot-w"));
+      var vh = parseFloat(plotEl.getAttribute("data-plot-h"));
+      var scale = Math.min(draw.width / vw, draw.height / vh);
+      var inset = (draw.width - vw * scale) / 2;
+      var origin = draw.left - plot.left + plotEl.scrollLeft + inset;
       var wide = tip.getBoundingClientRect().width || 190;
       var min = origin + parseFloat(plotEl.getAttribute("data-plot-left")) * scale + 4;
-      var max = Math.max(min, origin + draw.width - wide - 8);
+      var max = Math.max(min, origin + vw * scale - wide - 8);
       var want = r.left - plot.left + plotEl.scrollLeft - 60;
       tip.style.left = Math.max(min, Math.min(max, want)) + "px";
     }

@@ -47,13 +47,13 @@
     document.head.appendChild(s);
   }
 
-  /* The one swap point for the figures. The preview runs on the stub, which is
-     why the summary says so under its footnote. assess-engine.js is on the
-     server already but it only formats an API response and would put a live
-     call, and a stored record, behind every click, so it is deliberately not
-     loaded here. A later agent changes this one string and nothing else, as
-     long as whatever it names leaves a compute on window.GrydAssess. */
-  var ENGINE = "assess-engine.stub.js";
+  /* The one swap point for the figures. It runs Scott's sheet arithmetic in
+     the browser. assess-engine.js is on the server already but it only formats
+     an API response and would put a live call, and a stored record, behind
+     every click, so it is deliberately not loaded here. A later agent changes
+     this one string and nothing else, as long as whatever it names leaves a
+     compute on window.GrydAssess. */
+  var ENGINE = "assess-engine.sheet.js";
 
   var loading = false, loaded = false, waiting = [];
   function deps(then) {
