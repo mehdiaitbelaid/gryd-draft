@@ -54,6 +54,9 @@
   var XFADE = 0.12;     // width of one still cross fade, in scroll progress
   var SWAP = 150;       // the outgoing copy is gone before the incoming starts
   var RETRY = 600;      // frames the loop keeps asking after a write was refused
+  var GRACE = 350;      // ms a settled frame may be undelivered before the stack returns
+  var FAR = 1.0;        // seconds behind that no scrub explains: a beat, not a frame or two
+  var FAR_GRACE = 120;  // ms the stack waits when the film is that far behind
 
   var top = 0, span = 1;
   // active is the step on screen. Two values are not steps: NONE is the opening
@@ -63,6 +66,10 @@
   var NONE = -1, UNSET = -2;
   var target = 0, vis = -1, running = false, active = UNSET, swapTimer = 0;
   var film = false, wrote = -1, want = -1, retries = 0;
+  // shown is the film time the element has actually put on screen, which is the
+  // only thing a reader can see. wrote is what the driver asked for, and the two
+  // are the same number only once the seek behind it has answered.
+  var shown = -1, staleAt = 0, stale = false;
 
   function unpinned() {
     return innerWidth < 900 ||
@@ -112,11 +119,42 @@
       video.seekable.end(video.seekable.length - 1) > 0;
   }
 
-  /* Whether the film is where the last paint asked it to be. A refused write is
-     recorded as no write at all, so this is false until one is accepted, and
-     the loop below will not go to sleep on a frame it never delivered. */
+  /* Whether the reader is looking at the frame the last paint asked for.
+
+     Accepting a write is not the same as showing a frame. currentTime takes the
+     new value the moment it is assigned, whether or not the data behind it has
+     arrived, so a seek into a stretch of the file the network has not reached
+     yet reports the time that was asked for while the element still shows its
+     last decode. Reading the answer off `wrote` is therefore the beat 05 bug:
+     the copy, the ticks and the overlay are pure functions of the requested
+     time, so they move to Operate and Optimise while the picture is left on the
+     film's opening frame, bare ringed plots with no houses on them, and nothing
+     downstream notices. `shown` is the presented frame instead. */
   function landed() {
-    return !film || (wrote >= 0 && Math.abs(wrote - want) < FRAME);
+    return !film || (shown >= 0 && Math.abs(shown - want) < FRAME);
+  }
+
+  /* The still stack is the fallback for a frame the film cannot deliver, not
+     only for a film that never loads. While it is up the plates are painted
+     from the film time the driver asked for, so the state on screen is the one
+     the copy beside it describes and the swap back is a cut to the same
+     picture. */
+  function showStale(on) {
+    if (on === stale) return;
+    stale = on;
+    pin.classList.toggle('film-stale', on);
+    if (!on) frames.forEach(function (f) {
+      f.style.opacity = ''; f.style.willChange = 'auto';
+    });
+  }
+
+  /* The stack is hidden while the film has the section, and a hidden lazy image
+     is never fetched, so the fallback has to be warmed before it is needed. */
+  function warmPlates() {
+    frames.forEach(function (f) {
+      var img = f.querySelector('img');
+      if (img && img.loading === 'lazy') img.loading = 'eager';
+    });
   }
 
   /* Scroll progress to film seconds, across the baked curve. Monotone and
@@ -142,6 +180,29 @@
   function blend(i, p) {
     var mid = (i + 0.5) / 4;
     return smooth((p - (mid - XFADE / 2)) / XFADE);
+  }
+
+  /* The stack standing in for a frame the film owes. The film's own windows
+     decide which state is up, not the scroll's midpoints, because the reader is
+     inside a beat and the beat's state is what the copy beside them describes;
+     the scroll blend would leave two thirds of state 5 under a third of state 4
+     in the middle of Operate and Optimise, which is the half built scheme this
+     fallback exists to avoid. The cross over sits in the last fifth of each
+     window, so scrolling under the stack still dissolves rather than cuts. */
+  function platesFilm(t) {
+    var i = stepAt(t);
+    if (i < 0) i = 0;
+    var w = WIN[i];
+    var f = w && w[1] > w[0] ? (t - w[0]) / (w[1] - w[0]) : 0;
+    var next = i >= WIN.length - 1 ? 0 : smooth((f - 0.82) / 0.18);
+    for (var k = 0; k < 5; k++) {
+      var op = k === i ? 1 - next : (k === i + 1 ? next : 0);
+      var fr = frames[k];
+      if (fr) {
+        fr.style.opacity = op;
+        fr.style.willChange = op > 0 && op < 1 ? 'opacity' : 'auto';
+      }
+    }
   }
 
   function plates(p) {
@@ -232,7 +293,38 @@
       // back to it, rather than recording a write that never landed
       wrote = -1;
     } else {
-      plates(p);
+      // no film: the stack is the artwork, and it takes the same windows the
+      // copy does, so the state on screen and the words beside it are the same
+      // step at every scroll position
+      if (WIN.length) platesFilm(t); else plates(p);
+    }
+
+    /* Is the reader looking at the frame this paint asked for. A scrub is not a
+       stall: while the scroll is still moving every frame is on its way to the
+       next one, so the clock only starts once it has settled, and the stack
+       comes up only if the film is still behind GRACE later. Once it is up it
+       stays up until the film delivers, and it is painted from the same film
+       time, so scrolling on under it shows the right state. */
+    if (film) {
+      if (landed()) { staleAt = 0; showStale(false); }
+      else {
+        var now = Date.now();
+        /* A scrub is not a stall, so a moving scroll normally keeps the clock
+           at zero and the stack down. A film a whole beat behind is the
+           exception: nothing about scrolling explains it, it is a seek the
+           file has not answered, and waiting for the reader to settle before
+           admitting it is what leaves the opening frame standing under a later
+           step's copy for as long as the travel lasts. */
+        var far = shown < 0 || Math.abs(shown - want) > FAR;
+        if (Math.abs(target - vis) >= DEAD && !far) staleAt = 0;
+        else if (!staleAt) staleAt = now;
+        if (stale || (staleAt && now - staleAt > (far ? FAR_GRACE : GRACE)))
+          showStale(true);
+        // a seek that ended without delivering the frame was dropped, so ask
+        // again rather than sitting on a write that is remembered and gone
+        if (stale && !video.seeking && video.readyState >= 1) wrote = -1;
+      }
+      if (stale) platesFilm(want);
     }
 
     pin.style.setProperty('--sys-scale', (1.05 - 0.05 * p).toFixed(4));
@@ -332,7 +424,10 @@
     film = true;
     wrote = -1;
     want = -1;
+    shown = video.currentTime;
+    staleAt = 0;
     pin.classList.add('has-film');
+    warmPlates();
     frames.forEach(function (f) { f.style.opacity = ''; f.style.willChange = 'auto'; });
     // the film can arrive long after the reader has settled somewhere in the
     // pin, so take the scroll position as it is now and land on it
@@ -341,6 +436,7 @@
 
   function drop() {
     film = false;
+    showStale(false);
     pin.classList.remove('has-film');
     if (!unpinned()) paint(vis < 0 ? 0 : vis);
   }
@@ -353,8 +449,11 @@
     idling = false;
     pin.classList.remove('is-idle');
     film = false;
+    showStale(false);
     wrote = -1;
     want = -1;
+    shown = -1;
+    staleAt = 0;
     active = UNSET;
     pin.classList.remove('has-film');
     pin.dataset.step = '1';
@@ -377,7 +476,11 @@
     active = UNSET;
     wrote = -1;
     want = -1;
+    shown = video ? video.currentTime : -1;
+    staleAt = 0;
+    showStale(false);
     if (video && video.readyState >= 2) film = true;
+    if (film) warmPlates();
     pin.classList.toggle('has-film', film);
     paint(vis);
     idleWake();
@@ -385,6 +488,25 @@
 
   if (video) {
     video.pause();
+    /* What is actually on screen. Reading currentTime back in a seeked handler
+       is not that: the property answers with the time that was last asked for,
+       so a write made while the seek was still decoding would be recorded as
+       delivered. requestVideoFrameCallback reports the presentation time of the
+       frame the compositor really painted, so where it exists it is the only
+       source for shown. A browser without it falls back to the seek reports,
+       which are honest except in that race. */
+    if (typeof video.requestVideoFrameCallback === 'function') {
+      var onFrame = function (now, meta) {
+        shown = meta.mediaTime;
+        revive();
+        video.requestVideoFrameCallback(onFrame);
+      };
+      video.requestVideoFrameCallback(onFrame);
+    } else {
+      ['seeked', 'loadeddata'].forEach(function (e) {
+        video.addEventListener(e, function () { shown = video.currentTime; });
+      });
+    }
     ['loadeddata', 'canplay', 'canplaythrough', 'seeked'].forEach(function (e) {
       video.addEventListener(e, adopt);
     });

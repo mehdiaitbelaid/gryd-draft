@@ -160,6 +160,13 @@
    decodes, the stack is what is on screen and the film is not in the way. */
 .sys-pin:not(.has-film) .sys-film { display: none; }
 .sys-pin.has-film .sys-step .sys-frame { display: none; }
+/* And back again, for a frame the film owes but has not delivered. A seek into
+   a stretch of the file the network has not reached yet leaves the element on
+   its last decode, which on a cold load is the opening frame: bare ringed plots
+   standing under step 05's copy. The stack comes back for as long as that
+   lasts, so what is on screen is always the state the words describe. */
+.sys-pin.has-film.film-stale .sys-film { visibility: hidden; }
+.sys-pin.has-film.film-stale .sys-step .sys-frame { display: block; }
 
 /* The holder of the progress rail and the film. No connector is drawn over the
    picture: the ember through the houses belongs to the render itself. */
