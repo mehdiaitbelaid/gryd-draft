@@ -18,13 +18,10 @@
 /* Each group is gated on the beat and cross fades in 300ms. Everything gated
    starts at zero, so a group that has not been switched on paints nothing:
    that is what makes the no orange rule for beats 1 to 4 hold by construction
-   rather than by remembering to hide something. The flock is switched on for
-   every beat; only the beads and the weather change with the story. */
+   rather than by remembering to hide something. */
 .sys-live .lg,
-.sys-live .cl,
-.sys-live .bd { opacity: 0; transition: opacity .3s ease; }
+.sys-live .cl { opacity: 0; transition: opacity .3s ease; }
 .sys-live .lg.on { opacity: 1; }
-.sys-live .bd.on { opacity: 1; }
 
 /* The cloud is lighting, not an object: at this strength it reads as the sun
    going behind something rather than as a grey shape on the plate. */

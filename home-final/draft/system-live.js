@@ -15,18 +15,7 @@
    ground and stays constant for the whole loop. Nothing bunches, nothing
    overtakes, and neither street ever empties.
 
-   BIRDS are up in every beat. They are clay renders lit from the same side as
-   the estate and each drags its own ground shadow down and left across the
-   plate, which is where every shadow in the render falls; that shadow is what
-   keeps them in the picture rather than on it. Five of them cross in three
-   events around one 54 second cycle: a pair, a single bird, then another pair.
-   A pair's two birds are a second or so apart and on lines at different
-   heights, which is how a small flock actually crosses; a bird alone between
-   them keeps the piece from reading as a formation. The holes between events
-   run five to seven seconds, so the plate carries something about two thirds
-   of the time and never turns into a conveyor.
-
-   Nothing runs per frame. Paths and sprites are built once and animated by
+   Nothing runs per frame. Paths are built once and animated by
    SMIL, which the compositor owns; the only JavaScript after init is the
    MutationObserver reading the step the driver already wrote onto the pin,
    plus the IntersectionObserver that stops the layer off screen.
@@ -44,11 +33,6 @@
   if (!pin || !video) return;
   if (matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (/[?&]overlay=off/.test(location.search)) return;
-
-  // where the clay sprites live, so the same file serves the prototype and the
-  // built draft without a copy that can drift
-  var self = document.currentScript;
-  var SPRITES = (self && self.dataset.sprites) || 'assets/';
 
   var NS = 'http://www.w3.org/2000/svg';
   var frame = video.parentNode;
@@ -110,30 +94,6 @@
     '<stop offset="0.45" stop-color="#2A1B12" stop-opacity="0.55"/>' +
     '<stop offset="1" stop-color="#2A1B12" stop-opacity="0"/>'));
 
-  // the bird's own ground shadow, soft and round
-  defs.appendChild(el('radialGradient', { id: 'sysBirdShade' },
-    '<stop offset="0" stop-color="#2A1B12" stop-opacity="1"/>' +
-    '<stop offset="0.5" stop-color="#2A1B12" stop-opacity="0.5"/>' +
-    '<stop offset="1" stop-color="#2A1B12" stop-opacity="0"/>'));
-
-  /* Five flight lines, each held inside the plate: the estate's diamond runs
-     from about (95,379) on the left corner to (1505,524) on the right, so a
-     crossing bows across the middle of the model and never leaves it for the
-     white page. Each line is foreshortened onto the plan's own axes, rising to
-     the right the way the streets do. The shadow tracks its own copy of the
-     line, dropped down and left, which is where every shadow in the plate
-     falls. Lines 0 and 3 are the upper band, 1, 2 and 4 the lower one. */
-  var LINES = [
-    ['M190 396Q800 244 1440 470', 'M158 460Q768 308 1408 534'],
-    ['M250 530Q830 372 1360 578', 'M218 594Q798 436 1328 642'],
-    ['M210 452Q810 296 1420 520', 'M178 516Q778 360 1388 584'],
-    ['M175 368Q790 218 1455 445', 'M143 432Q758 282 1423 509'],
-    ['M270 566Q840 410 1330 606', 'M238 630Q808 474 1298 670']
-  ];
-  LINES.forEach(function (l, i) {
-    defs.appendChild(el('path', { id: 'sysFly' + i, d: l[0] }));
-    defs.appendChild(el('path', { id: 'sysFlyS' + i, d: l[1] }));
-  });
   svg.appendChild(defs);
   frame.appendChild(svg);
 
@@ -173,74 +133,12 @@
   }));
   svg.appendChild(cloud);
 
-  /* ------------------------------------------------- the flock, every beat
-     One 54 second cycle carries three crossings: a pair, a single bird, then a
-     second pair. Within a pair the second bird is about a second behind the
-     first and on a line at a different height, so the two read as a small
-     flock rather than as a queue. Each bird crosses for its own eleven seconds
-     and then parks off the far corner for the rest of the cycle. The holes
-     between events are five, six and seven seconds. */
-  var CYCLE = 54;
-  var BIRDS = [
-    { i: 0, start: 0.0,  cross: 11, w: 66, ph: -0.00 },
-    { i: 2, start: 1.2,  cross: 11, w: 63, ph: -0.17 },
-    { i: 4, start: 17.2, cross: 11, w: 62, ph: -0.31 },
-    { i: 3, start: 34.2, cross: 11, w: 58, ph: -0.24 },
-    { i: 1, start: 35.6, cross: 11, w: 60, ph: -0.09 }
-  ];
-  var flock = el('g', { 'class': 'bd' });
-  BIRDS.forEach(function (b) {
-    var c = b.cross / CYCLE;
-    var begin = -b.start;
-    var motion = function (id) {
-      return '<animateMotion dur="' + CYCLE + 's" begin="' + begin + 's" ' +
-        'repeatCount="indefinite" calcMode="linear" keyPoints="0;1;1"' +
-        ' keyTimes="0;' + c.toFixed(4) + ';1"><mpath href="#' + id +
-        '"/></animateMotion>';
-    };
-    // a crossing fades up off the left corner and fades away at the right one,
-    // so nothing pops on over the plate and nothing sits parked at the edge
-    var fadeAt = function (peak) {
-      return '<animate attributeName="opacity" dur="' + CYCLE + 's" begin="' +
-        begin + 's" repeatCount="indefinite" keyTimes="0;' +
-        (c * 0.10).toFixed(4) + ';' + (c * 0.90).toFixed(4) + ';' +
-        c.toFixed(4) + ';1" values="0;' + peak + ';' + peak + ';0;0"/>';
-    };
-
-    // the shadow first, so the bird always sits over it. SMIL beats the
-    // stylesheet, so its strength is carried in the fade rather than in .bsh
-    flock.appendChild(el('g', { 'class': 'bsh' }, fadeAt(0.30) +
-      '<ellipse rx="' + (b.w * 0.60).toFixed(1) + '" ry="' +
-      (b.w * 0.25).toFixed(1) + '" fill="url(#sysBirdShade)"/>' +
-      motion('sysFlyS' + b.i)));
-
-    // three clay poses cycled at about 4 a second, each bird offset in phase
-    // the three poses share one canvas anchored on the bird's mass centre
-    var h = b.w * 1.0125, poses = '';
-    for (var k = 0; k < 3; k++) {
-      poses += '<image class="wp" href="' + SPRITES + 'bird-clay-' + k +
-        '.png" width="' + b.w + '" height="' + h.toFixed(1) + '" x="' +
-        (-b.w / 2) + '" y="' + (-h / 2).toFixed(1) + '">' +
-        '<animate attributeName="opacity" dur="0.75s" begin="' +
-        (b.ph - k * 0.25).toFixed(2) + 's" repeatCount="indefinite" ' +
-        'calcMode="discrete" keyTimes="0;0.333;0.667;1" values="1;0;0;1"/></image>';
-    }
-    var bob = '<animateTransform attributeName="transform" type="translate" ' +
-      'dur="2.6s" begin="' + (b.ph * 3).toFixed(2) + 's" repeatCount="indefinite" ' +
-      'calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" ' +
-      'keyTimes="0;0.5;1" values="0 -3.5; 0 3.5; 0 -3.5"/>';
-    flock.appendChild(el('g', { 'class': 'bird' },
-      fadeAt(1) + '<g>' + poses + bob + '</g>' + motion('sysFly' + b.i)));
-  });
-  svg.appendChild(flock);
-
   /* Which layer is up. The driver already writes the step onto the pin, so the
      overlay reads that rather than the film clock and cannot disagree with the
      copy on screen. */
   function show(step) {
     net.classList.toggle('on', step === 5);
     cloud.classList.toggle('on', step >= 1 && step <= 4);
-    flock.classList.toggle('on', step >= 1 && step <= 5);
   }
   function readStep() {
     var n = parseInt(pin.dataset.step || '1', 10);
