@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../../../home-final/assets/site-modal.css">
+<script src="../../../home-final/assets/hubspot-frame.js"></script>
 <link rel="stylesheet" href="../g.css">
 <link rel="stylesheet" media="print" href="../print.css">
 </head>
@@ -109,7 +111,7 @@
       if (copy) copy.addEventListener("click", function () {
         var done = function () {
           var was = copy.innerHTML;
-          copy.innerHTML = "\u2713";
+          copy.innerHTML = "✓";
           setTimeout(function () { copy.innerHTML = was; }, 1400);
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
