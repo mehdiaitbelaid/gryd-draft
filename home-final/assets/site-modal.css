@@ -1,0 +1,257 @@
+/* One plate for every modal on the site, and one button for every primary
+   action inside one.
+
+   Three modals existed with three plates: the site assessment popup (.sam), the
+   Get in touch form (.gc-modal) and the hub's download gate (.dl-gate). Each had
+   drawn its own scrim, its own radius, its own close control and its own submit
+   button, so opening two of them in a row showed two different products. The
+   assessment popup was the best drawn of the three, so its plate is the one kept
+   and the other two are re-expressed on it here. The per modal sheets now carry
+   only what is genuinely theirs: the stage dash, the HubSpot fallback note.
+
+   Loaded by site-assess-modal.js on first open, by the homepage head for the
+   contact modal and by the hub head for the download gate, so any page that can
+   open any modal has it.
+
+   The scale is stated once as tokens so a fourth modal cannot invent a fifth
+   radius. Values are literal rather than var() references to the palette
+   because the download gate is reached from pages whose token file is the hub
+   copy, and the two token files have drifted. */
+
+:root {
+  --modal-plate: #F8F6F2;
+  --modal-chip: #EFEAE3;
+  --modal-ink: #4E251B;
+  --modal-grey: #8A776E;
+  --modal-line: #D8CFC5;
+  --modal-flare: #FF5532;
+  --modal-flare-press: #E8431F;
+  --modal-scrim: rgba(40, 18, 12, .46);
+  --modal-radius: 28px;
+  --modal-shadow: 0 24px 60px rgba(40, 18, 12, .22);
+  --modal-close: 34px;
+}
+
+/* ---------------------------------------------------------- the container */
+
+.sam,
+.gc-modal,
+.dl-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  color: var(--modal-ink);
+}
+.sam[hidden],
+.gc-modal[hidden],
+.dl-gate[hidden] { display: none; }
+
+/* The assessment popup paints the scrim on the container and fades the whole
+   thing; the two form modals carry a scrim element, because a click on it
+   closes them. Both routes end at the same colour. */
+.sam { background: var(--modal-scrim); opacity: 0; transition: opacity .22s ease; }
+.sam.open { opacity: 1; }
+.gc-scrim,
+.dl-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--modal-scrim);
+  animation: modal-in .18s ease both;
+}
+
+/* -------------------------------------------------------------- the plate */
+
+.sam-box,
+.gc-panel,
+.dl-panel {
+  position: relative;
+  background: var(--modal-plate);
+  border-radius: var(--modal-radius);
+  box-shadow: var(--modal-shadow);
+  padding: 26px 34px 24px;
+  max-height: min(640px, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+}
+
+.sam-box {
+  width: min(880px, 100%);
+  transform: translateY(10px) scale(.985);
+  transition: transform .22s cubic-bezier(.22,.61,.36,1);
+}
+.sam.open .sam-box { transform: none; }
+
+/* The two form plates hold one HubSpot form and nothing else, so they are the
+   narrow width, they scroll as one column, and their top padding clears the
+   close control rather than sliding under it the way the popup's stage dash
+   does with its own right margin. */
+.gc-panel,
+.dl-panel {
+  width: min(560px, 100%);
+  overflow: auto;
+  padding-top: 62px;
+  animation: modal-rise .22s cubic-bezier(.2,.7,.3,1) both;
+}
+
+@keyframes modal-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes modal-rise {
+  from { opacity: 0; transform: translateY(12px) }
+  to { opacity: 1; transform: none }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gc-scrim, .dl-scrim, .gc-panel, .dl-panel { animation: none; }
+  .sam, .sam-box { transition: none; }
+}
+
+/* ------------------------------------------------------ the close control */
+
+.sam-close,
+.gc-close,
+.dl-x {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  width: var(--modal-close);
+  height: var(--modal-close);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--modal-chip);
+  color: var(--modal-ink);
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+  z-index: 3;
+}
+.sam-close:hover,
+.gc-close:hover,
+.dl-x:hover { background: var(--modal-flare); color: #ffffff; }
+.sam-close:focus-visible,
+.gc-close:focus-visible,
+.dl-x:focus-visible { outline: 2px solid var(--modal-flare); outline-offset: 3px; }
+
+/* ------------------------------------------------------ the primary action */
+
+/* The same geometry as .btn on the homepage, restated rather than referenced so
+   a modal opened from a page that does not carry that sheet still matches it.
+   Any change to .btn in tokens.css has to be made here in the same commit. */
+.sam-go,
+.ar-btn,
+.gc-form input[type="submit"],
+.gc-form .hs-button,
+.dl-form input[type="submit"],
+.dl-form .hs-button {
+  display: inline-block;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  border: 0;
+  border-radius: 999px;
+  background: var(--modal-flare);
+  color: #ffffff;
+  padding: 14px 26px;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sam-go:hover,
+.ar-btn:hover,
+.gc-form input[type="submit"]:hover,
+.gc-form .hs-button:hover,
+.dl-form input[type="submit"]:hover,
+.dl-form .hs-button:hover { background: var(--modal-flare-press); }
+.sam-go:focus-visible,
+.ar-btn:focus-visible,
+.gc-form input[type="submit"]:focus-visible,
+.dl-form input[type="submit"]:focus-visible {
+  outline: 2px solid var(--modal-flare);
+  outline-offset: 3px;
+}
+.sam-go[disabled] { opacity: .45; cursor: not-allowed; }
+.sam-go[disabled]:hover { background: var(--modal-flare); }
+.sam-go[hidden] { display: none; }
+
+/* The quiet second action, the ghost button's vocabulary. */
+.ar-btn-quiet {
+  background: transparent;
+  color: var(--modal-ink);
+  box-shadow: inset 0 0 0 1px var(--modal-line);
+}
+.ar-btn-quiet:hover { background: var(--modal-chip); }
+
+/* -------------------------------------------------------------- the fields */
+
+/* One hairline per field, no box, on the assessment popup's own numbers. The
+   HubSpot embed brings its own markup, so what is reachable from a host sheet
+   is set here and the rest is left to it. */
+.sam-field input,
+.gc-form input[type="text"], .gc-form input[type="email"], .gc-form input[type="tel"],
+.gc-form select, .gc-form textarea,
+.dl-form input[type="text"], .dl-form input[type="email"], .dl-form input[type="tel"],
+.dl-form select, .dl-form textarea {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  background: transparent;
+  color: var(--modal-ink);
+  border: 0;
+  border-bottom: 1px solid var(--modal-line);
+  border-radius: 0;
+  padding: 6px 0 7px;
+  transition: border-color .2s ease;
+}
+.sam-field input:focus,
+.gc-form input:focus, .gc-form select:focus, .gc-form textarea:focus,
+.dl-form input:focus, .dl-form select:focus, .dl-form textarea:focus {
+  outline: 0;
+  border-bottom-color: var(--modal-flare);
+}
+.sam-field ::placeholder,
+.gc-form ::placeholder,
+.dl-form ::placeholder { color: var(--modal-grey); opacity: .8; }
+
+.sam-field label,
+.gc-form label,
+.dl-form label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--modal-grey);
+  margin-bottom: 2px;
+}
+.gc-form .hs-form-field,
+.dl-form .hs-form-field { margin-bottom: 16px; }
+
+/* The embed draws into an iframe whenever the form carries HubSpot styling, and
+   an iframe's own body is white, which puts a white card on the paper plate.
+   The frame is made transparent here and the document inside it is painted by
+   the css option passed to hbspt.forms.create. */
+.gc-form, .dl-form { margin-top: 0; }
+.gc-form iframe, .dl-form iframe {
+  width: 100%;
+  border: 0;
+  display: block;
+  background: transparent;
+  color-scheme: light;
+}
+
+.gc-note, .dl-note { margin: 0; font-size: 15px; color: #6B4A3E; }
+.gc-note a { color: var(--modal-flare); }
+
+html.dl-open, html.gc-open { overflow: hidden; }
+
+@media (max-width: 720px) {
+  .sam, .gc-modal, .dl-gate { padding: 12px; }
+  .sam-box, .gc-panel, .dl-panel { padding: 22px 20px 20px; border-radius: 22px; }
+  .gc-panel, .dl-panel { padding-top: 58px; }
+}

@@ -23,7 +23,11 @@
       if (!window.hbspt) return;
       window.hbspt.forms.create({
         region: REGION, portalId: PORTAL, formId: FORM,
-        target: "#gc-contact-form"
+        target: "#gc-contact-form",
+        // HubSpot serves the form in an iframe whenever the form carries its
+        // own styling, and that document's body is white. css is injected
+        // inside the frame, which is the only reach a host page has into it.
+        css: window.GRYD_HS_CSS || ""
       });
     };
     s.onerror = function () {

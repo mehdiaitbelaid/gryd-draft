@@ -625,82 +625,13 @@
 /* ---------- download gate ---------- */
 
 /* Every PDF sits behind the same HubSpot lead capture form the live site uses,
-   so the Download button opens this panel and the file opens only on submit. */
-.dl-gate {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.dl-gate[hidden] { display: none; }
-.dl-scrim { position: absolute; inset: 0; background: rgba(30, 12, 8, 0.55); }
-.dl-panel {
-  position: relative;
-  width: min(520px, 100%);
-  max-height: calc(100vh - 48px);
-  overflow: auto;
-  background: var(--paper);
-  border-radius: var(--radius-panel);
-  padding: 44px 40px 36px;
-}
-.dl-note { margin: 0; font-size: 15px; color: #6B4A3E; }
-.dl-form { margin-top: 8px; }
-.dl-x {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  cursor: pointer;
-  font-size: 22px;
-  line-height: 1;
-  color: var(--red110);
-}
-.dl-x:hover { color: var(--flare); }
-.dl-x:focus-visible { outline: 2px solid var(--flare); outline-offset: 2px; }
-html.dl-open { overflow: hidden; }
+   so the Download button opens this panel and the file opens only on submit.
 
-/* The embed brings its own markup, so only the parts it leaves open to a host
-   sheet are set: the field rules, the type and the submit button. */
-.dl-form input[type="text"], .dl-form input[type="email"], .dl-form input[type="tel"],
-.dl-form select, .dl-form textarea {
-  width: 100%;
-  box-sizing: border-box;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--stone-mid);
-  border-radius: 0;
-  padding: 10px 0;
-  font: inherit;
-  font-size: 16px;
-  color: var(--red110);
-}
-.dl-form input:focus, .dl-form select:focus, .dl-form textarea:focus {
-  outline: none;
-  border-bottom-color: var(--flare);
-}
-.dl-form label { font-size: 13px; color: #6B4A3E; }
-.dl-form .hs-form-field { margin-bottom: 18px; }
-.dl-form input[type="submit"] {
-  border: 0;
-  border-radius: 999px;
-  background: var(--flare);
-  color: var(--paper);
-  padding: 13px 26px;
-  font: inherit;
-  font-size: 15px;
-  cursor: pointer;
-}
+   The panel, its scrim, its close control, its fields and its submit button are
+   the shared modal plate in home-final/assets/site-modal.css, the same plate the
+   site assessment popup and the Get in touch modal stand on. Nothing about the
+   gate's own look is set here. */
 
-@media (max-width: 560px) {
-  .dl-panel { padding: 32px 22px 28px; }
-}
 
 /* ---------- legal pages ---------- */
 

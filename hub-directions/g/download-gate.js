@@ -16,6 +16,10 @@
   var FORM = '300acd1e-5c44-4728-b375-f51164c018b5';
   var REGION = 'eu1';
   var EMBED = 'https://js-eu1.hsforms.net/forms/embed/v2.js';
+  // HubSpot serves the form in an iframe whenever the form carries its own
+  // styling, so no sheet on the page can reach it. css is injected inside the
+  // frame, and the string is the one home-final/assets/hubspot-frame.js sets,
+  // shared with the Get in touch modal so the two embeds cannot drift.
 
   var links = Array.prototype.slice.call(document.querySelectorAll('a.btn[download]'));
   if (!links.length) { return; }
@@ -55,6 +59,7 @@
       window.hbspt.forms.create({
         region: REGION, portalId: PORTAL, formId: FORM,
         target: '#dl-gate-form',
+        css: window.GRYD_HS_CSS || '',
         onFormSubmitted: release
       });
     };

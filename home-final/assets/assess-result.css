@@ -108,21 +108,8 @@
 .ar-note { font-size: 11px; color: var(--ar-flare); margin: 4px 0 0; }
 
 .ar-acts { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
-.ar-btn {
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  border: 0;
-  border-radius: 999px;
-  background: var(--ar-flare);
-  color: #ffffff;
-  padding: 11px 24px;
-  cursor: pointer;
-}
-.ar-btn:hover { background: #E8431F; }
-.ar-btn-quiet { background: var(--ar-plate); color: var(--ar-ink); font-weight: 400; }
-.ar-btn-quiet:hover { background: #E5DDD3; }
-.ar-btn:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 3px; }
+/* .ar-btn and .ar-btn-quiet are drawn by site-modal.css, on the same geometry
+   as .btn everywhere else on the site. Nothing about them is set here. */
 .ar-said { font-size: 12px; color: var(--ar-grey); }
 
 @media (max-width: 720px) {

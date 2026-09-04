@@ -1,10 +1,15 @@
-/* The site assessment popup, the plate only.
+/* The site assessment popup, what only this popup has.
+
+   The plate itself is no longer here. The scrim, the panel, the close control,
+   the primary button and the gate fields are the shared modal plate in
+   site-modal.css, which the Get in touch modal and the hub's download gate sit
+   on too, so all three read as the same object. What is left in this file is the
+   stage dash, the panes, the nav row and the consent line.
 
    The questions are dressed by assess-inputs.css and the summary by
-   assess-result.css, both of which the tools page loads too. What is left here
-   is what only the popup has: the scrim, the plate, the stage dash, the gate
-   fields and the nav row. Every class is prefixed sam- so it cannot meet the
-   assessment page's own rules on a page that loads both. */
+   assess-result.css, both of which the tools page loads too. Every class is
+   prefixed sam- so it cannot meet the assessment page's own rules on a page that
+   loads both. */
 
 .sam {
   --sam-paper: #F8F6F2;
@@ -13,36 +18,7 @@
   --sam-grey: #8A776E;
   --sam-line: #D8CFC5;
   --sam-flare: #FF5532;
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(40, 18, 12, .46);
-  opacity: 0;
-  transition: opacity .22s ease;
-  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: var(--sam-ink);
 }
-.sam.open { opacity: 1; }
-.sam[hidden] { display: none; }
-
-.sam-box {
-  position: relative;
-  width: min(880px, 100%);
-  max-height: min(640px, calc(100vh - 48px));
-  background: var(--sam-paper);
-  border-radius: 28px;
-  padding: 26px 34px 24px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 24px 60px rgba(40, 18, 12, .22);
-  transform: translateY(10px) scale(.985);
-  transition: transform .22s cubic-bezier(.22,.61,.36,1);
-}
-.sam.open .sam-box { transform: none; }
 
 .sam-sr {
   position: absolute;
@@ -68,25 +44,6 @@
 .sam-seg .s-bar { display: block; height: 2px; background: var(--sam-line); }
 .sam-seg .s-bar i { display: block; height: 100%; width: 0; background: var(--sam-flare); transition: width .3s ease; }
 
-.sam-close {
-  position: absolute;
-  top: 20px;
-  right: 22px;
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--sam-plate);
-  color: var(--sam-ink);
-  font-size: 17px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background .2s ease, color .2s ease;
-  z-index: 3;
-}
-.sam-close:hover { background: var(--sam-flare); color: #fff; }
-.sam-close:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
-
 /* --------------------------------------------------------------- one pane */
 
 .sam-body { overflow: auto; flex: 1 1 auto; min-height: 0; padding-right: 4px; }
@@ -111,60 +68,19 @@
 .sam-pane h2 { font-size: 20px; line-height: 1.2; margin: 0 0 6px; font-weight: 500; }
 .sam-stand { font-size: 13px; color: var(--sam-grey); margin: 0 0 18px; max-width: 60ch; }
 
-/* the gate: one hairline per field, no box */
+/* the gate. The hairline field itself is the shared plate's; the column it
+   stands in is this popup's own. */
 .sam-field { margin: 0 0 16px; max-width: 340px; }
-.sam-field label {
-  display: block;
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--sam-grey);
-  margin-bottom: 2px;
-}
-.sam-field input {
-  font: inherit;
-  font-size: 16px;
-  width: 100%;
-  background: transparent;
-  color: var(--sam-ink);
-  border: 0;
-  border-bottom: 1px solid var(--sam-line);
-  border-radius: 0;
-  padding: 6px 0 7px;
-  transition: border-color .2s ease;
-}
-.sam-field input:focus { outline: 0; border-bottom-color: var(--sam-flare); }
-.sam-field ::placeholder { color: var(--sam-grey); opacity: .8; }
 .sam-gate { font-size: 12px; color: var(--sam-flare); margin: 0; }
 
 /* ------------------------------------------------------------------ the nav */
 
 .sam-nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; flex: none; }
-.sam-go {
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  border: 0;
-  border-radius: 999px;
-  background: var(--sam-flare);
-  color: #fff;
-  padding: 11px 24px;
-  cursor: pointer;
-  order: 2;
-}
-.sam-go:hover { background: #E8431F; }
-.sam-go[disabled] { opacity: .45; cursor: not-allowed; }
-.sam-go[disabled]:hover { background: var(--sam-flare); }
-.sam-go[hidden] { display: none; }
+.sam-go { order: 2; }
 .sam-back { font: inherit; font-size: 13px; background: transparent; border: 0; color: var(--sam-grey); cursor: pointer; padding: 0; order: 1; }
 .sam-back:hover { color: var(--sam-ink); }
 .sam-back[hidden] { display: none; }
+.sam-back:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
 .sam-count { margin-left: auto; order: 3; font-size: 11px; letter-spacing: .08em; color: var(--sam-grey); }
-.sam-go:focus-visible, .sam-back:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
 .sam-consent { margin: 8px 0 0; font-size: 11px; color: var(--sam-grey); max-width: 62ch; }
 .sam-consent[hidden] { display: none; }
-
-@media (max-width: 720px) {
-  .sam { padding: 12px; }
-  .sam-box { padding: 22px 20px 20px; border-radius: 22px; }
-}
