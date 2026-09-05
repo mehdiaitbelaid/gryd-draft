@@ -18,9 +18,18 @@
   function measure() {
     var pill = document.querySelector('.dnav');
     if (!pill) return;
-    var r = pill.getBoundingClientRect();
-    if (!r.height) return;   // tucked, so the last good reading stands
-    clearance = Math.round(r.bottom + GAP);
+    /* The retracted pill is translated off the top of the window, so its
+       client rect reads a negative bottom and the clearance went with it: an
+       anchor computed from that scrolls the group up under the bar instead of
+       clear of it. offsetHeight is the untransformed box, and the pill's own
+       top is a fixed offset, so the two together are the clearance the bar
+       takes when it is on screen whatever it is doing at the moment of the
+       click. */
+    var h = pill.offsetHeight;
+    if (!h) return;          // not laid out at all, so the last reading stands
+    var top = parseFloat(getComputedStyle(pill).top);
+    if (!isFinite(top)) top = 16;
+    clearance = Math.round(top + h + GAP);
     document.documentElement.style.setProperty('--faq-anchor', clearance + 'px');
   }
   measure();

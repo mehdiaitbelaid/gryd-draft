@@ -39,9 +39,15 @@
     document.head.appendChild(s);
   }
 
+  /* The form is a cross origin iframe, and an iframe is a tab stop. Leaving it
+     out of the scope made Close both the first and the last item, so Tab from
+     Close wrapped straight back to Close and the fields could not be reached by
+     keyboard at all. It is in the list now, which is what lets Tab out of Close
+     land on the form. */
   function focusable() {
     return panel.querySelectorAll(
-      'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      'a[href], button, input, select, textarea, iframe,'
+      + ' [tabindex]:not([tabindex="-1"])');
   }
 
   function open(trigger) {
@@ -67,7 +73,15 @@
   });
 
   /* A dialog that cannot be left by keyboard is a dialog that traps the
-     reader, so Escape closes it and Tab is kept inside it while it is up. */
+     reader, so Escape closes it and Tab is kept inside it while it is up.
+
+     The trap has to know about the frame. Once focus is inside the HubSpot
+     document this page gets no key events at all, so the wrap cannot be done
+     from here on that half of the journey: the rule is to let focus go into the
+     frame and to catch it on the way back out. Tab off the last item in the
+     panel wraps to the first as usual; anything that lands outside the panel
+     while the dialog is up is pulled back to Close by the focusin guard below,
+     which is the edge the frame hands focus over at. */
   document.addEventListener("keydown", function (e) {
     if (modal.hidden) return;
     if (e.key === "Escape") { close(); return; }
@@ -75,10 +89,19 @@
     var items = focusable();
     if (!items.length) return;
     var first = items[0], last = items[items.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
+    var here = document.activeElement;
+    if (!panel.contains(here)) { e.preventDefault(); first.focus(); return; }
+    if (e.shiftKey && here === first) {
       e.preventDefault(); last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
+    } else if (!e.shiftKey && here === last) {
       e.preventDefault(); first.focus();
     }
+  });
+
+  document.addEventListener("focusin", function (e) {
+    if (modal.hidden) return;
+    if (panel.contains(e.target)) return;
+    var items = focusable();
+    if (items.length) items[0].focus();
   });
 })();

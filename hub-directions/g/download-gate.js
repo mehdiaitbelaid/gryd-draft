@@ -17,12 +17,25 @@
    alone is why a real submission landed the lead and still left the reader
    with nothing.
 
-   The gate now releases on any of them, once: the v4 window events, the
-   legacy options callbacks, the legacy cross frame message, and a last resort
-   observer that watches the form host for HubSpot's own confirmation copy in
-   case a future renderer signals through neither. The panel always ends on a
-   visible link, because from inside the frame the submit is not this
-   document's gesture and the popup can be refused.
+   The gate releases once, and only on a signal that is both a success and
+   provably HubSpot's: the v4 on-submission:success event carrying this form's
+   own id, the legacy onFormSubmitted callback, and the legacy cross frame
+   message when it arrives from a HubSpot origin, from this embed's own frame,
+   and names this form. Nothing else opens it. An attempt was submitted is not
+   a submission succeeded, so on-submission and on-form-submit are no longer
+   listened for: they fire before the server has taken the lead, and releasing
+   on them handed the file over for a form that then failed validation.
+
+   The last resort observer stays, and it is honest about its reach: this
+   renderer serves the form from js-eu1.hsforms.net, a different origin, so
+   nothing inside that frame is readable from here and the observer sees only
+   what HubSpot writes into this document's own host element. It therefore
+   catches a renderer that draws the form inline and nothing else. It is kept
+   for that case rather than removed, and it is not a substitute for the
+   signals above.
+
+   The panel always ends on a visible link, because from inside the frame the
+   submit is not this document's gesture and the popup can be refused.
 
    The HubSpot script is fetched on the first open rather than on page load, so
    a reader who never asks for the PDF never pays for it, and the print build
@@ -117,7 +130,8 @@
         region: REGION, portalId: PORTAL, formId: FORM,
         target: '#dl-gate-form',
         css: window.GRYD_HS_CSS || '',
-        onFormSubmit: release,
+        // onFormSubmit fires on the click, before the lead is taken. Only the
+        // completed callback releases the file.
         onFormSubmitted: release
       });
     };
@@ -127,44 +141,66 @@
     document.head.appendChild(s);
   }
 
+  // The origins HubSpot serves its embeds and its form frames from. A message
+  // from anywhere else is somebody else's, whatever it says it is. This
+  // portal's frame loads from js-eu1.hsforms.net, read off the live embed on
+  // 4 September; the other three are the remaining HubSpot form hosts.
+  var ORIGINS = ['https://forms-eu1.hsforms.com',
+                 'https://js-eu1.hsforms.net',
+                 'https://forms.hsforms.com',
+                 'https://js.hsforms.net'];
+
   // Signal one, the v4 embed. The events bubble from div.hs-form-frame to
-  // window, and carry the form id, so another HubSpot form on the page cannot
-  // open this gate. Bound at load, before the embed script is ever fetched,
-  // which is what HubSpot asks for.
+  // window and carry this form's id, confirmed live: on-ready and
+  // on-submission:success both arrive with detail.formId set. An event with no
+  // id is not this form's, so it is refused rather than assumed. Bound at
+  // load, before the embed script is ever fetched, which is what HubSpot asks
+  // for.
   function mine(ev) {
     var d = ev && ev.detail;
-    return !d || !d.formId || d.formId === FORM;
+    return !!(d && d.formId === FORM);
   }
   ['hs-form-event:on-submission:success',
-   'hs-form-event:on-submission',
-   'hs-form-event:on-form-submitted',
-   'hs-form-event:on-form-submit'].forEach(function (name) {
+   'hs-form-event:on-form-submitted'].forEach(function (name) {
     window.addEventListener(name, function (ev) { if (mine(ev)) { release(); } }, true);
   });
 
+  // The window this embed's form actually lives in. A message that did not
+  // come from it did not come from this form, so it cannot open this gate.
+  function frameWindow() {
+    var box = host();
+    var f = box && box.querySelector('iframe');
+    return f ? f.contentWindow : null;
+  }
+
   // Signal two, the legacy v2 embed, which does not always route its callbacks
   // through the options object and so posts them across the frame instead.
+  // Three things have to hold before a posted message is believed: a HubSpot
+  // origin, this embed's own frame as the sender, and this form's id.
   window.addEventListener('message', function (e) {
+    if (ORIGINS.indexOf(e.origin) === -1) { return; }
+    var src = frameWindow();
+    if (!src || e.source !== src) { return; }
     var d = e.data;
     if (typeof d === 'string') {
       try { d = JSON.parse(d); } catch (err) { return; }
     }
     if (!d || typeof d !== 'object') { return; }
-    var name = d.eventName || d.type;
-    if (d.type === 'hsFormCallback' &&
-        (d.eventName === 'onFormSubmit' || d.eventName === 'onFormSubmitted')) {
-      if (!d.id || d.id === FORM) { release(); }
-      return;
-    }
+    if (d.type === 'hsFormCallback' && d.eventName === 'onFormSubmitted' &&
+        d.id === FORM) { release(); return; }
     // and the newer message shape, should a renderer post rather than dispatch
-    if (typeof name === 'string' && name.indexOf('hs-form-event:on-submission') === 0 &&
-        name.indexOf('failed') === -1) { release(); }
+    var name = d.eventName || d.type;
+    if (name === 'hs-form-event:on-submission:success' &&
+        d.detail && d.detail.formId === FORM) { release(); }
   });
 
-  // Signal three, the last resort. If a renderer ever signals through neither,
-  // HubSpot still swaps the fields for its own confirmation copy. Watched only
-  // while the gate is open, and only fired once the fields are actually gone,
-  // so a form whose own standfirst says thank you cannot trip it.
+  // Signal three, the last resort, and the narrowest of the three. It reads
+  // this document's own host element, so it can only see a renderer that draws
+  // the form inline. The renderer this portal is on puts the form in a
+  // cross origin iframe, where nothing is readable from here: on that path
+  // this observer sees nothing and is expected to. Watched only while the gate
+  // is open, and only fired once the fields are actually gone, so a form whose
+  // own standfirst says thank you cannot trip it.
   var DONE_TEXT = /it'?s on its way|on its way to your inbox|thanks? for (submitting|your)|thank you for (submitting|your)|submission (has been )?received|form (has been )?submitted/i;
   var watcher = null;
 

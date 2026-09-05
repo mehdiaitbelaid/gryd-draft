@@ -856,11 +856,16 @@
       // made against a narrower box and leave the country off to one side.
       map.resize();
       refresh(true);
-      var ro = new ResizeObserver(function () {
-        map.resize();
-        refresh(true);
-      });
-      ro.observe(el.canvas);
+      // ResizeObserver is not everywhere the map is, and a browser without it
+      // must still redraw when the window changes rather than throw here and
+      // leave the plate half drawn.
+      var refit = function () { map.resize(); refresh(true); };
+      if (typeof ResizeObserver === "function") {
+        var ro = new ResizeObserver(refit);
+        ro.observe(el.canvas);
+      } else {
+        addEventListener("resize", refit);
+      }
       document.body.dataset.csiReady = "1";
     });
   }

@@ -70,6 +70,12 @@
   // only thing a reader can see. wrote is what the driver asked for, and the two
   // are the same number only once the seek behind it has answered.
   var shown = -1, staleAt = 0, stale = false;
+  // HOLD is not a step. It is platesFilm saying it has no decoded picture to
+  // put on screen, which is the one case where the copy must not move either.
+  var HOLD = -3;
+  var plateIn = [];      // has this plate decoded and can it be painted
+  var lastPlate = -1;    // the last plate actually put on screen
+  var warmed = false, filmAsked = false, filmTimer = 0;
 
   function unpinned() {
     return innerWidth < 900 ||
@@ -149,12 +155,95 @@
   }
 
   /* The stack is hidden while the film has the section, and a hidden lazy image
-     is never fetched, so the fallback has to be warmed before it is needed. */
+     is never fetched, so the fallback has to be warmed before it is needed.
+
+     Warming used to happen on adoption, which is the wrong cue twice over: the
+     film adopting is exactly the case where the plates are not what is on
+     screen, and on a slow connection the film is the last thing to arrive, so
+     the plates were asked for last as well. The reader met the Design beat's
+     words beside an empty box for as long as the network took. It is on
+     approach to the section now, and it does not wait on the film for
+     anything.
+
+     Decoding is asked for as well as loading. A loaded image is still a blank
+     box until it has been decoded, and the whole point of this is that no
+     picture is claimed to be there before it can be painted. */
   function warmPlates() {
+    if (warmed) return;
+    warmed = true;
     frames.forEach(function (f) {
       var img = f.querySelector('img');
       if (img && img.loading === 'lazy') img.loading = 'eager';
     });
+    trackPlates();
+  }
+
+  /* Which plates can be painted. This only watches, it fetches nothing: the
+     first plate is eager in the markup and the other four are not, so on a page
+     the reader never scrolls into this costs one listener each. It runs from
+     init so the first plate is known to be paintable as early as it is
+     paintable, which is what gives the section a picture and copy pair to hold
+     while the later plates are still on the wire. */
+  var tracked = false;
+
+  function trackPlates() {
+    if (tracked) return;
+    tracked = true;
+    frames.forEach(function (f, i) {
+      var img = f.querySelector('img');
+      if (!img) { plateIn[i] = true; return; }
+      var settle = function () {
+        var got = function () {
+          plateIn[i] = true;
+          if (!unpinned()) start();
+        };
+        if (typeof img.decode === 'function') img.decode().then(got, got);
+        else got();
+      };
+      // a plate that will never arrive still has to stop holding the section up
+      if (img.complete) settle();
+      else {
+        img.addEventListener('load', settle, { once: true });
+        img.addEventListener('error', settle, { once: true });
+      }
+    });
+  }
+
+  /* The film is 12MB and the plates are the thing the reader is actually
+     looking at while it downloads, so on a cold load the two are not allowed to
+     race: the element is left at preload none in the markup and is only asked
+     for once the plates are in, or once the wait for them has run long enough
+     that holding the film back is costing more than it saves. */
+  function kickFilm() {
+    if (filmAsked || !video) return;
+    filmAsked = true;
+    video.preload = 'auto';
+    try { video.load(); } catch (e) {}
+    /* A source that never resolves is the same failure as one that errors. The
+       wait is generous because the master is a 12MB file and a slow first byte
+       is not a broken one; a late canplay still adopts after this has fallen
+       back, so the cost of being patient is nothing and the cost of being hasty
+       is a reader who gets the still stack on every cold load. The clock starts
+       here rather than at load, because the fetch does. */
+    clearTimeout(filmTimer);
+    filmTimer = setTimeout(function () {
+      if (!film && (!video.buffered || !video.buffered.length)) drop();
+    }, 12000);
+  }
+
+  var PLATE_WAIT = 2200;   // how long the film is held back for the plates
+
+  function approach() {
+    warmPlates();
+
+    var t0 = Date.now();
+    var poll = function () {
+      var all = true;
+      for (var i = 0; i < frames.length; i++) if (!plateIn[i]) { all = false; break; }
+      if (all || Date.now() - t0 > PLATE_WAIT) kickFilm();
+      else setTimeout(poll, 120);
+    };
+    poll();
   }
 
   /* Scroll progress to film seconds, across the baked curve. Monotone and
@@ -192,9 +281,29 @@
   function platesFilm(t) {
     var i = stepAt(t);
     if (i < 0) i = 0;
+    /* A plate that has not decoded is a blank box, and blank is worse than
+       late: the section stays on the last state it actually painted until the
+       one the scroll asks for can be painted too. Until anything has decoded
+       there is no such pair, so nothing is claimed and the section says it is
+       waiting. The caller takes the returned index for the copy, so the words
+       never run ahead of the picture. */
+    var wait = 0;
+    if (!plateIn[i]) {
+      if (lastPlate < 0) {
+        for (var z = 0; z < 5; z++) if (frames[z]) frames[z].style.opacity = 0;
+        pin.classList.add('film-wait');
+        return HOLD;
+      }
+      i = lastPlate;
+      wait = 1;
+    }
+    lastPlate = i;
+    pin.classList.remove('film-wait');
     var w = WIN[i];
     var f = w && w[1] > w[0] ? (t - w[0]) / (w[1] - w[0]) : 0;
-    var next = i >= WIN.length - 1 ? 0 : smooth((f - 0.82) / 0.18);
+    // the cross fade only runs into a plate that is there to fade into
+    var next = (wait || i >= WIN.length - 1 || !plateIn[i + 1])
+      ? 0 : smooth((f - 0.82) / 0.18);
     for (var k = 0; k < 5; k++) {
       var op = k === i ? 1 - next : (k === i + 1 ? next : 0);
       var fr = frames[k];
@@ -203,6 +312,7 @@
         fr.style.willChange = op > 0 && op < 1 ? 'opacity' : 'auto';
       }
     }
+    return i;
   }
 
   function plates(p) {
@@ -270,6 +380,8 @@
 
   function paint(p) {
     var t = timeAt(p);
+    // which plate the stack actually has on screen, or -1 when the film has it
+    var painted = -1;
 
     if (film) want = t;
 
@@ -296,7 +408,7 @@
       // no film: the stack is the artwork, and it takes the same windows the
       // copy does, so the state on screen and the words beside it are the same
       // step at every scroll position
-      if (WIN.length) platesFilm(t); else plates(p);
+      if (WIN.length) painted = platesFilm(t); else plates(p);
     }
 
     /* Is the reader looking at the frame this paint asked for. A scrub is not a
@@ -324,7 +436,7 @@
         // again rather than sitting on a write that is remembered and gone
         if (stale && !video.seeking && video.readyState >= 1) wrote = -1;
       }
-      if (stale) platesFilm(want);
+      if (stale) painted = platesFilm(want);
     }
 
     pin.style.setProperty('--sys-scale', (1.05 - 0.05 * p).toFixed(4));
@@ -337,7 +449,12 @@
     if (bar) bar.style.width = (p * 100).toFixed(2) + '%';
     pin.style.setProperty('--sys-p', p.toFixed(4));
 
-    copy(stepAt(t));
+    /* The copy is the picture's caption, so it goes where the picture went. A
+       step the stack could not draw is a step whose words have nothing to sit
+       beside, and running the words on regardless is the thing this section
+       must never do. */
+    if (painted === HOLD) return;
+    copy(painted >= 0 ? painted : stepAt(t));
   }
 
   /* The loop sleeps on two conditions, not one. Scroll having caught up is the
@@ -455,7 +572,7 @@
     shown = -1;
     staleAt = 0;
     active = UNSET;
-    pin.classList.remove('has-film');
+    pin.classList.remove('has-film', 'film-wait');
     pin.dataset.step = '1';
     pin.style.removeProperty('--sys-scale');
     frames.forEach(function (f) { f.style.opacity = ''; f.style.willChange = 'auto'; });
@@ -479,6 +596,7 @@
     shown = video ? video.currentTime : -1;
     staleAt = 0;
     showStale(false);
+    trackPlates();
     if (video && video.readyState >= 2) film = true;
     if (film) warmPlates();
     pin.classList.toggle('has-film', film);
@@ -516,14 +634,6 @@
       video.addEventListener(e, revive);
     });
     video.addEventListener('error', drop);
-    /* A source that never resolves is the same failure as one that errors. The
-       wait is generous because the master is a 12MB file and a slow first byte
-       is not a broken one; a late canplay still adopts after this has fallen
-       back, so the cost of being patient is nothing and the cost of being hasty
-       is a reader who gets the still stack on every cold load. */
-    setTimeout(function () {
-      if (!film && (!video.buffered || !video.buffered.length)) drop();
-    }, 12000);
   }
 
   /* Click to step. The ticks are the only control in the section, and what
@@ -557,6 +667,21 @@
       scrollTo({ top: top + p * span, behavior: 'smooth' });
     });
   });
+
+  /* Approach, not arrival. A viewport and a half of warning is enough for the
+     plates to be in before the reader can read a word of the beat they belong
+     to, and it is the cue for the film as well. Without an observer there is no
+     approach to wait for, so both happen now. */
+  if (window.IntersectionObserver) {
+    var near = new IntersectionObserver(function (es) {
+      if (!es[es.length - 1].isIntersecting) return;
+      near.disconnect();
+      approach();
+    }, { rootMargin: '150% 0px' });
+    near.observe(track);
+  } else {
+    approach();
+  }
 
   if (window.IntersectionObserver) {
     new IntersectionObserver(function (es) {

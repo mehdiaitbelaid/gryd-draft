@@ -168,6 +168,25 @@
 .sys-pin.has-film.film-stale .sys-film { visibility: hidden; }
 .sys-pin.has-film.film-stale .sys-step .sys-frame { display: block; }
 
+/* And the case before either of them: nothing has decoded yet, so there is no
+   picture to show and no earlier one to hold. An empty box beside a beat's
+   words reads as a section that is broken, so the frame says it is waiting
+   instead. The copy is held back at the same time, in system.js, so the words
+   and the picture arrive together. */
+.sys-pin.film-wait .sys-lineholder .sys-frame::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(100deg, #EDE7DE 0%, #F5F1EA 45%, #EDE7DE 90%);
+  background-size: 260% 100%;
+  animation: sys-wait 1.5s ease-in-out infinite;
+}
+@keyframes sys-wait {
+  from { background-position: 130% 0 }
+  to   { background-position: -30% 0 }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sys-pin.film-wait .sys-lineholder .sys-frame::after { animation: none; }
+}
+
 /* The holder of the progress rail and the film. No connector is drawn over the
    picture: the ember through the houses belongs to the render itself. */
 .sys-lineholder { pointer-events: none; }

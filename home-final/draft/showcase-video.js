@@ -19,16 +19,27 @@
     video.load();
   }
 
+  /* Older engines return nothing from play(), so calling .catch on the result
+     throws and takes the rest of the start loop with it. */
+  function play(video) {
+    var p;
+    try { p = video.play(); } catch (err) { return; }
+    if (p && typeof p.catch === "function") p.catch(function () {});
+  }
+
   function watch(video) {
     if (!("IntersectionObserver" in window)) {
-      video.play().catch(function () {});
+      // no observer means no cue to attach on, so the sources go on now:
+      // without them play() has nothing to play.
+      attach(video);
+      play(video);
       return;
     }
     var seen = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           attach(video);
-          video.play().catch(function () {});
+          play(video);
         } else if (!video.paused) {
           video.pause();
         }

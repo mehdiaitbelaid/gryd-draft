@@ -27,8 +27,8 @@
   window.grydPageFade = true;
 
   var GROUND = '#F8F6F2';
-  var OUT = 220;
-  var IN = 320;
+  var OUT = 160;
+  var IN = 240;
   var KEY = 'gryd-page-fade';
   var root = document.documentElement;
 
@@ -91,6 +91,16 @@
       if (Date.now() - t0 >= CAP) return true;
       var links = document.querySelectorAll('link[rel="stylesheet"]');
       for (var i = 0; i < links.length; i++) {
+        /* A sheet the page has deliberately taken off the critical path, by
+           asking for it under a media query this window does not match, is not
+           something the first paint is waiting on. Waiting on it here would put
+           it straight back on the path the link was written to keep it off. */
+        var m = links[i].media;
+        if (m && m !== 'all') {
+          var matched = true;
+          try { matched = matchMedia(m).matches; } catch (e) {}
+          if (!matched) continue;
+        }
         var loaded = false;
         try { loaded = !!links[i].sheet; } catch (e) { loaded = true; }
         if (!loaded) return false;
