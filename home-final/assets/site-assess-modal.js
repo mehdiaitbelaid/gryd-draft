@@ -36,13 +36,16 @@
     document.head.appendChild(link);
   }
 
+  /* then(true) only when the file actually ran. A script that 404s fires
+     onerror, and treating that as a load left the popup opening on an engine
+     that was never there. */
   function script(file, then, fallback) {
     var s = document.createElement("script");
     s.src = url(file);
-    s.onload = function () { then(); };
+    s.onload = function () { then(true); };
     s.onerror = function () {
       s.remove();
-      if (fallback) { script(fallback, then, null); } else { then(); }
+      if (fallback) { script(fallback, then, null); } else { then(false); }
     };
     document.head.appendChild(s);
   }
@@ -55,9 +58,12 @@
      compute on window.GrydAssess. */
   var ENGINE = "assess-engine.sheet.js";
 
+  /* loaded is set only when all three files ran, so a failed fetch leaves the
+     popup unbuilt and the next click tries again rather than opening an empty
+     plate for the rest of the session. */
   var loading = false, loaded = false, waiting = [];
   function deps(then) {
-    if (loaded) { return then(); }
+    if (loaded) { return then(true); }
     waiting.push(then);
     if (loading) { return; }
     loading = true;
@@ -65,11 +71,13 @@
     css("site-assess-modal.css");
     css("assess-inputs.css");
     css("assess-result.css");
-    var left = 3;
-    function one() {
+    var left = 3, ok = true;
+    function one(got) {
+      if (!got) { ok = false; }
       if (--left) { return; }
-      loaded = true;
-      waiting.splice(0).forEach(function (f) { f(); });
+      loading = false;
+      loaded = ok;
+      waiting.splice(0).forEach(function (f) { f(ok); });
     }
     script("assess-inputs.js", one);
     script("assess-result.js", one);
@@ -107,7 +115,9 @@
       + '<p class="sam-gate" data-gate hidden>A name and a work email are all we need.</p>'
       + "</section>"
 
-      + '<section class="sam-pane" data-pane="2" hidden><div data-result></div></section>'
+      + '<section class="sam-pane" data-pane="2" hidden>'
+      + '<p class="sam-gate" data-sent hidden></p>'
+      + "<div data-result></div></section>"
       + "</div>"
       + '<div class="sam-nav"><button type="button" class="sam-back" data-back hidden>Back</button>'
       + '<button type="button" class="sam-go" data-go>Continue</button>'
@@ -125,8 +135,9 @@
 
   /* The lead goes to Gryd's own API, the one the live tool calls, through
      assets/assess-lead.js. The popup is injected on pages that never name that
-     file, so it pulls it in itself, once, beside its own script. It is fire and
-     forget: the assessment renders whether or not the API answers. */
+     file, so it pulls it in itself, once, beside its own script. The
+     assessment renders whether or not the API answers, and a send that did not
+     land says so over the summary with the send offered again. */
   (function () {
     if (document.querySelector("script[data-assess-lead]")) { return; }
     var me = document.currentScript
@@ -138,12 +149,31 @@
     document.head.appendChild(s);
   })();
 
+  /* the send in flight, so a second Continue or a second Try again cannot file
+     the same reader twice, and the payload it carried, so Try again resends
+     exactly what failed */
+  var sending = false, lastPayload = null;
+
+  function saidSent(ok) {
+    var note = root && root.querySelector("[data-sent]");
+    if (!note) { return; }
+    note.hidden = ok;
+    if (ok) { note.innerHTML = ""; return; }
+    note.innerHTML = "We could not send your details, try again. "
+      + '<button type="button" data-retry style="background:none;border:0;padding:0;'
+      + 'font:inherit;color:inherit;text-decoration:underline;cursor:pointer">Try again</button>';
+  }
+
   function sendLead(payload) {
-    window.grydAssessLead = payload;
-    if (!window.GrydAssessLeadApi) { return; }
+    if (payload) { lastPayload = payload; window.grydAssessLead = payload; }
+    if (!lastPayload || !window.GrydAssessLeadApi || sending) { return; }
     var res = null;
-    try { res = window.GrydAssess.compute(payload.inputs); } catch (err) { res = null; }
-    window.GrydAssessLeadApi.send(payload.inputs, res, payload.lead);
+    try { res = window.GrydAssess.compute(lastPayload.inputs); } catch (err) { res = null; }
+    sending = true;
+    saidSent(true);
+    window.GrydAssessLeadApi.send(lastPayload.inputs, res, lastPayload.lead)
+      .then(function () { sending = false; saidSent(true); },
+            function () { sending = false; saidSent(false); });
   }
 
   function build() {
@@ -181,6 +211,7 @@
     root.addEventListener("click", function (ev) {
       if (ev.target === root) { close(); return; }
       if (ev.target.closest("[data-close]")) { close(); return; }
+      if (ev.target.closest("[data-retry]")) { sendLead(null); return; }
       if (ev.target.closest("[data-back]")) { goBack(); return; }
       if (ev.target.closest("[data-go]")) { goNext(); }
     });
@@ -286,9 +317,24 @@
     });
   }
 
+  /* The plate is hidden a beat after the close so it can fade, and that beat
+     is long enough to reopen inside. Every open and close takes the next
+     generation, so a timer from a closed plate can only ever hide the plate it
+     was started for, and the page behind is only made live again when the
+     generation that made it inert is the one still standing. */
+  var closeTimer = null, generation = 0;
+
   function open(trigger) {
-    deps(function () {
+    deps(function (ok) {
+      /* nothing loaded, so there is nothing to open: let the link the reader
+         clicked take them to the page version instead */
+      if (!ok) {
+        if (trigger && trigger.href) { window.location.href = trigger.href; }
+        return;
+      }
       if (!root) { build(); }
+      generation += 1;
+      if (closeTimer) { window.clearTimeout(closeTimer); closeTimer = null; }
       opener = trigger || null;
       root.hidden = false;
       behind(true);
@@ -299,11 +345,16 @@
 
   function close() {
     if (!root || root.hidden) { return; }
+    var gen = (generation += 1);
     root.classList.remove("open");
     behind(false);
     document.documentElement.style.overflow = "";
     var back_to = opener;
-    window.setTimeout(function () { root.hidden = true; }, 200);
+    if (closeTimer) { window.clearTimeout(closeTimer); }
+    closeTimer = window.setTimeout(function () {
+      closeTimer = null;
+      if (gen === generation) { root.hidden = true; }
+    }, 200);
     if (back_to && back_to.focus) { back_to.focus(); }
   }
 

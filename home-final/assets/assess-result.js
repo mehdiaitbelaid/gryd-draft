@@ -81,14 +81,24 @@
   var HOVER_KEY = "gryd.resultHover";
 
   /* The axis follows the data. It stops at the first £500 above the tallest
-     value on the run, in £500 steps while that is £3,000 or less and £1,000
-     steps above it, so a gas scheme keeps a fine ladder and an all electric
-     5+ bed run tops out at £5,000 rather than a decorative £8,000. */
-  function axisStep(raw) { return Math.ceil(raw / 500) * 500 <= 3000 ? 500 : 1000; }
+     value on the run, and the ladder is piecewise: £500 rungs to £3,000, then
+     £1,000 rungs above that. A tall run keeps the fine ladder over the range
+     where the bars actually sit instead of losing it the moment the line
+     passes £3,000, and the top rung is the axis top itself even when £1,000
+     steps would skip it. */
+  var FINE_TO = 3000, FINE = 500, COARSE = 1000;
 
   function axisTop(raw) {
-    var step = axisStep(raw);
-    return Math.max(step, Math.ceil(raw / step) * step);
+    return Math.max(FINE, Math.ceil(raw / FINE) * FINE);
+  }
+
+  function axisTicks(raw) {
+    var top = axisTop(raw);
+    var out = [];
+    for (var t = 0; t <= Math.min(top, FINE_TO); t += FINE) { out.push(t); }
+    for (var c = FINE_TO + COARSE; c <= top; c += COARSE) { out.push(c); }
+    if (out[out.length - 1] !== top) { out.push(top); }
+    return out;
   }
 
   function chartSvg(c, plotH) {
@@ -100,19 +110,18 @@
       top = Math.max(top, c.without[i], c.subscription[i] + c.retailer[i]);
     }
     var max = axisTop(top);
-    var tickStep = axisStep(top);
     var step = plotW / n;
     var bw = Math.max(6, step * 0.62);
     var y = function (val) { return PAD_T + plotH - (val / max) * plotH; };
     var cx = function (i) { return PAD_L + step * i + step / 2; };
 
     var ticks = "";
-    for (var t = 0; t <= max + 0.5; t += tickStep) {
+    axisTicks(top).forEach(function (t) {
       ticks += '<line class="ar-grid" x1="' + PAD_L + '" x2="' + (W - PAD_R)
         + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>'
         + '<text class="ar-ytick" x="' + (PAD_L - 10) + '" y="' + (y(t) + 4).toFixed(1)
         + '" text-anchor="end">£' + Math.round(t).toLocaleString("en-GB") + "</text>";
-    }
+    });
 
     var bars = "";
     for (var k = 0; k < n; k++) {

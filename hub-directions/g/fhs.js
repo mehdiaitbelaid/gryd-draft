@@ -71,6 +71,9 @@
      order and bedCounts holds the plots against each size. */
   var beds = [];
   var bedCounts = {};
+  /* what was typed under each tile, kept beside the parsed count so a blank, a
+     0, a minus or a decimal is reported rather than quietly read as one plot */
+  var bedRaw = {};
   var contact = { name: "", email: "" };
   var at = 0;
 
@@ -211,23 +214,35 @@
     var cells = O.bedrooms.map(function (v, i) {
       var on = beds.indexOf(v) >= 0;
       var art = '<img src="' + IMG + BED_ART[v] + '.png" alt="" width="300" height="300" decoding="async">';
-      var has = bedCounts[v] !== undefined;
+      var has = bedRaw[v] !== undefined && bedRaw[v] !== "";
       return '<div class="f-tile-cell" style="--i:' + i + '">'
         + tile("bedrooms", v, v + " bed", art, on)
         + '<input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="'
         + v + '" aria-label="' + v + ' bed plots" placeholder="0"'
-        + (has ? ' value="' + bedCounts[v] + '"' : "")
+        + (has ? ' value="' + esc(bedRaw[v]) + '"' : "")
         + (on ? "" : " hidden") + "></div>";
     }).join("");
-    return '<div class="f-tiles cols-5 beds" role="group" aria-label="Bedrooms">' + cells + "</div>";
+    return '<div class="f-tiles cols-5 beds" role="group" aria-label="Bedrooms">' + cells + "</div>"
+      + '<p class="fm-flag" data-count-note role="status" hidden></p>';
   }
 
   function sizeLine() {
     return beds.map(function (b) { return b + " bed x " + plotsFor(b); }).join(", ");
   }
-  /* A size left blank is one plot of that size, which is what the reader who
-     picked the tile and typed nothing meant. */
-  function plotsFor(b) { return bedCounts[b] || 1; }
+  /* Every picked size carries its own count by the time the run moves on, so
+     there is nothing to stand in for. */
+  function plotsFor(b) { return bedCounts[b]; }
+
+  /* A plot count is a whole number of plots, one or more. Nothing else is read
+     as one. */
+  function wholePlots(text) {
+    var t = String(text === undefined || text === null ? "" : text).trim();
+    return /^\d+$/.test(t) && Number(t) > 0;
+  }
+
+  function uncounted() {
+    return beds.filter(function (b) { return !wholePlots(bedRaw[b]); });
+  }
 
   function yesNo(field, current) {
     return '<div class="f-tiles cols-2 narrow" role="group">'
@@ -293,10 +308,11 @@
       return '<div class="fm-gate">'
         + '<div class="fm-in"><label for="fm-name">Full name</label>'
         + '<input id="fm-name" type="text" data-k="name" aria-label="Full name" '
-        + 'placeholder="Jane Smith" autocomplete="name"></div>'
+        + 'placeholder="Jane Smith" autocomplete="name" value="' + esc(contact.name) + '"></div>'
         + '<div class="fm-in"><label for="fm-email">Work email</label>'
         + '<input id="fm-email" type="email" data-k="email" aria-label="Work email" '
-        + 'placeholder="jane@company.co.uk" autocomplete="email"></div></div>'
+        + 'placeholder="jane@company.co.uk" autocomplete="email" value="'
+        + esc(contact.email) + '"></div></div>'
         + '<p class="fm-hint">Gryd stores the name and the email to send the check and to talk '
         + "about the standard. Nothing else.</p>";
     }
@@ -347,6 +363,16 @@
      rows and plates use. Back plays the move in reverse. */
   var STEP_MS = 340;
   var moving = false;
+  /* The tap that answers a question waits a beat before the pane leaves. That
+     beat used to be spent holding nothing but a timer, so a second tap landing
+     on the outgoing pane advanced from wherever the run had reached by then and
+     stepped straight over the bedroom question and its guard. The advance now
+     carries the step it was started on and is dropped if the run has moved. */
+  var pending = null;
+
+  function cancelPending() {
+    if (pending) { w.clearTimeout(pending); pending = null; }
+  }
 
   function reduced() {
     return !!(w.matchMedia && w.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -370,6 +396,7 @@
      the slide cannot land the reader two questions on. */
   function goTo(next, dir) {
     if (moving) { return; }
+    cancelPending();
     if (reduced()) { at = next; paint(dir); return; }
     var pane = el(".fhs-q");
     moving = true;
@@ -448,25 +475,42 @@
 
   function ready() {
     if (paneAt(at).key === "bedrooms") {
-      return beds.length > 0 && unsupportedBeds().length === 0;
+      return beds.length > 0 && unsupportedBeds().length === 0 && uncounted().length === 0;
     }
     return !onGate() || !!(contact.name && contact.email.indexOf("@") > 0);
   }
+
+  /* Continue stays off until every picked size has its plots, and the line
+     under the tiles says which sizes are still waiting rather than leaving the
+     reader to guess why the button will not move. */
+  function countNote() {
+    var note = el("[data-count-note]");
+    if (!note) { return; }
+    var bad = uncounted();
+    note.hidden = !beds.length || !bad.length;
+    note.textContent = bad.length
+      ? "How many plots of " + bad.map(function (b) { return b + " bed"; }).join(", ")
+        + "? A whole number, one or more."
+      : "";
+  }
+
   function gate() {
     var go = el("[data-go]");
     if (go) { go.disabled = !ready(); }
+    if (paneAt(at).key === "bedrooms") { countNote(); }
     return ready();
   }
 
   /* The run starts itself. There is no button to press and nothing to open:
      the page loads on question one. */
   function begin() {
+    cancelPending();
     a = G.defaults();
     a.houseType = null; a.bedrooms = null; a.storeys = null;
     a.heating = null; a.partL = null; a.ventilation = null;
     a.airtightness = null; a.glazing = null;
     a.hasSolar = false; a.panels = 0; a.hasBattery = false; a.hasWWHR = false;
-    beds = []; bedCounts = {};
+    beds = []; bedCounts = {}; bedRaw = {};
     contact = { name: "", email: "" };
     at = 0;
     el("[data-check]").hidden = false;
@@ -497,8 +541,9 @@
                    : { first: t.slice(0, cut), last: t.slice(cut + 1) };
   }
 
-  /* The check as plain text: what was answered, the verdict, every measure with
-     its state word, and the two coverage figures. */
+  /* The check as plain text: what was answered, a verdict line for every size
+     on the scheme, every measure of the size that drives the headline with its
+     state word, and the two coverage figures. */
   function leadNotes(runs, best) {
     var m = best.m, r = best.r;
     var lines = [
@@ -514,12 +559,12 @@
       "Battery in spec: " + (a.hasBattery ? "Yes" : "No"),
       "Wastewater heat recovery: " + (a.hasWWHR ? "Yes" : "No"),
       "",
-      "Verdict (" + best.bed + " bed): " + m.heading,
+      "Headline size: " + best.bed + " bed",
       "Summary: " + m.sub,
       ""
     ];
     runs.forEach(function (x) {
-      lines.push(x.bed + " bed x " + x.count + ": " + x.m.heading);
+      lines.push("Verdict (" + x.bed + " bed): " + x.m.heading);
     });
     lines.push("");
     m.measures.forEach(function (x) { lines.push(x.name + ": " + x.state); });
@@ -656,6 +701,21 @@
      count and its own verdict. */
   var BAND_RANK = { green: 0, amber: 1, red: 2 };
 
+  /* Two sizes can land in the same band and not be the same answer: a 5 bed
+     with a solar shortfall and a 2 bed with a single soft measure both read
+     amber, and taking the first of them hid the shortfall behind the smaller
+     home. The size with the most required measures still outstanding wins, and
+     the larger home wins a tie after that. */
+  function worseThan(x, worst) {
+    if (BAND_RANK[x.m.band] !== BAND_RANK[worst.m.band]) {
+      return BAND_RANK[x.m.band] > BAND_RANK[worst.m.band];
+    }
+    if (x.r.unresolved !== worst.r.unresolved) {
+      return x.r.unresolved > worst.r.unresolved;
+    }
+    return x.bed > worst.bed;
+  }
+
   function bedRuns() {
     return beds.map(function (b) {
       var spec = {};
@@ -669,7 +729,7 @@
 
   function worstRun(runs) {
     return runs.reduce(function (worst, x) {
-      return BAND_RANK[x.m.band] > BAND_RANK[worst.m.band] ? x : worst;
+      return worseThan(x, worst) ? x : worst;
     }, runs[0]);
   }
 
@@ -701,7 +761,9 @@
     host.innerHTML = '<div class="ar-root">'
       + '<header class="fhs-verdict band-' + esc(m.band) + '">'
       + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(sizeLine()) + "</span>"
-      + '<h2 class="ar-title" data-live>' + esc(m.heading) + "</h2></header>"
+      + '<h2 class="ar-title" data-live>' + esc(m.heading) + "</h2>"
+      + '<p class="fhs-hint" data-drives>Every figure and every measure below is the '
+      + esc(best.bed) + " bed size, the one that sets this verdict.</p></header>"
 
       + '<section class="ar-chartcard"><div class="ar-pins"><div class="ar-plates">'
       + plate("Energy covered on your spec", r.user.coverage, 0)
@@ -864,6 +926,7 @@
     if (on) {
       beds = beds.filter(function (b) { return b !== v; });
       delete bedCounts[v];
+      delete bedRaw[v];
       if (field) { field.hidden = true; field.value = ""; }
     } else {
       if (beds.indexOf(v) < 0) { beds.push(v); }
@@ -883,13 +946,15 @@
       var t = ev.target;
       if (!t || !t.closest) { return; }
 
-      if (t.closest("[data-restart]")) { reset(); return; }
+      if (t.closest("[data-restart]")) { cancelPending(); reset(); return; }
 
       var chip = t.closest(".r-chip");
       if (chip) { showNote(Number(chip.getAttribute("data-chip"))); return; }
 
       var tileEl = t.closest(".fm .f-tile");
       if (tileEl) {
+        /* a pane on its way out is not the question the reader is answering */
+        if (moving) { return; }
         var field = tileEl.getAttribute("data-f");
         if (field === "bedrooms") { toggleBed(tileEl); return; }
         setField(field, tileEl.getAttribute("data-v"));
@@ -900,14 +965,20 @@
         /* A single choice answers the question, so the run moves on by itself.
            The pause is one beat, long enough to see the tile take the answer
            before the pane starts leaving. */
-        w.setTimeout(function () {
-          if (at < seq().length) { goTo(at + 1, "fwd"); }
+        cancelPending();
+        var from = at;
+        pending = w.setTimeout(function () {
+          pending = null;
+          if (moving || at !== from || at >= seq().length) { return; }
+          goTo(at + 1, "fwd");
         }, 160);
         return;
       }
 
-      if (t.closest("[data-back]")) { goTo(Math.max(0, at - 1), "back"); return; }
+      if (t.closest("[data-back]")) { cancelPending(); goTo(Math.max(0, at - 1), "back"); return; }
       if (t.closest("[data-go]")) {
+        cancelPending();
+        if (moving) { return; }
         if (!gate()) { return; }
         if (!onGate()) { goTo(at + 1, "fwd"); return; }
         finish();
@@ -918,8 +989,9 @@
       var cf = ev.target && ev.target.closest ? ev.target.closest(".f-count") : null;
       if (cf) {
         var b = Number(cf.getAttribute("data-count"));
-        var n = parseInt(cf.value, 10);
-        if (!n || n < 1) { delete bedCounts[b]; } else { bedCounts[b] = n; }
+        bedRaw[b] = cf.value.trim();
+        if (wholePlots(bedRaw[b])) { bedCounts[b] = Number(bedRaw[b]); }
+        else { delete bedCounts[b]; }
         gate();
         return;
       }

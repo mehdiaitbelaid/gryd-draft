@@ -102,9 +102,10 @@
     return split;
   }
 
-  /* The split straight off the plot counts. Percentages are what the engine and
-     the summary read, so the three are rounded down and the leftover points go
-     to the largest fractional parts first, which keeps them reading as 100. */
+  /* The split straight off the plot counts, for the summary to print. The
+     three are rounded down and the leftover points go to the largest
+     fractional parts first, which keeps them reading as 100. The engine is
+     given bandCounts instead, so this rounding never reaches a figure. */
   function splitFromCounts(counts) {
     var split = { small: 0, mid: 0, large: 0 };
     var raw = { small: 0, mid: 0, large: 0 };
@@ -125,6 +126,19 @@
     parts.sort(function (a, b) { return b.frac - a.frac; });
     for (var i = 0; i < rest; i++) { split[parts[i % parts.length].k] += 1; }
     return split;
+  }
+
+  /* The plots per engine band, straight off the counts and never through the
+     percentages: the engine wants whole homes, and three plots one to a band
+     are three homes rather than 1.02 / 0.99 / 0.99 of one. */
+  function bandCounts(counts) {
+    var out = { small: 0, mid: 0, large: 0 };
+    Object.keys(counts).forEach(function (name) {
+      var n = counts[name] || 0;
+      if (n <= 0) { return; }
+      BEDS.forEach(function (b) { if (b[0] === name) { out[b[1]] += n; } });
+    });
+    return out;
   }
 
   function countTotal(counts) {
@@ -172,6 +186,7 @@
                postcode: v.postcode.toUpperCase().trim(),
                orientation: ORIENTATION, energy: ENERGY, beds: v.beds.slice(),
                counts: JSON.parse(JSON.stringify(v.counts)),
+               bandCounts: counted ? bandCounts(v.counts) : null,
                split: counted ? splitFromCounts(v.counts) : shareOut(v.beds) };
     }
 
@@ -292,6 +307,7 @@
 
   window.GrydAssessInputs = { mount: mount, POSTCODE: POSTCODE,
                               shareOut: shareOut, splitFromCounts: splitFromCounts,
+                              bandCounts: bandCounts,
                               countTotal: countTotal, BEDS: BEDS,
                               ENERGY: ENERGY, ORIENTATION: ORIENTATION };
 })();

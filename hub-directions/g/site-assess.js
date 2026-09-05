@@ -26,6 +26,9 @@
      that gives way when a plot total is typed over the top of the counts */
   var counts = {};
   var lastCount = null;
+  /* what was actually typed under each tile, kept beside the parsed count so a
+     0, a decimal or an empty box can be reported rather than silently dropped */
+  var countRaw = {};
 
   function countTotal() {
     return Object.keys(counts).reduce(function (n, k) { return n + (counts[k] || 0); }, 0);
@@ -37,6 +40,46 @@
     values[key] = val;
     paint(key);
   }
+
+  /* The send in flight and what it carried, so a second press cannot file the
+     same reader twice and Try again resends exactly what failed. The result is
+     drawn either way: the reader asked for numbers, not for a receipt. */
+  var sending = false, lastLead = null;
+
+  function saidSent(ok) {
+    var host = doc.getElementById("saResult");
+    if (!host) { return; }
+    var note = host.querySelector("[data-sent]");
+    if (!note) {
+      note = doc.createElement("p");
+      note.className = "f-tally is-off";
+      note.setAttribute("data-sent", "");
+      note.setAttribute("role", "status");
+      host.insertBefore(note, host.firstChild);
+    }
+    note.hidden = ok;
+    if (ok) { note.innerHTML = ""; return; }
+    note.innerHTML = "We could not send your details, try again. "
+      + '<button type="button" data-retry style="background:none;border:0;padding:0;'
+      + 'font:inherit;color:inherit;text-decoration:underline;cursor:pointer">Try again</button>';
+  }
+
+  function sendLead(lead, result, contact) {
+    if (lead) { lastLead = { lead: lead, result: result, contact: contact }; }
+    if (!lastLead || !window.GrydAssessLeadApi || sending) { return; }
+    sending = true;
+    saidSent(true);
+    window.GrydAssessLeadApi.send(lastLead.lead, lastLead.result, lastLead.contact)
+      .then(function () { sending = false; saidSent(true); },
+            function () { sending = false; saidSent(false); });
+  }
+
+  doc.addEventListener("click", function (ev) {
+    if (ev.target && ev.target.closest && ev.target.closest("[data-retry]")) {
+      ev.preventDefault();
+      sendLead(null);
+    }
+  });
 
   /* Every echo of an answer, wherever it sits, is a [data-sum] element. The
      empty class is what gives the summary rail its unanswered look. */
@@ -83,10 +126,12 @@
   all("[data-count]").forEach(function (f) {
     var bed = f.getAttribute("data-count");
     f.addEventListener("input", function () {
+      countRaw[bed] = f.value.trim();
       var n = parseInt(f.value, 10);
       if (!n || n < 1) { delete counts[bed]; } else { counts[bed] = n; lastCount = bed; }
       fillPlots();
       tally();
+      gateReady();
     });
   });
 
@@ -121,6 +166,7 @@
             field.hidden = true;
             field.value = "";
             delete counts[bed];
+            delete countRaw[bed];
             if (lastCount === bed) { lastCount = null; }
           } else {
             field.hidden = false;
@@ -130,6 +176,8 @@
         tally();
       }
       set(key, picked.join(", "));
+      gateReady();
+      if (stage) { stage.clear(); }
     });
   });
 
@@ -193,9 +241,51 @@
   var form = doc.getElementById("saForm");
   var out = doc.getElementById("saResult");
   var submit = doc.getElementById("saSubmit");
+  /* set by the staged column below, so the gate can send the reader back to
+     the question it is complaining about */
+  var stage = null;
+
+  var POSTCODE = (window.GrydAssessInputs || {}).POSTCODE
+    || /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
   function ready() {
     return !!(values.name && values.email && /.+@.+\..+/.test(values.email));
+  }
+
+  /* Every screen used to let itself be skipped empty, and the gate filed
+     whatever that left: one plot, no postcode, nothing in any band. Each
+     question now answers for itself, and the same three answers are checked
+     again at the gate so a reader cannot walk backwards past one. */
+  function wholePlots(text) {
+    var t = String(text === undefined || text === null ? "" : text).trim();
+    return /^\d+$/.test(t) && Number(t) > 0;
+  }
+
+  function problemAt(i) {
+    if (i === 0) {
+      return POSTCODE.test(String(values.postcode || "").trim())
+        ? null : "That is not a UK postcode yet.";
+    }
+    if (i === 1) {
+      if (!beds.length) { return "Pick at least one size on the scheme."; }
+      var bad = beds.some(function (b) {
+        var raw = countRaw[b];
+        return raw !== undefined && raw !== "" && !wholePlots(raw);
+      });
+      return bad ? "Give a whole number of plots, one or more, under each size." : null;
+    }
+    if (i === 2) {
+      return wholePlots(values.plots) ? null : "Give a whole number of plots, one or more.";
+    }
+    return null;
+  }
+
+  function firstProblem() {
+    for (var i = 0; i < 3; i++) {
+      var msg = problemAt(i);
+      if (msg) { return { at: i, msg: msg }; }
+    }
+    return null;
   }
 
   function engineInputs() {
@@ -205,12 +295,15 @@
              postcode: String(values.postcode || "").toUpperCase().trim(),
              orientation: api.ORIENTATION || "South",
              energy: api.ENERGY || "All Electric",
+             /* whole plots per band where they were counted, so the engine
+                never runs the arithmetic through a rounded percentage */
+             bandCounts: counted && api.bandCounts ? api.bandCounts(counts) : null,
              split: counted ? api.splitFromCounts(counts)
                     : (api.shareOut ? api.shareOut(beds) : { small: 100, mid: 0, large: 0 }) };
   }
 
   function gateReady() {
-    if (submit) { submit.disabled = !ready(); }
+    if (submit) { submit.disabled = !ready() || !!firstProblem(); }
   }
 
   if (submit && form && out) {
@@ -220,6 +313,11 @@
     submit.addEventListener("click", function (ev) {
       ev.preventDefault();
       if (!ready()) { return; }
+      var bad = firstProblem();
+      if (bad) {
+        if (stage) { stage.go(bad.at); stage.say(bad.at, bad.msg); }
+        return;
+      }
       window.grydAssessLead = { lead: { name: values.name, email: values.email },
                                 inputs: engineInputs() };
       var answers = engineInputs();
@@ -227,13 +325,10 @@
       /* the lead goes to HubSpot through the shared sender, carrying the bed
          counts as well as the engine's own inputs, and it never blocks the
          assessment */
-      if (window.GrydAssessLeadApi) {
-        var lead = { homes: answers.homes, postcode: answers.postcode,
-                     orientation: answers.orientation, energy: answers.energy,
-                     beds: beds.slice(), counts: counts };
-        window.GrydAssessLeadApi.send(lead, result,
-                                      { name: values.name, email: values.email });
-      }
+      sendLead({ homes: answers.homes, postcode: answers.postcode,
+                 orientation: answers.orientation, energy: answers.energy,
+                 beds: beds.slice(), counts: counts },
+               result, { name: values.name, email: values.email });
       form.hidden = true;
       out.hidden = false;
       doc.body.classList.add("has-result");
@@ -320,9 +415,49 @@
     }
     window.addEventListener("resize", fit);
 
+    /* the complaint under the question it belongs to, made once and reused,
+       in the tally's own off state so it needs no style of its own */
+    function noteFor(i) {
+      var panel = panels[i];
+      if (!panel) { return null; }
+      var note = panel.querySelector("[data-q-note]");
+      if (!note) {
+        note = doc.createElement("p");
+        note.className = "f-tally is-off";
+        note.setAttribute("data-q-note", "");
+        note.setAttribute("role", "status");
+        note.hidden = true;
+        var field = panel.querySelector(".q-field") || panel;
+        field.appendChild(note);
+      }
+      return note;
+    }
+
+    function say(i, msg) {
+      var note = noteFor(i);
+      if (!note) { return; }
+      note.textContent = msg || "";
+      note.hidden = !msg;
+    }
+
+    stage = {
+      go: function (i) { if (i !== at) { show(i, true, i < at); } },
+      say: say,
+      clear: function () { if (!problemAt(at)) { say(at, ""); } }
+    };
+
     all("[data-next]", col).forEach(function (btn) {
-      btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at + 1, true); });
+      btn.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        var msg = problemAt(at);
+        if (msg) { say(at, msg); return; }
+        say(at, "");
+        show(at + 1, true);
+      });
     });
+    /* the complaint goes as soon as the answer is good, rather than sitting
+       under a question the reader has already fixed */
+    col.addEventListener("input", function () { if (!problemAt(at)) { say(at, ""); } });
     all("[data-back]", col).forEach(function (btn) {
       btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true, true); });
     });
@@ -334,6 +469,7 @@
       if (f.id === "saEmail" || f.id === "saName") { if (ready()) { submit.click(); } return; }
       var next = panels[at].querySelector("[data-next]");
       if (next) { next.click(); }
+      else { gateReady(); }
     });
     show(0);
   }

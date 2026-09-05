@@ -100,18 +100,32 @@
     return { annualGeneration: Math.round(gen), coverage: Math.round(cover * 100) };
   }
 
-  /* Solar sizing. The panel count and the coverage ratio both come off the
-     unrounded capacity, so only the printed kWp figures are rounded. */
+  /* Solar sizing. Every figure the model does arithmetic on is the unrounded
+     capacity; the rounded pair is for print only. Twelve panels are 5.28 kWp,
+     and running the generation off the printed 5.3 put 18 kWh a year on the
+     same system depending on which route it took. */
   function solarSizing(area, storeys, panels, hasSolar) {
     var ground = area / storeys;
     var kwpRaw = (ground * GROUND_RATIO) / M2_PER_KWP;
     var userRaw = hasSolar ? panels * KWP_PER_PANEL : 0;
     return {
+      requiredKwpRaw: kwpRaw,
       requiredKwp: round1(kwpRaw),
       minPanels: Math.ceil(kwpRaw / KWP_PER_PANEL),
+      userKwpRaw: userRaw,
       userKwp: round1(userRaw),
       coverageRatio: kwpRaw > 0 && hasSolar ? userRaw / kwpRaw : 0
     };
+  }
+
+  /* The measures the published FHS requires. Battery storage and WWHR are not
+     mandated, so they can stand at amber under a green verdict; nothing else
+     can. unresolved counts the required measures still to be dealt with, which
+     is what separates two sizes that land in the same band. */
+  var REQUIRED = ['heating', 'solar', 'partL', 'ventilation', 'airtightness', 'glazing'];
+
+  function unresolved(scores) {
+    return REQUIRED.filter(function (k) { return scores[k] !== 'green'; }).length;
   }
 
   function estimate(a) {
@@ -141,10 +155,15 @@
       glazing: a.glazing === GLAZING[0] || a.glazing === GLAZING[1] ? 'green' : 'red',
       wwhr: a.hasWWHR ? 'green' : 'amber'
     };
-    /* Only heating, solar and airtightness force an overall red. */
+    /* Only heating, solar and airtightness force an overall red. Nothing the
+       FHS actually requires may sit at amber or red under a Looking good
+       heading, so the verdict can only be green once every required measure is
+       green; battery and WWHR are not required, and two of those outstanding
+       still read as gaps to address. */
     var gates = ['heating', 'solar', 'airtightness'];
     var overall;
     if (gates.some(function (k) { return scores[k] === 'red'; })) overall = 'red';
+    else if (REQUIRED.some(function (k) { return scores[k] !== 'green'; })) overall = 'amber';
     else {
       var ambers = Object.keys(scores).filter(function (k) { return scores[k] === 'amber'; }).length;
       overall = ambers <= 1 ? 'green' : 'amber';
@@ -162,8 +181,9 @@
       userExceedsGryd: a.hasSolar && userPanels > sys.panels,
       scores: scores,
       overall: overall,
-      user: energy(sz.userKwp, area, a.hasBattery),
-      fhs: energy(sz.requiredKwp, area, false),
+      unresolved: unresolved(scores),
+      user: energy(sz.userKwpRaw, area, a.hasBattery),
+      fhs: energy(sz.requiredKwpRaw, area, false),
       gryd: energy(grydKwp, area, true)
     };
   }
@@ -418,6 +438,8 @@
     },
     defaults: function () { var o = {}; for (var k in DEFAULTS) o[k] = DEFAULTS[k]; return o; },
     estimate: estimate,
+    REQUIRED: REQUIRED,
+    unresolved: unresolved,
     isSupported: isSupported,
     fields: fields,
     stepValue: stepValue,

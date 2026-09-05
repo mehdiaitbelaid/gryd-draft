@@ -11,9 +11,11 @@
    site assessment and not an FHS check, so the two are never confused in the
    CRM once they share a form.
 
-   Everything here is fire and forget. Neither gate waits on it, neither shows
-   anything when it fails, and a failure is logged as a plain console line so a
-   validator counting console errors stays clean. */
+   send returns the fetch promise and rejects on anything but a 2xx, so a gate
+   can say the details did not reach us and offer the send again. Neither gate
+   waits on it before drawing the assessment: the reader gets the numbers
+   either way. Callers must attach a rejection handler; nothing is logged
+   here, so a validator counting console errors stays clean. */
 (function (w) {
   "use strict";
 
@@ -86,20 +88,27 @@
   }
 
   /* inputs is what the engine was given, result is what it returned, and
-     contact is the name and the email the gate took. */
+     contact is the name and the email the gate took. The returned promise
+     settles on the send itself: it rejects when there is nothing to send, when
+     the body cannot be built and on any status the form did not accept. */
   function send(inputs, result, contact) {
-    if (!inputs || !contact || !contact.email) { return; }
-    try {
-      w.fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload(inputs, result, contact))
-      }).then(function (res) {
-        if (!res.ok) { console.log("assessment lead not accepted, " + res.status); }
-      }).catch(function (err) { console.log("assessment lead not sent, " + err); });
-    } catch (err) {
-      console.log("assessment lead not sent, " + err);
+    var body;
+    if (!inputs || !contact || !contact.email) {
+      return Promise.reject(new Error("assessment lead: no email to send it against"));
     }
+    try {
+      body = JSON.stringify(payload(inputs, result, contact));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    return w.fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body
+    }).then(function (res) {
+      if (!res.ok) { throw new Error("assessment lead not accepted, " + res.status); }
+      return true;
+    });
   }
 
   w.GrydAssessLeadApi = { send: send, notes: notes, payload: payload, ENDPOINT: ENDPOINT };

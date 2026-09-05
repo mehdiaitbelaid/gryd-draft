@@ -7,7 +7,8 @@
    section and the worked example line it was reversed from.
 
    Contract is the stub's: window.GrydAssess.compute(inputs) with
-   inputs {homes, postcode, orientation, energy, split:{small,mid,large}} and a
+   inputs {homes, postcode, orientation, energy, split:{small,mid,large},
+   bandCounts:{small,mid,large}} and a
    return of {developerSaving, homeownerLifetimeSaving, co2TonnesPerYear,
    savingPerUnit, rows[], chart{years,subscription,retailer,without},
    location{postcode,town}}.
@@ -39,6 +40,12 @@
       saving      hardware costs £2,846.47 / £3,613.97 / £4,219.41. 200 homes at
                    20/50/30 gives exactly £728,420.40, per unit £3,642.10. No
                    uplift is needed; the sheet figure reproduces as it stands.
+                   The sheet asks for the homes in each band as a number, not
+                   as a share ("home size break down | number | ... total
+                   equals homes"), so bandCounts is the exact input and split
+                   is the rounded reading of it. Three plots, one in each band,
+                   are three whole homes here and 1.02 / 0.99 / 0.99 through
+                   the percentages.
   10. Carbon       sum over bands of homes_in_band x generation x 0.225 / 1000
                    tonnes a year. Worked example 349.15 tonnes.
   11. Chart        the largest band present in the run. The live API only ships
@@ -214,16 +221,33 @@
     };
   }
 
+  /* The homes in each band. bandCounts is the sheet's own input and is used
+     whole; split is the percentage reading of it and is only fallen back on
+     when no counts were collected. A run with nothing in any band is refused
+     rather than charged to the 1 to 2 bed band, because a fabricated one home
+     scheme reads as a real answer everywhere downstream. */
+  function bandCounts(i, asked) {
+    var raw = i.bandCounts;
+    var split = i.split || {};
+    var out = BANDS.map(function (b) {
+      var n = raw ? Number(raw[b.key]) : asked * Number(split[b.key] || 0) / 100;
+      return n > 0 ? n : 0;
+    });
+    var total = out.reduce(function (a, n) { return a + n; }, 0);
+    if (!(total > 0)) { throw new Error("site assessment: no plots in any bedroom band"); }
+    return out;
+  }
+
   function compute(inputs) {
     var i = inputs || {};
-    var homes = Math.max(1, parseInt(i.homes, 10) || 1);
-    var split = i.split || { small: 100, mid: 0, large: 0 };
+    var asked = Math.max(1, parseInt(i.homes, 10) || 1);
     var ekey = energyKey(i.energy);
     var kk = kkValue(i.postcode, i.orientation);
     var dep = 1 - independence(kk);
 
     var models = BANDS.map(function (b) { return bandModel(b, kk, ekey); });
-    var counts = models.map(function (m) { return homes * (split[m.key] || 0) / 100; });
+    var counts = bandCounts(i, asked);
+    var homes = counts.reduce(function (a, n) { return a + n; }, 0);
 
     var developerSaving = 0, carbonKg = 0, biggest = 0;
     models.forEach(function (m, n) {
@@ -231,18 +255,12 @@
       carbonKg += counts[n] * m.generation * CARBON;
       if (counts[n] > 0 && m.lifetimeSaving > biggest) { biggest = m.lifetimeSaving; }
     });
-    if (!biggest) { biggest = models[0].lifetimeSaving; }
 
     var rows = models.filter(function (m, n) { return counts[n] > 0; }).map(function (m) {
       return { band: m.band, subscription: m.subscription,
                lifetimeSaving: round2(m.lifetimeSaving),
                lifetimePct: round2(m.lifetimePct), hardware: m.hardware };
     });
-    if (!rows.length) {
-      rows = [{ band: models[0].band, subscription: models[0].subscription,
-                lifetimeSaving: round2(models[0].lifetimeSaving),
-                lifetimePct: round2(models[0].lifetimePct), hardware: models[0].hardware }];
-    }
 
     /* The chart draws the largest band present in the run. The live API only
        ever returns gridCostsLarge, so a scheme with no 5+ bed plots used to be
@@ -269,7 +287,8 @@
       location: { postcode: String(i.postcode || "").toUpperCase().trim(),
                   town: ZONE_TOWN[zoneOf(i.postcode)] || "United Kingdom" },
       model: { kk: kk, zone: zoneOf(i.postcode), independence: independence(kk),
-               dependence: dep, energy: ekey, bands: models, counts: counts }
+               dependence: dep, energy: ekey, bands: models, counts: counts,
+               homes: homes }
     };
   }
 
