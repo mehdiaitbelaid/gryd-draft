@@ -1,0 +1,35 @@
+# Files that live in this repo but must not answer on the deployment.
+# Gitignore syntax, read from the project root, and an ignored path is never
+# uploaded, so it returns 404 rather than being merely unlinked.
+# https://vercel.com/docs/deployments/vercel-ignore
+
+# Local tooling. republish.sh carries a personal address and a local path map;
+# _serve.py is the development static server.
+republish.sh
+home-final/_serve.py
+
+# Homepage prototypes. proto-live-film is the earlier cut of the film section,
+# menu-lab is the four way menu comparison, and the two pages below it are the
+# section drafts only menu-lab links to. home-final/_sync_org.py already skips
+# this same set when it proves the stripped tree.
+home-final/proto-live-film
+home-final/draft/menu-lab.html
+home-final/draft/grid-constraint.html
+home-final/draft/battery-modelling.html
+
+# The FHS prototypes. The live checker is hub-directions/g/fhs.{html,css,js};
+# everything under fhs/ except assess-model.js, which that checker loads,
+# is the earlier standalone build and its assets.
+fhs/fhs.css
+fhs/img
+fhs/proto-modal
+fhs/pages/2
+fhs/pages/2-results
+fhs/pages/g-skin.css
+fhs/pages/shared.css
+fhs/pages/stepper.js
+
+# Meta refresh stubs, now served as 301s from the redirects block in vercel.json.
+hub-directions/g/article.html
+hub-directions/g/case-study.html
+hub-directions/g/battery-tool.html

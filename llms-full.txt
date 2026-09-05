@@ -1,7 +1,7 @@
 # Gryd, full text
 
 Gryd Energy Ltd, London, United Kingdom. Company no. 15092056.
-Every section below is the text of the page named above it, on 2026-09-04.
+Every section below is the text of the page named above it, on 2026-09-05.
 Index and links: https://gryd.energy/llms.txt
 
 
@@ -381,7 +381,6 @@ Gryd’s proof of concept validated with real data
 The Developer
 BK Developments is a property developer delivering high-quality residential homes in the South West of England. For the St. Ives project, they acquired a traditional barn with planning permission to convert it into three modern homes. They chose to run it as a Build-to-Rent (BTR) scheme, retaining the freehold and letting the properties to tenants on long-term rental agreements.
 The BTR model meant that running costs mattered. Tenants would be living in these homes day-to-day, paying the bills, and their experience would directly affect tenant experience, retention and rental yields. Getting the energy specification right was a commercial priority, not just a sustainability aspiration.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
 The project delivered three all-electric residential properties in St. Ives, Cornwall — each fitted with Air Source Heat Pumps (ASHPs) for heating and hot water, eliminating gas dependency entirely. This aligned with current building regulations and the UK’s push toward net zero.
 However, with no gas alternative, electricity was the single largest running cost for tenants. Every kilowatt-hour of heating, hot water, cooking, and appliance use would come from the grid at the prevailing tariff rate — making the energy specification critical to the affordability of the homes.
 BK Developments recognised early on that adding solar panels would make the properties more attractive to prospective tenants and differentiate the scheme in a competitive Cornish rental market.

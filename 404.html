@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found, Gryd</title>
+<meta name="description" content="The page you asked for is not on this site. The routes back to the developer pages, the hub, the tools and the Future Homes Standard check are all here.">
+<meta name="robots" content="noindex, follow">
+
+<!-- Hand written, unlike every page under hub-directions/g/. Vercel serves the
+     file at the deployment root for any path that matches nothing, so it cannot
+     be generated into a subfolder and it cannot use a relative asset path: every
+     url below is absolute from the root, because this one document answers from
+     /nope, /hub-directions/nope and /a/b/c/nope alike.
+
+     The head and the two script tags are the same set hub-directions/_build_hub.py
+     writes in head() and foot(). If that pair changes there, change it here. -->
+
+<link rel="icon" href="/home-final/assets/img/icon/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/home-final/assets/img/icon/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/home-final/assets/img/icon/icon-32.png">
+<link rel="apple-touch-icon" href="/home-final/assets/img/icon/icon-180.png">
+<link rel="manifest" href="/home-final/assets/img/icon/site.webmanifest">
+<meta name="theme-color" content="#FF5532">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/hub-directions/assets/tokens.css">
+<link rel="stylesheet" href="/home-final/assets/site-modal.css">
+<script src="/home-final/assets/hubspot-frame.js"></script>
+<link rel="stylesheet" href="/hub-directions/g/g.css">
+<style>
+  /* The only rules this page needs beyond the hub sheet: the mast sits in the
+     middle of the viewport rather than at the top, because there is nothing
+     under it to scroll to. */
+  .nf { display: flex; align-items: center; min-height: calc(100vh - 300px); }
+  .nf .g-mast { padding-bottom: 0; }
+  .nf .g-mast h1 { max-width: 12ch; }
+  .nf .routes { margin: 34px 0 0; padding: 0; list-style: none;
+                display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 16px; }
+  .nf .routes a { color: var(--red110); }
+</style>
+</head>
+<body>
+
+<script src="/home-final/assets/site-nav.js"></script>
+
+<div class="g-page">
+
+<div class="nf">
+  <header class="g-mast wrap">
+    <span class="eyebrow">Error 404</span>
+    <h1>That page is not <span class="flare">here</span>.</h1>
+    <p class="stand">The address you followed is either mistyped or points at a page that has since moved. Nothing is lost, so pick up the trail below.</p>
+    <div class="btns">
+      <a class="btn" href="/home-final/draft/index.html">Back to the homepage</a>
+    </div>
+    <ul class="routes">
+      <li><a href="/home-final/draft/index.html#developers">Developers</a></li>
+      <li><a href="/hub-directions/g/blog.html">Hub</a></li>
+      <li><a href="/hub-directions/g/tools.html">Tools</a></li>
+      <li><a href="/hub-directions/g/fhs.html">FHS</a></li>
+    </ul>
+  </header>
+</div>
+
+<script src="/home-final/assets/site-footer.js"></script>
+
+</div>
+</body>
+</html>

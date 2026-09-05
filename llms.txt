@@ -57,7 +57,7 @@ Source: [Home](https://gryd.energy/home-final/draft/index.html)
 Three tools. Each answers a question before you commit a plot. One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.
 
 - [Site assessment](https://gryd.energy/hub-directions/g/site-assessment.html): Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.
-- [Future Homes Standard readiness check](https://gryd.energy/hub-directions/g/fhs.html): Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.
+- [Future Homes Standard readiness check](https://gryd.energy/hub-directions/g/fhs.html): Twelve questions on house type, specification and contact details, eleven where the specification carries no solar, return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.
 - [Council Solar Index](https://gryd.energy/hub-directions/g/council-solar-index.html): Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.
 - [All three tools](https://gryd.energy/hub-directions/g/tools.html): the three tools, and what each one answers.
 

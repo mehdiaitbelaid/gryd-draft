@@ -246,6 +246,9 @@
   text-decoration: none;
 }
 .n-row:hover { background: var(--stonelight); }
+/* A row whose outlet has taken the piece down keeps its place in the record
+   and goes nowhere, so it must not offer the hover a link would. */
+.n-row.n-flat:hover { background: none; }
 /* Same cover treatment as the project and article cards, sized down to a row thumb.
    Every press item carries the picture the live site gives it, so there is no
    empty variant: three of these photographs are shared with another item, which

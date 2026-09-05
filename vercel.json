@@ -8,6 +8,306 @@
       "source": "/",
       "destination": "/home-final/draft/index.html",
       "statusCode": 301
+    },
+    {
+      "source": "/are-you-fhs-ready",
+      "destination": "/hub-directions/g/fhs.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/projects",
+      "destination": "/hub-directions/g/projects.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/blog",
+      "destination": "/hub-directions/g/blog.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/news",
+      "destination": "/hub-directions/g/news.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/hub-directions/g/privacy-policy.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/cookie-policy",
+      "destination": "/hub-directions/g/cookie-policy.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/fhs-briefing",
+      "destination": "/hub-directions/g/articles/fhs-briefing.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/mandatory-solar-panels-in-new-homes-what-housebuilders-need-to-know",
+      "destination": "/hub-directions/g/articles/mandatory-solar-panels-in-new-homes.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/best-roof-types-for-solar-panels-a-guide-for-housebuilders",
+      "destination": "/hub-directions/g/articles/best-roof-types-for-solar.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/what-is-gryd-how-were-changing-the-way-homes-are-powered",
+      "destination": "/hub-directions/g/articles/what-is-gryd.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/do-you-need-a-solar-battery-benefits-for-new-build-homes",
+      "destination": "/hub-directions/g/articles/do-you-need-a-solar-battery.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/how-onsite-battery-storage-can-solve-grid-constraints-and-improve-project-viability",
+      "destination": "/hub-directions/g/articles/battery-storage-and-grid-constraints.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/solar-providers-compared-gryd-vs-zero-bills-vs-snrg",
+      "destination": "/hub-directions/g/articles/solar-providers-compared.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/a-simple-guide-to-solar-leases-how-they-work-and-why-theyre-growing",
+      "destination": "/hub-directions/g/articles/a-simple-guide-to-solar-leases.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/future-homes-standard-how-to-calculate-how-much-solar-you-need",
+      "destination": "/hub-directions/g/articles/how-much-solar-do-you-need.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/the-future-homes-standard-is-published-heres-the-confirmed-timeline-for-implementation",
+      "destination": "/hub-directions/g/articles/future-homes-standard-timeline.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/future-homes-standard-explained",
+      "destination": "/hub-directions/g/articles/future-homes-standard-solar-mandate.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/why-solar-matters-for-the-future-of-affordable-housing",
+      "destination": "/hub-directions/g/articles/solar-and-affordable-housing.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/breaking-the-green-premium-why-its-holding-back-affordable-competitive-homes",
+      "destination": "/hub-directions/g/articles/breaking-the-green-premium.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/rising-energy-demand-why-new-build-homes-need-bigger-solar-systems",
+      "destination": "/hub-directions/g/articles/rising-energy-demand-bigger-systems.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/integrating-solar-and-heat-pumps-in-new-builds-a-guide-for-housebuilders",
+      "destination": "/hub-directions/g/articles/integrating-solar-and-heat-pumps.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/how-solar-helps-housebuilders-meet-epc-targets",
+      "destination": "/hub-directions/g/articles/how-solar-helps-meet-epc-targets.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/solar-panel-maintenance-and-replacement-costs-what-builders-and-buyers-should-know",
+      "destination": "/hub-directions/g/articles/solar-maintenance-and-replacement-costs.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/the-future-homes-standard-how-to-differentiate-when-everyone-must-comply",
+      "destination": "/hub-directions/g/articles/future-homes-standard-differentiate.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/sap-scores-vs-real-energy-use-why-developers-are-missing-half-the-picture",
+      "destination": "/hub-directions/g/articles/sap-scores-versus-real-energy-use.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/funded-solar-storage-new-build-homes-guide",
+      "destination": "/hub-directions/g/articles/complete-guide-to-funded-solar.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/rooftop-solar-vs-solar-farms",
+      "destination": "/hub-directions/g/articles/why-solar-farms-keep-getting-rejected.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/gryds-council-housing-solar-rankings-2026-which-regions-are-leading-and-which-are-falling-behind",
+      "destination": "/hub-directions/g/articles/council-housing-solar-index-2026.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/independent-developer-analysis-of-gryd-on-a-55-home-site",
+      "destination": "/hub-directions/g/projects/fifty-five-plot-analysis.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/funded-solar-and-battery-for-three-new-build-homes-in-st-ives-cornwall-a-year-with-a-gryd-solar-subscription",
+      "destination": "/hub-directions/g/projects/st-ives-year-of-data.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/how-gryd-helped-deliver-higher-sustainability-without-adding-a-penny-to-the-build-cost",
+      "destination": "/hub-directions/g/projects/lower-farm-mews.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/fhs-briefing",
+      "destination": "/hub-directions/g/articles/fhs-briefing.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/mandatory-solar-panels-in-new-homes",
+      "destination": "/hub-directions/g/articles/mandatory-solar-panels-in-new-homes.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/best-roof-types-for-solar",
+      "destination": "/hub-directions/g/articles/best-roof-types-for-solar.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/what-is-gryd",
+      "destination": "/hub-directions/g/articles/what-is-gryd.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/do-you-need-a-solar-battery",
+      "destination": "/hub-directions/g/articles/do-you-need-a-solar-battery.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/battery-storage-and-grid-constraints",
+      "destination": "/hub-directions/g/articles/battery-storage-and-grid-constraints.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/solar-providers-compared",
+      "destination": "/hub-directions/g/articles/solar-providers-compared.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/a-simple-guide-to-solar-leases",
+      "destination": "/hub-directions/g/articles/a-simple-guide-to-solar-leases.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/how-much-solar-do-you-need",
+      "destination": "/hub-directions/g/articles/how-much-solar-do-you-need.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/future-homes-standard-timeline",
+      "destination": "/hub-directions/g/articles/future-homes-standard-timeline.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/future-homes-standard-solar-mandate",
+      "destination": "/hub-directions/g/articles/future-homes-standard-solar-mandate.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/solar-and-affordable-housing",
+      "destination": "/hub-directions/g/articles/solar-and-affordable-housing.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/breaking-the-green-premium",
+      "destination": "/hub-directions/g/articles/breaking-the-green-premium.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/rising-energy-demand-bigger-systems",
+      "destination": "/hub-directions/g/articles/rising-energy-demand-bigger-systems.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/integrating-solar-and-heat-pumps",
+      "destination": "/hub-directions/g/articles/integrating-solar-and-heat-pumps.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/how-solar-helps-meet-epc-targets",
+      "destination": "/hub-directions/g/articles/how-solar-helps-meet-epc-targets.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/solar-maintenance-and-replacement-costs",
+      "destination": "/hub-directions/g/articles/solar-maintenance-and-replacement-costs.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/future-homes-standard-differentiate",
+      "destination": "/hub-directions/g/articles/future-homes-standard-differentiate.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/sap-scores-versus-real-energy-use",
+      "destination": "/hub-directions/g/articles/sap-scores-versus-real-energy-use.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/complete-guide-to-funded-solar",
+      "destination": "/hub-directions/g/articles/complete-guide-to-funded-solar.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/why-solar-farms-keep-getting-rejected",
+      "destination": "/hub-directions/g/articles/why-solar-farms-keep-getting-rejected.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge/council-housing-solar-index-2026",
+      "destination": "/hub-directions/g/articles/council-housing-solar-index-2026.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/projects/fifty-five-plot-analysis",
+      "destination": "/hub-directions/g/projects/fifty-five-plot-analysis.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/projects/st-ives-year-of-data",
+      "destination": "/hub-directions/g/projects/st-ives-year-of-data.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/projects/lower-farm-mews",
+      "destination": "/hub-directions/g/projects/lower-farm-mews.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/get-started",
+      "destination": "/hub-directions/g/request-site-assessment.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/hub-directions/g/article.html",
+      "destination": "/hub-directions/g/articles/why-solar-farms-keep-getting-rejected.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/hub-directions/g/case-study.html",
+      "destination": "/hub-directions/g/projects/lower-farm-mews.html",
+      "statusCode": 301
+    },
+    {
+      "source": "/hub-directions/g/battery-tool.html",
+      "destination": "/hub-directions/g/tools.html",
+      "statusCode": 301
     }
   ],
   "rewrites": [],
@@ -17,7 +317,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
         }
       ]
     },
