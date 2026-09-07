@@ -450,11 +450,15 @@
 
   function revealCheck() {
     var host = el("[data-check]");
-    var startRow = el("[data-start-row]");
-    if (startRow) { startRow.hidden = true; }
+    var rows = d.querySelectorAll("[data-start-row]");
+    var i;
+    for (i = 0; i < rows.length; i += 1) { rows[i].hidden = true; }
     host.hidden = false;
     w.setTimeout(function () {
       host.scrollIntoView({ behavior: "smooth", block: "start" });
+      var tile = host.querySelector(".f-tile");
+      // preventScroll so the focus ring never fights the smooth scroll above
+      if (tile && tile.focus) { tile.focus({ preventScroll: true }); }
     }, 20);
   }
 

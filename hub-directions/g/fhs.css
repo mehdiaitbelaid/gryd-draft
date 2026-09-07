@@ -145,6 +145,8 @@
 
 .fhs-start { margin-top: 40px; }
 .fhs-start[hidden] { display: none; }
+/* the masthead copy of the button carries the masthead's own gap */
+.fhs-mast .fhs-start { margin-top: var(--btn-gap-top); }
 
 /* =============================================================== the check */
 /* Mehdi, 4 September: the run is the page. .fm stays as the shell's class so
@@ -661,6 +663,7 @@
 @media (max-width: 760px) {
   /* the shared sheet steps the table down at 720; the site's floor is 15px */
   .fhs-result .ar-table { font-size: 15px; }
+  .fhs-mast .fhs-start .btn { display: block; width: 100%; }
   .fhs-facts { grid-template-columns: 1fr; gap: 0; }
   .fhs-facts li { margin-top: 12px; }
   .fhs-result .ar-stat { padding: 16px 16px 14px; }
