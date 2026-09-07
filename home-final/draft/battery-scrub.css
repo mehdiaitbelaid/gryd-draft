@@ -25,7 +25,7 @@
    areas keep that true without a spacer element. */
 .d-batt .band-grid {
   display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  grid-template-areas: "intro ." "card steps";
+  grid-template-areas: "intro intro" "card steps";
   column-gap: 60px; row-gap: 30px; align-items: start;
 }
 .d-batt .band-intro { grid-area: intro; }
@@ -34,11 +34,12 @@
 
 /* The copy ---------------------------------------------------------------- */
 .d-batt .band-intro h2 {
-  font-size: clamp(26px, 2.5vw, 35px);
+  /* on h2.sec-head's shared ramp, so every section heading matches at any width */
+  font-size: clamp(30px, 3.6vw, 50px);
   color: var(--red110);
-  /* Mehdi, 4 September: 17ch broke the sentence over four lines at 1440. The
-     measure is widened until it sets in three inside the same left column. */
-  max-width: 22ch;
+  /* the written breaks shape the heading now, so the measure only has to be
+     wide enough not to fight them */
+  max-width: 30ch;
   margin-top: var(--label-gap);
 }
 /* the label here matches every other section label rather than being set in
@@ -133,10 +134,17 @@
   .d-batt .visual .rest { display: block; }
 }
 
+/* Written to three lines. On a phone the third is too long for the measure, so
+   a fourth break opens and it reads "from good" / "to game changing." */
+.d-batt .band-intro h2 br.lb-m { display: none; }
+@media (max-width: 460px) {
+  .d-batt .band-intro h2 br.lb-m { display: inline; }
+}
+
 /* A phone ------------------------------------------------------------------ */
-/* One column and no clip. A looping video on a small screen costs the reader a
-   download for a picture the width cannot carry, so the band collapses to the
-   copy and the evening still. */
+/* One column, and the clip stays. It is a five second loop played on
+   intersection rather than scrubbed, so there is nothing in it a phone cannot
+   do. Only reduced motion falls back to the evening still. */
 @media (max-width: 900px) {
   .d-batt .band-grid {
     grid-template-columns: 1fr;
@@ -144,7 +152,4 @@
     column-gap: 0; row-gap: 32px;
   }
   .d-batt .rung { opacity: 1; }
-  .d-batt .visual .clip { display: none; }
-  .d-batt .visual .poster { display: none; }
-  .d-batt .visual .rest { display: block; }
 }

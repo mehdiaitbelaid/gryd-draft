@@ -3,11 +3,10 @@
   var track = document.querySelector("[data-batt]");
   if (!track) return;
 
-  var small = window.matchMedia("(max-width: 900px)").matches;
   var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  /* Both rest states are drawn by the sheet, and neither wants the clip. No
-     source is attached in either, so nothing is ever fetched for them. */
-  if (small || calm) return;
+  /* The reduced motion rest state is drawn by the sheet and does not want the
+     clip, so no source is attached and nothing is ever fetched for it. */
+  if (calm) return;
 
   var steps = track.querySelectorAll(".step");
   var STEPS = steps.length || 1;

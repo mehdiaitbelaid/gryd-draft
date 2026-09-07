@@ -125,6 +125,7 @@
    for the whole film. Kept rather than folded flat because it is the one seam
    a future night cut would need, and folding it costs the same edit back. */
 .sys-plate img,
+.sys-clip,
 .sys-film {
   width: 100%; height: 100%; object-fit: contain; display: block;
   --edge-x: calc(7% + 11% * var(--sys-dark, 0));
@@ -393,4 +394,19 @@
   .sys-pin.is-idle .sys-frame,
   .sys-pin.is-idle .sys-ticks button.on { animation: none; }
   .sys-pin.is-idle .sys-frame { will-change: auto; }
+}
+
+
+/* Mobile step clips. The pinned film cannot be scrubbed on a phone, so each
+   step instead plays the slice of that same film which builds into it, cut at
+   the boundaries the desktop version uses in data-windows. Each clip is a
+   palindrome, forward then back, so looping it never makes a hard cut. */
+.sys-clip { display: none; position: absolute; inset: 0; }
+@media (max-width: 900px) {
+  .sys-clip { display: block; opacity: 0; transition: opacity .4s linear; }
+  .sys-frame.clip-on .sys-clip { opacity: 1; }
+}
+/* Reduced motion keeps the stills, and must come last to win over the above. */
+@media (prefers-reduced-motion: reduce) {
+  .sys-clip { display: none; }
 }

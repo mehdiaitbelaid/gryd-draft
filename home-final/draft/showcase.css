@@ -2,7 +2,7 @@
 /* the page's one section rhythm, not a band of its own */
 .sec.a-trust.showcase-band { padding: var(--sec-pad) 0; }
 .showcase-band h2.sec-head {
-  font-size: clamp(38px, 3.4vw, 46px); max-width: 22ch; margin-top: var(--label-gap);
+  font-size: clamp(30px, 3.6vw, 50px); max-width: 22ch; margin-top: var(--label-gap);
 }
 .showcase-band .lede {
   font-size: 20px; line-height: 1.68; color: var(--ink-soft); max-width: 37ch;

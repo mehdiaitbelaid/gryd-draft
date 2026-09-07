@@ -53,4 +53,9 @@ footer.foot .wrap { display: block; }
 @media (max-width: 600px) {
   .foot .f-grid { grid-template-columns: 1fr; }
   .foot .f-plate { padding: 36px 26px 26px; }
+  /* Three links no longer fit on one line here. Without this the nowrap span
+     keeps its full width and, being right aligned, spills out past the plate's
+     left padding. */
+  .foot .f-policy { flex-wrap: wrap; white-space: normal;
+    justify-content: flex-end; }
 }

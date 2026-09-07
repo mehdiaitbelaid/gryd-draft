@@ -1,0 +1,139 @@
+/* Cookie consent banner and preferences manager. Paired with cookie-consent.js,
+   which injects this sheet from its own src, so the two files travel together. */
+.cc-bar,
+.cc-modal {
+  --cc-paper: var(--paper, #F8F6F2);
+  --cc-ink: var(--red110, #4E251B);
+  --cc-grey: var(--warm-grey, #8A776E);
+  --cc-line: var(--stone-mid, #D8CFC5);
+  --cc-chip: var(--stonelight, #EFEAE3);
+  --cc-flare: var(--flare, #FF5532);
+  --cc-flare-press: #E8431F;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  color: var(--cc-ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.cc-bar[hidden],
+.cc-modal[hidden] { display: none; }
+.cc-bar {
+  position: fixed;
+  z-index: 300;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  margin: 0 auto;
+  width: min(760px, calc(100vw - 32px));
+  background: var(--cc-paper);
+  border: 1px solid var(--cc-line);
+  border-radius: var(--radius-panel, 28px);
+  box-shadow: 0 24px 60px rgba(40, 18, 12, .22);
+  padding: 22px 26px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 24px;
+  animation: cc-rise .24s cubic-bezier(.2,.7,.3,1) both;
+}
+.cc-say { flex: 1 1 320px; margin: 0; }
+.cc-say a { color: var(--cc-ink); text-decoration: underline; text-underline-offset: 2px; }
+.cc-acts { display: flex; flex-wrap: wrap; gap: 10px; }
+.cc-btn {
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-chip, 10px);
+  padding: 11px 20px;
+  border: 1px solid var(--cc-line);
+  background: transparent;
+  color: var(--cc-ink);
+  transition: background .16s ease, border-color .16s ease;
+}
+.cc-btn:hover { background: var(--cc-chip); }
+.cc-btn.cc-key {
+  background: var(--cc-flare);
+  border-color: var(--cc-flare);
+  color: #fff;
+}
+.cc-btn.cc-key:hover { background: var(--cc-flare-press); border-color: var(--cc-flare-press); }
+.cc-btn.cc-quiet { border-color: transparent; text-decoration: underline; text-underline-offset: 3px; padding-left: 8px; padding-right: 8px; }
+.cc-btn:focus-visible { outline: 2px solid var(--cc-flare); outline-offset: 2px; }
+/* Preferences manager */
+.cc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 310;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.cc-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(40, 18, 12, .46);
+  animation: cc-fade .18s ease both;
+}
+.cc-panel {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(680px, calc(100vh - 48px));
+  overflow: auto;
+  background: var(--cc-paper);
+  border-radius: var(--radius-panel, 28px);
+  box-shadow: 0 24px 60px rgba(40, 18, 12, .22);
+  padding: 30px 34px 26px;
+  animation: cc-rise .22s cubic-bezier(.2,.7,.3,1) both;
+}
+.cc-panel h2 { font-family: var(--font-display, inherit); font-size: 26px; line-height: 1.2; margin: 0 0 10px; font-weight: 500; }
+.cc-lede { margin: 0 0 22px; color: var(--cc-grey); }
+.cc-cat { border-top: 1px solid var(--cc-line); padding: 18px 0; display: flex; gap: 16px; align-items: flex-start; }
+.cc-cat h3 { margin: 0 0 4px; font-size: 16px; font-weight: 500; }
+.cc-cat p { margin: 0; color: var(--cc-grey); font-size: 14px; }
+.cc-cat-text { flex: 1 1 auto; }
+/* Switch */
+.cc-sw { flex: 0 0 auto; position: relative; width: 46px; height: 26px; }
+.cc-sw input { position: absolute; inset: 0; margin: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.cc-sw span {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--cc-line);
+  transition: background .16s ease;
+  pointer-events: none;
+}
+.cc-sw span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .16s ease;
+}
+.cc-sw input:checked + span { background: var(--cc-flare); }
+.cc-sw input:checked + span::after { transform: translateX(20px); }
+.cc-sw input:disabled { cursor: default; }
+.cc-sw input:disabled + span { background: var(--cc-flare); opacity: .4; }
+.cc-sw input:focus-visible + span { outline: 2px solid var(--cc-flare); outline-offset: 2px; }
+.cc-foot { border-top: 1px solid var(--cc-line); padding-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+.cc-foot .cc-btn { flex: 0 0 auto; }
+.cc-spacer { flex: 1 1 auto; }
+@media (max-width: 560px) {
+  .cc-bar { padding: 20px; gap: 14px; }
+  .cc-acts { width: 100%; }
+  .cc-acts .cc-btn { flex: 1 1 auto; }
+  .cc-panel { padding: 26px 22px 22px; }
+  .cc-foot .cc-btn { flex: 1 1 auto; }
+}
+@keyframes cc-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes cc-rise {
+  from { opacity: 0; transform: translateY(12px) }
+  to { opacity: 1; transform: none }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-bar, .cc-scrim, .cc-panel { animation: none; }
+  .cc-sw span, .cc-sw span::after, .cc-btn { transition: none; }
+}
