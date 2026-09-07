@@ -112,6 +112,9 @@
 .f-text:focus-visible,
 .f-area:focus-visible { outline: 0; }
 /* the browser's own date and number furniture is the one boxed thing left */
+/* the total is added up from the counts, so it is shown rather than asked for */
+.f-text[readonly] { color: var(--red110); cursor: default; }
+.f-text[readonly]:focus { border-bottom-color: var(--stone-mid); }
 .f-text::-webkit-calendar-picker-indicator { opacity: .5; }
 .f-text::-webkit-inner-spin-button,
 .f-text::-webkit-outer-spin-button { appearance: none; margin: 0; }
@@ -198,6 +201,14 @@
   border-radius: 0;
   padding: 4px 0 6px;
   appearance: none;
+}
+/* Scott, 5 September: the count under every size holds its place and is armed
+   only once that size is on the scheme, so the row never jumps. */
+.f-count[disabled] {
+  color: var(--warm-grey);
+  opacity: .4;
+  cursor: default;
+  -webkit-text-fill-color: var(--warm-grey);
 }
 .f-count::placeholder { color: var(--warm-grey); opacity: .7; }
 .f-count:focus { outline: 0; border-bottom-color: var(--flare); }
@@ -694,6 +705,7 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   text-align: left;
 }
 .sa-q .q-gate .f-lab { text-align: left; }
+.sa-q .q-field > .f-lab { margin-bottom: 14px; }
 .sa-q .f-tiles { max-width: 620px; margin: 0 auto; gap: 20px; align-items: stretch; }
 /* the clay models are not all the same height, so the count field is pushed to
    the foot of its cell and the five rules sit on one line. The FHS run asks the
@@ -703,15 +715,39 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
 .sa-q .f-tally { margin-top: 16px; }
 .sa-q .f-consent { margin-left: auto; margin-right: auto; text-align: center; }
 
+/* Scott, 5 September: Back is the outline button of the pair and stands on the
+   left, Continue is the orange one and stands on the right. */
 .sa-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 22px;
   padding-top: 30px;
+  max-width: 560px;
+  margin: 0 auto;
 }
-.sa-nav .e-back { order: 1; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; }
-.sa-nav .f-submit { order: 2; }
+.sa-nav .e-back { order: 1; }
+.sa-nav .f-submit { order: 2; margin-left: auto; }
+.sa-nav:not(:has(.e-back)) { justify-content: center; max-width: none; }
+.sa-nav:not(:has(.e-back)) .f-submit { margin-left: 0; }
+.f-ghost {
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: normal;
+  text-transform: none;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--red110);
+  box-shadow: inset 0 0 0 1px var(--stone-mid);
+  padding: 14px 26px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.f-ghost:hover { background: var(--stonelight); color: var(--red110); }
+.f-ghost:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
 .sa-count {
   display: block;
   margin-top: 18px;
@@ -773,6 +809,3 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   .sa-prog i::after { transition: none; }
 }
 
-/* the hover switch keeps 12px off the summary's right edge on this page, which
-   is the shell's business: the renderer draws the same head in the popup */
-body.sa-tool .sa-result .ar-head { padding-right: 12px; }

@@ -48,39 +48,58 @@
 
 .sam-body { overflow: auto; flex: 1 1 auto; min-height: 0; padding-right: 4px; }
 .sam-pane[hidden] { display: none; }
-.sam-eyebrow {
-  display: block;
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--sam-grey);
-  margin-bottom: 6px;
+.sam-pane h2 {
+  font-size: 34px;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  margin: 0 0 6px;
+  font-weight: 500;
 }
-.sam-eyebrow::before {
-  content: "";
-  display: inline-block;
-  width: 14px;
-  height: 1.5px;
-  background: var(--sam-flare);
-  vertical-align: middle;
-  margin-right: 8px;
-}
-.sam-pane h2 { font-size: 20px; line-height: 1.2; margin: 0 0 6px; font-weight: 500; }
-.sam-stand { font-size: 13px; color: var(--sam-grey); margin: 0 0 18px; max-width: 60ch; }
+.sam-stand { font-size: 15px; line-height: 1.5; color: var(--sam-grey); margin: 6px 0 18px; max-width: 60ch; }
 
 /* the gate. The hairline field itself is the shared plate's; the column it
-   stands in is this popup's own. */
-.sam-field { margin: 0 0 16px; max-width: 340px; }
+   stands in is this popup's own. It sits on the question rows' own rhythm:
+   the same label, the same 22px answer, the same padding down the column. */
+.sam-field { margin: 0; padding: 12px 0 10px; max-width: 440px; }
+.sam-field label {
+  font-size: 12px;
+  letter-spacing: .16em;
+  font-weight: 500;
+  color: var(--sam-grey);
+  margin-bottom: 4px;
+}
+.sam-field input {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: 22px;
+  line-height: 1.55;
+  padding: 4px 0 8px;
+}
 .sam-gate { font-size: 12px; color: var(--sam-flare); margin: 0; }
 
 /* ------------------------------------------------------------------ the nav */
 
-.sam-nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; flex: none; }
-.sam-go { order: 2; }
-.sam-back { font: inherit; font-size: 13px; background: transparent; border: 0; color: var(--sam-grey); cursor: pointer; padding: 0; order: 1; }
-.sam-back:hover { color: var(--sam-ink); }
+.sam-nav { display: flex; align-items: center; gap: 18px; padding-top: 20px; flex: none; }
+.sam-go { order: 2; margin-left: auto; }
+.sam-back {
+  order: 1;
+  font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sam-ink);
+  box-shadow: inset 0 0 0 1px var(--sam-line);
+  padding: 14px 26px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sam-back:hover { background: var(--sam-plate); }
 .sam-back[hidden] { display: none; }
 .sam-back:focus-visible { outline: 2px solid var(--sam-flare); outline-offset: 3px; }
-.sam-count { margin-left: auto; order: 3; font-size: 11px; letter-spacing: .08em; color: var(--sam-grey); }
 .sam-consent { margin: 8px 0 0; font-size: 11px; color: var(--sam-grey); max-width: 62ch; }
 .sam-consent[hidden] { display: none; }

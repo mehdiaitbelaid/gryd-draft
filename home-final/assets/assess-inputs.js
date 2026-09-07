@@ -52,7 +52,7 @@
       + ' decoding="async"><span class="ai-tile-name">' + esc(b[0]) + "</span></button>"
       + '<input class="ai-count" type="number" min="1" step="1" inputmode="numeric"'
       + ' data-count="' + esc(b[0]) + '" aria-label="' + esc(b[0]) + ' plots"'
-      + ' placeholder="0" hidden></div>';
+      + ' placeholder="0" disabled></div>';
   }
 
   function row(label, inner) {
@@ -63,7 +63,6 @@
   function markup() {
     var beds = BEDS.map(bedTile).join("");
     return '<section class="ai-screen" data-screen="0" hidden>'
-      + '<span class="ai-eyebrow">Your scheme</span>'
       + "<h2>Where the site is and how big</h2>"
       + '<div class="ai-rows">'
       + row("Site postcode",
@@ -72,16 +71,17 @@
             + '<p class="ai-hint">The postcode is enough to place it.</p>'
             + '<span class="ai-note" data-postcode-note hidden>'
             + "That is not a UK postcode yet.</span>")
-      + row("Bedrooms",
+      + row("Number of plots",
             '<div class="ai-tiles" data-tiles="bedrooms" role="group" aria-label="Bedrooms">'
             + beds + "</div>"
             + '<p class="ai-hint">Pick every size on the scheme, then say how many'
             + " of each.</p>"
             + '<p class="ai-tally" data-tally hidden></p>')
-      + row("Number of plots",
+      + row("Total plots",
             '<input class="ai-text" type="number" id="aiHomes" data-key="homes"'
-            + ' aria-label="Number of plots" placeholder="42" min="1" step="1"'
-            + ' inputmode="numeric">')
+            + ' aria-label="Total plots" placeholder="0" min="1" step="1"'
+            + ' inputmode="numeric" readonly>'
+            + '<p class="ai-hint">Added up from the sizes above.</p>')
       + "</div></section>";
   }
 
@@ -159,25 +159,38 @@
 
     function hasCounts() { return countTotal(v.counts) > 0; }
 
-    function tally() {
-      var line = container.querySelector("[data-tally]");
-      var total = countTotal(v.counts);
-      line.hidden = !total;
-      if (!total) { return; }
-      var target = v.homes || total;
-      line.textContent = total + " of " + target + " plots counted";
-      line.classList.toggle("is-off", total !== target);
+    /* Every size on the scheme carries its own count, so the line under the
+       tiles says which ones are still waiting rather than counting towards a
+       total the reader could once type. */
+    function uncounted() {
+      return v.beds.filter(function (b) { return !(v.counts[b] > 0); });
     }
 
+    function tally() {
+      var line = container.querySelector("[data-tally]");
+      var waiting = uncounted();
+      line.hidden = !v.beds.length;
+      if (!v.beds.length) { return; }
+      if (waiting.length) {
+        line.textContent = "How many plots of "
+          + waiting.join(", ") + "? A whole number, one or more.";
+      } else {
+        line.textContent = countTotal(v.counts) + " plots counted";
+      }
+      line.classList.toggle("is-off", waiting.length > 0);
+    }
+
+    /* The total is the sum and nothing else: it is read only on screen and
+       written from here on every change. */
     function fillHomes() {
       var total = countTotal(v.counts);
-      if (!total) { return; }
-      v.homes = total;
-      container.querySelector("#aiHomes").value = String(total);
+      v.homes = total || null;
+      container.querySelector("#aiHomes").value = total ? String(total) : "";
     }
 
     function canAdvance() {
-      return POSTCODE.test(v.postcode) && v.beds.length > 0 && !!(v.homes && v.homes > 0);
+      return POSTCODE.test(v.postcode) && v.beds.length > 0
+        && uncounted().length === 0 && !!(v.homes && v.homes > 0);
     }
 
     function values() {
@@ -215,12 +228,12 @@
       var name = t.getAttribute("data-value");
       var field = t.parentNode.querySelector(".ai-count");
       if (on) {
-        field.hidden = true;
+        field.disabled = true;
         field.value = "";
         delete v.counts[name];
         if (lastCount === name) { lastCount = null; }
       } else {
-        field.hidden = false;
+        field.disabled = false;
       }
       fillHomes();
       tally();
@@ -239,18 +252,6 @@
       }
       var key = ev.target.getAttribute("data-key");
       if (!key) { return; }
-      if (key === "homes") {
-        v.homes = parseInt(ev.target.value, 10) || null;
-        /* plots typed over the counts: the count touched last gives way so the
-           two agree, and it never falls under one plot */
-        if (v.homes && lastCount && hasCounts()) {
-          var want = v.homes - (countTotal(v.counts) - v.counts[lastCount]);
-          v.counts[lastCount] = Math.max(1, want);
-          var f = container.querySelector('[data-count="' + lastCount + '"]');
-          if (f) { f.value = String(v.counts[lastCount]); }
-        }
-        tally();
-      }
       if (key === "postcode") {
         v.postcode = ev.target.value;
         var note = container.querySelector("[data-postcode-note]");
@@ -283,7 +284,7 @@
         lastCount = null;
         [].slice.call(container.querySelectorAll(".ai-count")).forEach(function (f) {
           f.value = "";
-          f.hidden = true;
+          f.disabled = true;
         });
         container.querySelector("[data-tally]").hidden = true;
         [].slice.call(container.querySelectorAll(".ai-tile")).forEach(function (b) {

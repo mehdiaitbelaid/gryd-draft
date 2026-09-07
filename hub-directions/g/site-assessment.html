@@ -75,22 +75,23 @@
       <h2 class="sa-sec-head">What sizes are on the scheme?</h2>
       <p class="f-hint q-sub">Pick every size on the scheme, then say how many of each.</p>
       <div class="q-field">
-        <div class="f-tiles" data-tile-group="bedrooms" role="group" aria-label="Bedrooms"><div class="f-tile-cell" style="--i:0"><button type="button" class="f-tile" aria-pressed="false" data-value="1 bed"><img src="../../home-final/assets/img/site-assess/beds-1.png" alt="" width="300" height="300" decoding="async"><span class="t-name">1 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="1 bed" aria-label="1 bed plots" placeholder="0" hidden></div><div class="f-tile-cell" style="--i:1"><button type="button" class="f-tile" aria-pressed="false" data-value="2 bed"><img src="../../home-final/assets/img/site-assess/beds-2.png" alt="" width="300" height="300" decoding="async"><span class="t-name">2 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="2 bed" aria-label="2 bed plots" placeholder="0" hidden></div><div class="f-tile-cell" style="--i:2"><button type="button" class="f-tile" aria-pressed="false" data-value="3 bed"><img src="../../home-final/assets/img/site-assess/beds-3.png" alt="" width="300" height="300" decoding="async"><span class="t-name">3 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="3 bed" aria-label="3 bed plots" placeholder="0" hidden></div><div class="f-tile-cell" style="--i:3"><button type="button" class="f-tile" aria-pressed="false" data-value="4 bed"><img src="../../home-final/assets/img/site-assess/beds-4.png" alt="" width="300" height="300" decoding="async"><span class="t-name">4 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="4 bed" aria-label="4 bed plots" placeholder="0" hidden></div><div class="f-tile-cell" style="--i:4"><button type="button" class="f-tile" aria-pressed="false" data-value="5 bed"><img src="../../home-final/assets/img/site-assess/beds-5.png" alt="" width="300" height="300" decoding="async"><span class="t-name">5 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="5 bed" aria-label="5 bed plots" placeholder="0" hidden></div></div>
+        <span class="f-lab">Number of plots</span>
+        <div class="f-tiles" data-tile-group="bedrooms" role="group" aria-label="Bedrooms"><div class="f-tile-cell" style="--i:0"><button type="button" class="f-tile" aria-pressed="false" data-value="1 bed"><img src="../../home-final/assets/img/site-assess/beds-1.png" alt="" width="300" height="300" decoding="async"><span class="t-name">1 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="1 bed" aria-label="1 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:1"><button type="button" class="f-tile" aria-pressed="false" data-value="2 bed"><img src="../../home-final/assets/img/site-assess/beds-2.png" alt="" width="300" height="300" decoding="async"><span class="t-name">2 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="2 bed" aria-label="2 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:2"><button type="button" class="f-tile" aria-pressed="false" data-value="3 bed"><img src="../../home-final/assets/img/site-assess/beds-3.png" alt="" width="300" height="300" decoding="async"><span class="t-name">3 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="3 bed" aria-label="3 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:3"><button type="button" class="f-tile" aria-pressed="false" data-value="4 bed"><img src="../../home-final/assets/img/site-assess/beds-4.png" alt="" width="300" height="300" decoding="async"><span class="t-name">4 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="4 bed" aria-label="4 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:4"><button type="button" class="f-tile" aria-pressed="false" data-value="5 bed"><img src="../../home-final/assets/img/site-assess/beds-5.png" alt="" width="300" height="300" decoding="async"><span class="t-name">5 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="5 bed" aria-label="5 bed plots" placeholder="0" disabled></div></div>
         <p class="f-tally" data-tally hidden></p>
       </div>
-      <div class="sa-nav"><button class="e-back" type="button" data-back>Back a step</button><button class="f-submit" type="button" data-next>Continue</button></div>
+      <div class="sa-nav"><button class="e-back f-ghost" type="button" data-back>Back a step</button><button class="f-submit" type="button" data-next>Continue</button></div>
       <span class="sa-count">Step 02 of 03</span>
     </section>
 
     <section class="sa-q e-stage" data-stage="2" data-qn="2" hidden>
       <span class="eyebrow">Scheme size</span>
       <h2 class="sa-sec-head">How many plots in total?</h2>
-      <p class="f-hint q-sub">The counts add up to this. Change it here and the last size you counted gives way.</p>
+      <p class="f-hint q-sub">Added up from the sizes you counted.</p>
       <div class="q-field q-one">
-        <label class="f-lab" for="saPlots">Number of plots</label>
-        <input class="f-text f-big" id="saPlots" type="number" data-key="plots" name="plots" placeholder="42" min="1" step="1" inputmode="numeric">
+        <label class="f-lab" for="saPlots">Total plots</label>
+        <input class="f-text f-big" id="saPlots" type="number" data-key="plots" name="plots" placeholder="0" min="1" step="1" inputmode="numeric" readonly>
       </div>
-      <div class="sa-nav"><button class="e-back" type="button" data-back>Back a step</button><button class="f-submit" type="button" data-next>Continue</button></div>
+      <div class="sa-nav"><button class="e-back f-ghost" type="button" data-back>Back a step</button><button class="f-submit" type="button" data-next>Continue</button></div>
       <span class="sa-count">Step 03 of 03</span>
     </section>
 
@@ -102,7 +103,7 @@
         <div class="q-in"><label class="f-lab" for="saName">Full name</label><input class="f-text" id="saName" type="text" data-key="name" name="name" placeholder="Jane Smith" autocomplete="name"></div>
         <div class="q-in"><label class="f-lab" for="saEmail">Work email</label><input class="f-text" id="saEmail" type="email" data-key="email" name="email" placeholder="jane@company.co.uk" autocomplete="email"></div>
       </div>
-      <div class="sa-nav"><button class="e-back" type="button" data-back>Back a step</button><button class="f-submit" type="button" id="saSubmit">See my assessment</button></div>
+      <div class="sa-nav"><button class="e-back f-ghost" type="button" data-back>Back a step</button><button class="f-submit" type="button" id="saSubmit">See my assessment</button></div>
       <p class="f-consent">By submitting you agree to be contacted about your scheme. We&rsquo;ll never share your details. Read our privacy policy.</p>
     </section>
   </div>

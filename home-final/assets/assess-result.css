@@ -22,54 +22,6 @@
 }
 .ar-title { font-size: 24px; font-weight: 500; margin: 0; line-height: 1.1; }
 
-/* The lift and shade are a preference, so the reader keeps the switch next to
-   the thing it changes rather than in a settings panel nobody opens. */
-.ar-hoverswitch {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.ar-hoverlab {
-  font-size: 11px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--ar-muted);
-}
-.ar-hovertoggle {
-  appearance: none;
-  border: 0;
-  background: none;
-  padding: 0;
-  line-height: 0;
-  cursor: pointer;
-  border-radius: 999px;
-}
-.ar-hovertrack {
-  display: block;
-  width: 32px;
-  height: 18px;
-  border-radius: 999px;
-  background: var(--ar-line);
-  transition: background .2s ease;
-}
-.ar-hoverknob {
-  display: block;
-  width: 14px;
-  height: 14px;
-  margin: 2px;
-  border-radius: 50%;
-  background: var(--ar-paper);
-  box-shadow: 0 1px 2px rgba(78, 37, 27, .25);
-  transition: transform .2s cubic-bezier(.22,.61,.36,1);
-}
-.ar-hovertoggle[aria-checked="true"] .ar-hovertrack { background: var(--ar-flare); }
-.ar-hovertoggle[aria-checked="true"] .ar-hoverknob { transform: translateX(14px); }
-.ar-hovertoggle:hover + .ar-hoverlab, .ar-hoverswitch:hover .ar-hoverlab { color: var(--ar-ink); }
-.ar-hovertoggle:focus-visible { outline: 2px solid var(--ar-flare); outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) {
-  .ar-hovertrack, .ar-hoverknob { transition: none; }
-}
 .ar-sec { padding: 0; min-width: 0; margin-bottom: 14px; }
 .ar-sec h3 {
   font-size: 10px;
@@ -85,8 +37,20 @@
    line, the legend, a tick or the tooltip at any width. */
 .ar-chartcard { border-top: 1px solid var(--ar-line); padding-top: 12px; margin-bottom: 16px; }
 .ar-pins { margin-bottom: 14px; }
-.ar-plates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ar-plates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+/* Scott, 5 September: each benefit list belongs to the figure above it, so a
+   column is the plate and its own fold and the two columns run side by side. */
+.ar-col { min-width: 0; display: flex; flex-direction: column; }
+.ar-col .ar-fold { margin-top: 2px; }
 .ar-stat { background: var(--ar-plate); border-radius: 16px; padding: 12px 15px 13px; }
+.ar-stat-title {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  font-weight: 500;
+  color: var(--ar-muted);
+  margin-bottom: 6px;
+}
 .ar-stat p { font-size: 13px; line-height: 1.4; margin: 6px 0 0; max-width: 46ch; text-wrap: pretty; }
 .ar-pin { box-shadow: 0 6px 20px rgba(40, 18, 12, .07); }
 .ar-chart-sec { margin-bottom: 0; }
@@ -292,10 +256,10 @@
 }
 
 /* ------------------------------------------------------------------ the hover */
-/* The summary answers a question, so the rows it answers it with lift under a
-   pointer the way the project and quote cards on the homepage do: the same
-   0.34s curve, the same 2px of travel the tiles use, and the plate colour and
-   shadow already declared above. Nothing new is introduced. */
+/* Scott, 5 September: the assessment summary carries no hover effect and no
+   switch to turn one on. The lift is kept here for the FHS readiness check,
+   which was signed off with it and opts in by carrying .ar-hover on its root:
+   the same 0.34s curve, the same 2px of travel the tiles use. */
 .ar-list li,
 .ar-table tbody tr,
 .ar-stat {
@@ -303,20 +267,20 @@
               box-shadow .34s cubic-bezier(.22,.61,.36,1),
               background-color .34s cubic-bezier(.22,.61,.36,1);
 }
-.ar-root:not(.ar-nohover) .ar-list li:hover,
-.ar-root:not(.ar-nohover) .ar-table tbody tr:hover {
+.ar-hover .ar-list li:hover,
+.ar-hover .ar-table tbody tr:hover {
   transform: translateY(-2px);
   background-color: var(--ar-plate);
 }
-.ar-root:not(.ar-nohover) .ar-stat:hover {
+.ar-hover .ar-stat:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(40, 18, 12, .07);
 }
-/* Switched off, nothing moves or shades: the transition goes too, so a row
-   cannot be caught mid animation when the switch is thrown. */
-.ar-nohover .ar-list li,
-.ar-nohover .ar-table tbody tr,
-.ar-nohover .ar-stat { transition: none; }
+/* Without the opt in nothing moves or shades, and the transition goes with it
+   so a row can never be caught mid animation. */
+.ar-root:not(.ar-hover) .ar-list li,
+.ar-root:not(.ar-hover) .ar-table tbody tr,
+.ar-root:not(.ar-hover) .ar-stat { transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .ar-list li, .ar-table tbody tr, .ar-stat { transition: none; }
   .ar-list li:hover, .ar-table tbody tr:hover, .ar-stat:hover { transform: none; }

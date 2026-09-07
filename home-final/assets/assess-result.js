@@ -78,8 +78,6 @@
      the page column. */
   var PLOT_H = { popup: 260, page: 320 };
 
-  var HOVER_KEY = "gryd.resultHover";
-
   /* The axis follows the data. It stops at the first £500 above the tallest
      value on the run, and the ladder is piecewise: £500 rungs to £3,000, then
      £1,000 rungs above that. A tall run keeps the fine ladder over the range
@@ -173,6 +171,23 @@
       + '<div class="ar-tip" data-tip hidden></div></div></div>';
   }
 
+  /* One fold, drawn under the plate it belongs to. Scott, 5 September: the two
+     benefit lists read as detail on their figure rather than as two more
+     sections at the foot of the summary, so each one sits in the plate's own
+     column. */
+  function fold(key, title, items) {
+    return '<details class="ar-sec ar-fold" data-sec="' + key + '"><summary>'
+      + "<h3>" + esc(title) + '</h3><span class="ar-foldcue">'
+      + '<span class="ar-show">Show the detail</span>'
+      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
+      + ' aria-hidden="true" focusable="false">'
+      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
+      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+      + "</svg></span></summary>"
+      + '<div class="ar-foldbody"><div class="ar-foldinner">'
+      + '<ul class="ar-list">' + items + "</ul></div></div></details>";
+  }
+
   function summaryText(result, inputs) {
     var lines = detailRows(result, inputs).map(function (r) { return r[0] + ": " + r[1]; });
     lines.unshift("Gryd site assessment summary");
@@ -206,11 +221,7 @@
         + esc(r.hardware) + "</td></tr>";
     }).join("");
 
-    container.innerHTML = '<div class="ar-head"><h2 class="ar-title">Assessment Summary</h2>'
-      + '<span class="ar-hoverswitch"><span class="ar-hoverlab" aria-hidden="true">Hover effects</span>'
-      + '<button type="button" class="ar-hovertoggle" data-hover role="switch"'
-      + ' aria-checked="false" aria-label="Hover effects">'
-      + '<span class="ar-hovertrack"><span class="ar-hoverknob"></span></span></button></span></div>'
+    container.innerHTML = '<div class="ar-head"><h2 class="ar-title">Assessment Summary</h2></div>'
 
       + '<section class="ar-sec ar-project" data-sec="details"><h3>Project Details</h3>'
       + '<dl class="ar-details">' + details + "</dl></section>"
@@ -220,14 +231,21 @@
          legend, tick or tooltip can ever end up underneath them. */
       + '<div class="ar-chartcard">'
       + '<section class="ar-sec ar-pins" data-sec="results"><h3 class="ar-sr">Results</h3>'
-      + '<div class="ar-plates"><article class="ar-stat ar-pin">'
+      + '<div class="ar-plates">'
+      + '<div class="ar-col"><article class="ar-stat ar-pin">'
+      + '<span class="ar-stat-title">BUILD COST SAVING</span>'
       + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
       + '<p>As a Developer, working with Gryd, you could save ' + money(result.developerSaving)
       + " in build cost</p></article>"
-      + '<article class="ar-stat ar-pin"><span class="ar-fig" data-home>'
+      + fold("dev", "Developer additional benefits", dev) + "</div>"
+      + '<div class="ar-col"><article class="ar-stat ar-pin">'
+      + '<span class="ar-stat-title">AVERAGE RUNNING COST SAVING</span>'
+      + '<span class="ar-fig" data-home>'
       + money(result.homeownerLifetimeSaving) + "</span>"
       + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
-      + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article></div></section>"
+      + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article>"
+      + fold("home", "Homeowner additional benefits", home) + "</div>"
+      + "</div></section>"
       + '<section class="ar-sec ar-chart-sec" data-sec="chart">' + chartSvg(result.chart, plotH)
       + "</section></div>"
 
@@ -237,52 +255,11 @@
       + "<th>Lifetime Saving (%)</th><th>Hardware Supplied</th></tr></thead><tbody>"
       + rows + "</tbody></table></div></section>"
 
-      + '<details class="ar-sec ar-fold" data-sec="dev"><summary>'
-      + '<h3>Developer additional benefits</h3><span class="ar-foldcue">'
-      + '<span class="ar-show">Show the detail</span>'
-      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
-      + ' aria-hidden="true" focusable="false">'
-      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
-      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
-      + '</svg></span></summary>'
-      + '<div class="ar-foldbody"><div class="ar-foldinner">'
-      + '<ul class="ar-list">' + dev + '</ul></div></div></details>'
-
-      + '<details class="ar-sec ar-fold" data-sec="home"><summary>'
-      + '<h3>Homeowner additional benefits</h3><span class="ar-foldcue">'
-      + '<span class="ar-show">Show the detail</span>'
-      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
-      + ' aria-hidden="true" focusable="false">'
-      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
-      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
-      + '</svg></span></summary>'
-      + '<div class="ar-foldbody"><div class="ar-foldinner">'
-      + '<ul class="ar-list">' + home + '</ul></div></div></details>'
 
       + '<p class="ar-foot">' + esc(FOOTNOTE) + "</p>"
       + '<div class="ar-acts"><button type="button" class="btn ar-btn" data-restart>Start Over</button>'
       + '<button type="button" class="btn ghost ar-btn ar-btn-quiet" data-share>Share</button>'
       + '<span class="ar-said" data-said role="status"></span></div>';
-
-    /* Hover lift is off until someone turns it on, and the choice is per
-       browser. Private mode and a blocked store both throw on read and on
-       write, so every touch of localStorage is guarded and the page simply
-       falls back to the default. */
-    var hoverBtn = container.querySelector("[data-hover]");
-    function applyHover(on) {
-      container.classList.toggle("ar-nohover", !on);
-      /* role=switch, so aria-checked is the state, and the knob follows it in
-         CSS rather than being moved from here */
-      hoverBtn.setAttribute("aria-checked", on ? "true" : "false");
-    }
-    var hoverOn = false;
-    try { hoverOn = localStorage.getItem(HOVER_KEY) === "on"; } catch (e) { hoverOn = false; }
-    applyHover(hoverOn);
-    hoverBtn.addEventListener("click", function () {
-      hoverOn = !hoverOn;
-      applyHover(hoverOn);
-      try { localStorage.setItem(HOVER_KEY, hoverOn ? "on" : "off"); } catch (e) { /* not stored */ }
-    });
 
     /* The folds are the reader's own control, so the row reads as a control:
        the whole width is the hit area, the label says what pressing it does,

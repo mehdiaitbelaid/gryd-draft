@@ -107,7 +107,6 @@
       + "Site assessment</h2><div data-inputs></div></section>"
 
       + '<section class="sam-pane" data-pane="1" hidden>'
-      + '<span class="sam-eyebrow">Your details</span>'
       + "<h2>Where should the assessment go?</h2>"
       + '<p class="sam-stand">The full summary opens as soon as you tell us who you are.</p>'
       + field("name", "text", "Full name", "Jane Smith")
@@ -120,8 +119,7 @@
       + "<div data-result></div></section>"
       + "</div>"
       + '<div class="sam-nav"><button type="button" class="sam-back" data-back hidden>Back</button>'
-      + '<button type="button" class="sam-go" data-go>Continue</button>'
-      + '<span class="sam-count"></span></div>'
+      + '<button type="button" class="sam-go" data-go>Continue</button></div>'
       + '<p class="sam-consent" hidden>By submitting you agree to be contacted about your'
       + " scheme. We’ll never share your details.</p>"
       + "</div>";
@@ -129,7 +127,7 @@
 
   /* ------------------------------------------------------------------ state */
 
-  var root = null, box, panes, segs, go, back, count, consent, gate;
+  var root = null, box, panes, segs, go, back, consent, gate;
   var inputs = null, at = 0, opener = null, answers = null, lead = {};
   var PANE_INPUTS = 0, PANE_GATE = 1, PANE_RESULT = 2;
 
@@ -188,7 +186,6 @@
     go = root.querySelector("[data-go]");
     back = root.querySelector("[data-back]");
     gate = root.querySelector("[data-gate]");
-    count = root.querySelector(".sam-count");
     consent = root.querySelector(".sam-consent");
 
     inputs = window.GrydAssessInputs.mount(
@@ -276,11 +273,6 @@
     back.hidden = at === PANE_INPUTS && screen === 0;
     consent.hidden = at !== PANE_GATE;
     gate.hidden = at !== PANE_GATE || ready() || !lead.name && !lead.email;
-    /* The scheme is one screen now, so a step counter would count to one. It
-       only appears if the questions are ever split again. */
-    count.textContent = at === PANE_INPUTS
-      ? (inputs.total > 1 ? "Step 0" + (screen + 1) + " of 0" + inputs.total : "Your scheme")
-      : (at === PANE_GATE ? "Your details" : "Assessment summary");
     go.textContent = at === PANE_RESULT ? "Close"
       : (at === PANE_GATE ? "See my assessment" : "Continue");
     go.disabled = at === PANE_GATE ? !ready() : false;
