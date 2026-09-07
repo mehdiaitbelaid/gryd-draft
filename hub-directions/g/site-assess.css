@@ -643,7 +643,7 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin: 0 0 26px;
+  margin: 0 0 18px;
 }
 .sa-prog i {
   display: block;
@@ -676,7 +676,7 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
 .sa-q > .eyebrow { justify-content: center; }
 .sa-tool .sa-q .sa-sec-head {
   font-size: clamp(26px, 2.8vw, 34px);
-  max-width: 22ch;
+  max-width: 30ch;
   margin: var(--label-gap) auto 0;
 }
 .sa-q .q-sub {
@@ -684,9 +684,9 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   font-size: 15px;
   line-height: 1.55;
   color: var(--warm-grey);
-  max-width: 46ch;
+  max-width: 68ch;
 }
-.sa-q .q-field { margin-top: 28px; }
+.sa-q .q-field { margin-top: 18px; }
 .sa-q .q-one { max-width: 380px; margin-left: auto; margin-right: auto; }
 .sa-q .q-one .f-text { text-align: center; }
 .sa-q .f-big { font-size: 34px; }
@@ -712,7 +712,36 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
    same question with the same control, so it takes the same rule. */
 .sa-q .f-tile-cell, .fhs-q .f-tile-cell { display: flex; flex-direction: column; }
 .sa-q .f-tile-cell .f-count, .fhs-q .f-tile-cell .f-count { margin-top: auto; }
-.sa-q .f-tally { margin-top: 16px; }
+.sa-q .f-tally { margin-top: 12px; }
+/* Mehdi, 6 September: the postcode and the sizes share one panel, so the sizes
+   follow the postcode at a tighter interval than a panel of their own took. */
+.sa-q .q-sizes { margin-top: 8px; }
+/* the plot total, reported under the sizes rather than asked for */
+.sa-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px auto 0;
+  max-width: 620px;
+}
+.sa-total[hidden] { display: none; }
+.sa-total-lab {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--warm-grey);
+}
+.sa-total-n {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--red110);
+  font-variant-numeric: tabular-nums;
+}
 .sa-q .f-consent { margin-left: auto; margin-right: auto; text-align: center; }
 
 /* Scott, 5 September: Back is the outline button of the pair and stands on the
@@ -721,7 +750,7 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   display: flex;
   align-items: center;
   gap: 22px;
-  padding-top: 30px;
+  padding-top: 16px;
   max-width: 560px;
   margin: 0 auto;
 }
@@ -750,7 +779,7 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
 .f-ghost:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
 .sa-count {
   display: block;
-  margin-top: 18px;
+  margin-top: 6px;
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -809,3 +838,9 @@ body.sa-tool.has-result .sa { padding-top: 128px; }
   .sa-prog i::after { transition: none; }
 }
 
+
+/* Mehdi, 6 September: the scheme is one stage of two, so it carries more than
+   a single question and the masthead gives it the height from the first frame
+   rather than only once the reader has moved on. */
+.sa-tool .sa-mast { padding-bottom: 8px; }
+.sa-tool .sa-mast h1 { font-size: clamp(22px, 2vw, 27px); }

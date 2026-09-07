@@ -98,52 +98,33 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <p class="stand">With just a site plan and house type information we can show you exactly what Gryd could deliver for your project, including build cost and homeowner bill savings.</p>
 </header>
 
-  <!-- Mehdi, 4 September: the three questions and the gate now run one to a
-       screen in the FHS check's own composition, centred in the content column
-       under a three mark progress rail. The questions, the bedroom counts and
-       the engine wiring are unchanged; only the layout and the reveal are. -->
+  <!-- Mehdi, 6 September: the scheme is one stage, not three. The postcode and
+       the sizes are the same question, the plot total is reported under the
+       sizes rather than asked for, and the rail carries the two stages that are
+       left: the scheme, then the reply address. -->
   <div class="sa-stage" data-staged>
-    <div class="sa-prog" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="sa-prog" aria-hidden="true"><i></i><i></i></div>
 
     <section class="sa-q e-stage" data-stage="0" data-qn="0">
-      <span class="eyebrow">Location</span>
-      <h2 class="sa-sec-head">Where is the scheme?</h2>
-      <p class="f-hint q-sub">The postcode is enough to place it.</p>
+      <span class="eyebrow">Your scheme</span>
+      <h2 class="sa-sec-head">Where the site is and how big</h2>
+      <p class="f-hint q-sub">The postcode places it. Pick every size on the scheme, then say how many of each.</p>
       <div class="q-field q-one">
         <label class="f-lab" for="saPostcode">Site postcode</label>
         <input class="f-text" id="saPostcode" type="text" data-key="postcode" name="postcode" placeholder="NR20 5DF" autocomplete="postal-code">
       </div>
-      <div class="sa-nav"><button class="f-submit" type="button" data-next>Continue</button></div>
-      <span class="sa-count">Step 01 of 03</span>
-    </section>
-
-    <section class="sa-q e-stage" data-stage="1" data-qn="1" hidden>
-      <span class="eyebrow">House types</span>
-      <h2 class="sa-sec-head">What sizes are on the scheme?</h2>
-      <p class="f-hint q-sub">Pick every size on the scheme, then say how many of each.</p>
-      <div class="q-field">
+      <div class="q-field q-sizes">
         <span class="f-lab">Number of plots</span>
         <div class="f-tiles" data-tile-group="bedrooms" role="group" aria-label="Bedrooms"><div class="f-tile-cell" style="--i:0"><button type="button" class="f-tile" aria-pressed="false" data-value="1 bed"><img src="../../home-final/assets/img/site-assess/beds-1.png" alt="" width="300" height="300" decoding="async"><span class="t-name">1 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="1 bed" aria-label="1 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:1"><button type="button" class="f-tile" aria-pressed="false" data-value="2 bed"><img src="../../home-final/assets/img/site-assess/beds-2.png" alt="" width="300" height="300" decoding="async"><span class="t-name">2 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="2 bed" aria-label="2 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:2"><button type="button" class="f-tile" aria-pressed="false" data-value="3 bed"><img src="../../home-final/assets/img/site-assess/beds-3.png" alt="" width="300" height="300" decoding="async"><span class="t-name">3 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="3 bed" aria-label="3 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:3"><button type="button" class="f-tile" aria-pressed="false" data-value="4 bed"><img src="../../home-final/assets/img/site-assess/beds-4.png" alt="" width="300" height="300" decoding="async"><span class="t-name">4 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="4 bed" aria-label="4 bed plots" placeholder="0" disabled></div><div class="f-tile-cell" style="--i:4"><button type="button" class="f-tile" aria-pressed="false" data-value="5 bed"><img src="../../home-final/assets/img/site-assess/beds-5.png" alt="" width="300" height="300" decoding="async"><span class="t-name">5 bed</span></button><input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="5 bed" aria-label="5 bed plots" placeholder="0" disabled></div></div>
         <p class="f-tally" data-tally hidden></p>
+        <p class="sa-total" data-total hidden role="status"><span class="sa-total-lab">Total plots</span><span class="sa-total-n" data-total-n>0</span></p>
       </div>
-      <div class="sa-nav"><button class="e-back f-ghost" type="button" data-back>Back a step</button><button class="f-submit" type="button" data-next>Continue</button></div>
-      <span class="sa-count">Step 02 of 03</span>
+      <div class="sa-nav"><button class="f-submit" type="button" data-next>Continue</button></div>
+      <span class="sa-count">Step 01 of 02</span>
     </section>
 
-    <section class="sa-q e-stage" data-stage="2" data-qn="2" hidden>
-      <span class="eyebrow">Scheme size</span>
-      <h2 class="sa-sec-head">How many plots in total?</h2>
-      <p class="f-hint q-sub">Added up from the sizes you counted.</p>
-      <div class="q-field q-one">
-        <label class="f-lab" for="saPlots">Total plots</label>
-        <input class="f-text f-big" id="saPlots" type="number" data-key="plots" name="plots" placeholder="0" min="1" step="1" inputmode="numeric" readonly>
-      </div>
-      <div class="sa-nav"><button class="e-back f-ghost" type="button" data-back>Back a step</button><button class="f-submit" type="button" data-next>Continue</button></div>
-      <span class="sa-count">Step 03 of 03</span>
-    </section>
-
-    <section class="sa-q e-stage" data-stage="3" data-qn="3" hidden>
-      <span class="eyebrow">Almost there</span>
+    <section class="sa-q e-stage" data-stage="1" data-qn="1" hidden>
+      <span class="eyebrow">Your details</span>
       <h2 class="sa-sec-head">Where should the assessment go?</h2>
       <p class="f-hint q-sub">A name and a work email are all we need. The full assessment lands on this page.</p>
       <div class="q-field q-gate">

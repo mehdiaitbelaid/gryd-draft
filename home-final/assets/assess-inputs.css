@@ -159,6 +159,34 @@
 .ai-count:focus { outline: 0; border-bottom-color: var(--ai-flare); }
 .ai-count::-webkit-inner-spin-button,
 .ai-count::-webkit-outer-spin-button { appearance: none; margin: 0; }
+/* Mehdi, 6 September: the plot total is reported, not asked. A label and the
+   sum on one line under the sizes, on the site's own label and figure scale. */
+.ai-total {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--ai-line);
+}
+.ai-total[hidden] { display: none; }
+.ai-total-lab {
+  font-size: 12px;
+  letter-spacing: .16em;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--ai-grey);
+}
+.ai-total-n {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ai-ink);
+  font-variant-numeric: tabular-nums;
+}
+
 .ai-tally { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ai-grey); }
 .ai-tally[hidden] { display: none; }
 .ai-tally.is-off { color: var(--ai-flare); }

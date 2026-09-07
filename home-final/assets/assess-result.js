@@ -70,7 +70,10 @@
      retailer bill that is left, and over them the line the same home would have
      paid with no system at all. Everything is laid out in the viewBox, so the
      figure scales with its column and never needs a resize listener. */
-  var W = 760, PAD_L = 64, PAD_R = 12, PAD_T = 14, PAD_B = 38;
+  /* Mehdi, 6 September: the ticks and the axis names are set at the site's
+     label size rather than two steps under it, so the left gutter is widened
+     to keep the rotated axis name clear of the widest tick. */
+  var W = 760, PAD_L = 82, PAD_R = 12, PAD_T = 14, PAD_B = 40;
 
   /* The plot is a fixed number of pixels tall in each shell, so a wider column
      widens the chart and never makes it taller: the sections under it stay put.
@@ -171,21 +174,31 @@
       + '<div class="ar-tip" data-tip hidden></div></div></div>';
   }
 
-  /* One fold, drawn under the plate it belongs to. Scott, 5 September: the two
-     benefit lists read as detail on their figure rather than as two more
+  /* One benefit list, drawn under the plate it belongs to. Scott, 5 September:
+     the two lists read as detail on their figure rather than as two more
      sections at the foot of the summary, so each one sits in the plate's own
-     column. */
-  function fold(key, title, items) {
-    return '<details class="ar-sec ar-fold" data-sec="' + key + '"><summary>'
-      + "<h3>" + esc(title) + '</h3><span class="ar-foldcue">'
-      + '<span class="ar-show">Show the detail</span>'
-      + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
-      + ' aria-hidden="true" focusable="false">'
-      + '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor"'
-      + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
-      + "</svg></span></summary>"
-      + '<div class="ar-foldbody"><div class="ar-foldinner">'
-      + '<ul class="ar-list">' + items + "</ul></div></div></details>";
+     column. Mehdi, 6 September: they are always open. Nothing a reader has to
+     press stands between them and what the two figures are made of. */
+  /* Mehdi, 6 September: each figure carries one plain line saying what it is,
+     so nobody has to guess whether they are reading a per plot number, a yearly
+     one or a whole scheme one. Both lines say only what the engine computes:
+     the build figure is the sum over bands of plots times hardware cost, once;
+     the running figure is the largest lifetime saving of the bands present,
+     which is one home over the 25 year life. */
+  function note(text) {
+    return '<p class="ar-note">' + esc(text) + "</p>";
+  }
+
+  var NOTE_DEV = "Build cost saving is the hardware Gryd funds across the whole"
+    + " scheme, counted once, so it never lands on your build budget.";
+  var NOTE_HOME = "Running cost saving is what one home of the largest size you"
+    + " counted keeps on energy over the 25 year system life, after the Gryd"
+    + " subscription.";
+
+  function benefits(key, title, items) {
+    return '<section class="ar-sec ar-benefits" data-sec="' + key + '">'
+      + "<h3>" + esc(title) + "</h3>"
+      + '<ul class="ar-list">' + items + "</ul></section>";
   }
 
   function summaryText(result, inputs) {
@@ -201,6 +214,10 @@
   function render(container, result, inputs, opts) {
     opts = opts || {};
     container.classList.add("ar-root");
+    /* Mehdi, 6 September: the summary reads at the site's own type scale, which
+       the FHS check sets for itself, so the scale is carried on a class of this
+       renderer's own rather than on .ar-root. */
+    container.classList.add("ar-assess");
     var plotH = (container.closest && container.closest(".sam")) ? PLOT_H.popup : PLOT_H.page;
 
     var details = detailRows(result, inputs).map(function (r) {
@@ -237,14 +254,16 @@
       + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
       + '<p>As a Developer, working with Gryd, you could save ' + money(result.developerSaving)
       + " in build cost</p></article>"
-      + fold("dev", "Developer additional benefits", dev) + "</div>"
+      + note(NOTE_DEV)
+      + benefits("dev", "Developer additional benefits", dev) + "</div>"
       + '<div class="ar-col"><article class="ar-stat ar-pin">'
       + '<span class="ar-stat-title">AVERAGE RUNNING COST SAVING</span>'
       + '<span class="ar-fig" data-home>'
       + money(result.homeownerLifetimeSaving) + "</span>"
       + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
       + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article>"
-      + fold("home", "Homeowner additional benefits", home) + "</div>"
+      + note(NOTE_HOME)
+      + benefits("home", "Homeowner additional benefits", home) + "</div>"
       + "</div></section>"
       + '<section class="ar-sec ar-chart-sec" data-sec="chart">' + chartSvg(result.chart, plotH)
       + "</section></div>"
@@ -260,50 +279,6 @@
       + '<div class="ar-acts"><button type="button" class="btn ar-btn" data-restart>Start Over</button>'
       + '<button type="button" class="btn ghost ar-btn ar-btn-quiet" data-share>Share</button>'
       + '<span class="ar-said" data-said role="status"></span></div>';
-
-    /* The folds are the reader's own control, so the row reads as a control:
-       the whole width is the hit area, the label says what pressing it does,
-       and the chevron turns with it. The details element is kept, so anything
-       that opens a fold by setting open still works; the body animates on the
-       site curve, and only when a person did the opening, so a programmatic
-       open lands at full height at once. */
-    var FOLD_MS = 420;
-    Array.prototype.forEach.call(container.querySelectorAll(".ar-fold"), function (d) {
-      var sum = d.querySelector("summary");
-      var body = d.querySelector(".ar-foldbody");
-      var show = d.querySelector(".ar-show");
-      var shut = null;
-      function label() {
-        show.textContent = d.open ? "Hide the detail" : "Show the detail";
-        sum.setAttribute("aria-expanded", d.open ? "true" : "false");
-      }
-      d.addEventListener("toggle", function () {
-        if (d.open) {
-          /* the content is only laid out once the element is open, so the
-             starting row track needs a frame of its own or there is nothing
-             to animate from */
-          requestAnimationFrame(function () {
-            requestAnimationFrame(function () { body.classList.add("is-open"); });
-          });
-        } else {
-          body.classList.remove("is-open");
-        }
-        label();
-      });
-      sum.addEventListener("click", function (ev) {
-        body.setAttribute("data-anim", "");
-        if (!d.open) { return; }
-        /* closing runs the other way round, so the row collapses before the
-           element itself shuts and takes the content out of the flow */
-        ev.preventDefault();
-        body.classList.remove("is-open");
-        show.textContent = "Show the detail";
-        sum.setAttribute("aria-expanded", "false");
-        clearTimeout(shut);
-        shut = setTimeout(function () { d.open = false; }, FOLD_MS);
-      });
-      label();
-    });
 
     var resultBox = container.closest ? container.closest(".sam-box") : null;
     if (resultBox) { resultBox.classList.add("sam-result-box"); }

@@ -6,10 +6,11 @@
    host owns those and drives this through next, back and the change callback,
    which is why the same questions can sit in an 880px popup and on a full page.
 
-   Since 4 September there is one screen, not three. The scheme is a postcode,
-   the bed sizes on it and the number of plots, which is what the tools page
-   already asked on its own first stage, so the popup asks it the same way and
-   in the same words. Orientation and the heating question are gone: every
+   Since 4 September there is one screen, not three. The scheme is a postcode
+   and the bed sizes on it, which is what the tools page asks on its own first
+   stage, so the popup asks it the same way and in the same words. Since
+   6 September the plot total is not asked at all: it is a line under the sizes
+   reporting what the counts add to. Orientation and the heating question are gone: every
    scheme is priced all electric, and the stub does not read a compass.
 
    window.GrydAssessInputs.mount(container, onComplete, opts) -> controller
@@ -76,12 +77,10 @@
             + beds + "</div>"
             + '<p class="ai-hint">Pick every size on the scheme, then say how many'
             + " of each.</p>"
-            + '<p class="ai-tally" data-tally hidden></p>')
-      + row("Total plots",
-            '<input class="ai-text" type="number" id="aiHomes" data-key="homes"'
-            + ' aria-label="Total plots" placeholder="0" min="1" step="1"'
-            + ' inputmode="numeric" readonly>'
-            + '<p class="ai-hint">Added up from the sizes above.</p>')
+            + '<p class="ai-tally" data-tally hidden></p>'
+            + '<p class="ai-total" data-total hidden role="status">'
+            + '<span class="ai-total-lab">Total plots</span>'
+            + '<span class="ai-total-n" data-total-n>0</span></p>')
       + "</div></section>";
   }
 
@@ -169,23 +168,25 @@
     function tally() {
       var line = container.querySelector("[data-tally]");
       var waiting = uncounted();
-      line.hidden = !v.beds.length;
-      if (!v.beds.length) { return; }
-      if (waiting.length) {
-        line.textContent = "How many plots of "
-          + waiting.join(", ") + "? A whole number, one or more.";
-      } else {
-        line.textContent = countTotal(v.counts) + " plots counted";
-      }
-      line.classList.toggle("is-off", waiting.length > 0);
+      /* Mehdi, 6 September: once every size is counted the total line below
+         says what they add to, so the tally has nothing left to say and goes
+         rather than repeating it. */
+      line.hidden = !v.beds.length || !waiting.length;
+      if (line.hidden) { return; }
+      line.textContent = "How many plots of "
+        + waiting.join(", ") + "? A whole number, one or more.";
+      line.classList.add("is-off");
     }
 
-    /* The total is the sum and nothing else: it is read only on screen and
-       written from here on every change. */
+    /* Mehdi, 6 September: the total was never a question, so it is not a field.
+       It is a line under the sizes that reports the sum, and nothing else on
+       the screen can change it. */
     function fillHomes() {
       var total = countTotal(v.counts);
       v.homes = total || null;
-      container.querySelector("#aiHomes").value = total ? String(total) : "";
+      var line = container.querySelector("[data-total]");
+      line.hidden = !total;
+      container.querySelector("[data-total-n]").textContent = total ? String(total) : "0";
     }
 
     function canAdvance() {
@@ -287,10 +288,11 @@
           f.disabled = true;
         });
         container.querySelector("[data-tally]").hidden = true;
+        container.querySelector("[data-total]").hidden = true;
+        container.querySelector("[data-total-n]").textContent = "0";
         [].slice.call(container.querySelectorAll(".ai-tile")).forEach(function (b) {
           b.setAttribute("aria-pressed", "false");
         });
-        container.querySelector("#aiHomes").value = "";
         container.querySelector("#aiPostcode").value = "";
         container.querySelector("[data-postcode-note]").hidden = true;
         show(0);

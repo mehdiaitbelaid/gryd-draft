@@ -9,7 +9,11 @@
    the scheme, stage two is the reply address, and what follows is the full
    summary rendered in place by assess-result.js off the same engine the popup
    calls. The old drawings and programme stage is gone, and so is the receipt
-   that used to stand in for an answer. */
+   that used to stand in for an answer.
+
+   Mehdi, 6 September: the postcode and the sizes were always one question, so
+   they are one stage. The plot total was never a question at all and is now a
+   line under the sizes reporting what the counts add to. */
 (function () {
   "use strict";
 
@@ -97,8 +101,6 @@
     }
   });
 
-  var plotsField = doc.querySelector('[data-key="plots"]');
-
   /* Every size on the scheme carries its own count, so the line under the tiles
      names the sizes still waiting rather than counting towards a total the
      reader could once type over. */
@@ -110,19 +112,22 @@
     var line = doc.querySelector("[data-tally]");
     if (!line) { return; }
     var waiting = uncounted();
-    line.hidden = !beds.length;
-    if (!beds.length) { return; }
-    line.textContent = waiting.length
-      ? "How many plots of " + waiting.join(", ") + "? A whole number, one or more."
-      : countTotal() + " plots counted";
-    line.classList.toggle("is-off", waiting.length > 0);
+    /* once every size is counted the total line below says what they add to,
+       so the tally has nothing left to say */
+    line.hidden = !beds.length || !waiting.length;
+    if (line.hidden) { return; }
+    line.textContent = "How many plots of " + waiting.join(", ")
+      + "? A whole number, one or more.";
+    line.classList.add("is-off");
   }
 
+  /* the total under the sizes, reported rather than asked for */
   function fillPlots() {
-    if (!plotsField) { return; }
+    var line = doc.querySelector("[data-total]");
+    var n = doc.querySelector("[data-total-n]");
     var total = countTotal();
-    plotsField.value = total ? String(total) : "";
-    set("plots", total ? String(total) : "");
+    if (line) { line.hidden = !total; }
+    if (n) { n.textContent = total ? String(total) : "0"; }
   }
 
   /* the plot counts under the chosen tiles */
@@ -245,29 +250,18 @@
      whatever that left: one plot, no postcode, nothing in any band. Each
      question now answers for itself, and the same three answers are checked
      again at the gate so a reader cannot walk backwards past one. */
-  function wholePlots(text) {
-    var t = String(text === undefined || text === null ? "" : text).trim();
-    return /^\d+$/.test(t) && Number(t) > 0;
-  }
-
   function problemAt(i) {
-    if (i === 0) {
-      return POSTCODE.test(String(values.postcode || "").trim())
-        ? null : "That is not a UK postcode yet.";
+    if (i !== 0) { return null; }
+    if (!POSTCODE.test(String(values.postcode || "").trim())) {
+      return "That is not a UK postcode yet.";
     }
-    if (i === 1) {
-      if (!beds.length) { return "Pick at least one size on the scheme."; }
-      return uncounted().length
-        ? "Give a whole number of plots, one or more, under each size." : null;
-    }
-    if (i === 2) {
-      return wholePlots(values.plots) ? null : "Give a whole number of plots, one or more.";
-    }
-    return null;
+    if (!beds.length) { return "Pick at least one size on the scheme."; }
+    return uncounted().length
+      ? "Give a whole number of plots, one or more, under each size." : null;
   }
 
   function firstProblem() {
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 1; i++) {
       var msg = problemAt(i);
       if (msg) { return { at: i, msg: msg }; }
     }
@@ -277,7 +271,7 @@
   function engineInputs() {
     var api = window.GrydAssessInputs || {};
     var counted = hasCounts() && api.splitFromCounts;
-    return { homes: counted ? countTotal() : (parseInt(values.plots, 10) || 1),
+    return { homes: counted ? countTotal() : 1,
              postcode: String(values.postcode || "").toUpperCase().trim(),
              orientation: api.ORIENTATION || "South",
              energy: api.ENERGY || "All Electric",
@@ -333,8 +327,8 @@
 
   /* ------------------------------------------------- the steps, one at a time */
   /* Mehdi, 4 September: the tools page runs the FHS check's composition now.
-     One question is on screen at a time, centred, under a three mark rail; the
-     gate is the fourth panel in the same frame. Enter on a field is the same
+     One stage is on screen at a time, centred, under the stage rail; the gate
+     is the second panel in the same frame. Enter on a field is the same
      as pressing Continue, so a postcode or a plot count can be answered without
      reaching for the mouse. The bedroom tiles stay multi select with a count
      under each, so they never advance on their own. */
