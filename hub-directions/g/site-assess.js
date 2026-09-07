@@ -239,8 +239,10 @@
      the question it is complaining about */
   var stage = null;
 
-  var POSTCODE = (window.GrydAssessInputs || {}).POSTCODE
-    || /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
+  /* the same three gates the popup applies, from the one module both load:
+     the format, the outward area against the 124 real UK areas, and the live
+     postcodes.io lookup */
+  var PC = window.GrydPostcode;
 
   function ready() {
     return !!(values.name && values.email && /.+@.+\..+/.test(values.email));
@@ -252,9 +254,8 @@
      again at the gate so a reader cannot walk backwards past one. */
   function problemAt(i) {
     if (i !== 0) { return null; }
-    if (!POSTCODE.test(String(values.postcode || "").trim())) {
-      return "That is not a UK postcode yet.";
-    }
+    var pcMsg = PC.problem(values.postcode);
+    if (pcMsg || !PC.shapeOk(values.postcode)) { return pcMsg || PC.BAD_SHAPE; }
     if (!beds.length) { return "Pick at least one size on the scheme."; }
     return uncounted().length
       ? "Give a whole number of plots, one or more, under each size." : null;
@@ -266,6 +267,30 @@
       if (msg) { return { at: i, msg: msg }; }
     }
     return null;
+  }
+
+  /* The lookup runs a beat behind the typing and again on the press, so a
+     postcode that has never been looked up is looked up before it can price a
+     scheme, and the press is replayed once the answer lands. */
+  var lookupTimer = null;
+  function lookupSoon(after) {
+    if (lookupTimer) { clearTimeout(lookupTimer); }
+    var pc = values.postcode;
+    if (!PC.shapeOk(pc) || PC.verdict(pc)) { return; }
+    lookupTimer = setTimeout(function () {
+      PC.verify(pc).then(function () {
+        if (values.postcode !== pc) { return; }
+        if (after) { after(); }
+      });
+    }, 400);
+  }
+
+  /* true when the press was held back to wait for the lookup */
+  function held(then) {
+    var pc = values.postcode;
+    if (!PC.shapeOk(pc) || PC.verdict(pc)) { return false; }
+    PC.verify(pc).then(function () { if (values.postcode === pc) { then(); } });
+    return true;
   }
 
   function engineInputs() {
@@ -293,6 +318,7 @@
     submit.addEventListener("click", function (ev) {
       ev.preventDefault();
       if (!ready()) { return; }
+      if (held(function () { submit.click(); })) { return; }
       var bad = firstProblem();
       if (bad) {
         if (stage) { stage.go(bad.at); stage.say(bad.at, bad.msg); }
@@ -429,6 +455,7 @@
     all("[data-next]", col).forEach(function (btn) {
       btn.addEventListener("click", function (ev) {
         ev.preventDefault();
+        if (held(function () { btn.click(); })) { return; }
         var msg = problemAt(at);
         if (msg) { say(at, msg); return; }
         say(at, "");
@@ -437,7 +464,14 @@
     });
     /* the complaint goes as soon as the answer is good, rather than sitting
        under a question the reader has already fixed */
-    col.addEventListener("input", function () { if (!problemAt(at)) { say(at, ""); } });
+    col.addEventListener("input", function () {
+      if (!problemAt(at)) { say(at, ""); }
+      lookupSoon(function () {
+        var msg = problemAt(at);
+        say(at, msg || "");
+        gateReady();
+      });
+    });
     all("[data-back]", col).forEach(function (btn) {
       btn.addEventListener("click", function (ev) { ev.preventDefault(); show(at - 1, true, true); });
     });

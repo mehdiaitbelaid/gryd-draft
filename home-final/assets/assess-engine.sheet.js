@@ -125,16 +125,17 @@
     E: "1", EC: "1", N: "1", NW: "1", SE: "1", SW: "1", W: "1", WC: "1",
     BR: "1", CR: "1", DA: "1", EN: "1", HA: "1", IG: "1", KT: "1", RM: "1",
     SM: "1", TW: "1", UB: "1", WD: "1", SL: "1", GU: "1", RH: "1", RG: "1",
+    SG: "1",
     HP: "1", AL: "1", LU: "1", MK: "1", OX: "1", TN: "1", ME: "1", CT: "1",
     BN: "2",
     SO: "3", PO: "3", SP: "3", BH: "3",
-    PL: "4", TQ: "4", TR: "4", EX: "4", DT: "4",
-    BS: "5E", BA: "5E", GL: "5E", TA: "5E", TF: "6", TE: "5E",
+    PL: "4", TQ: "4", TR: "4", EX: "4", DT: "4", GY: "4", JE: "4",
+    BS: "5E", BA: "5E", GL: "5E", TA: "5E", TF: "6", SN: "5E",
     CF: "5W", NP: "5W", SA: "5W",
     B: "6", CV: "6", WS: "6", WV: "6", DY: "6", ST: "6", WR: "6", HR: "6",
     M: "7E", SK: "7E", OL: "7E", BL: "7E", WA: "7E", WN: "7E", PR: "7E",
     BB: "7E", FY: "7E", L: "7E",
-    CH: "7W", LL: "7W", SY: "13", LD: "13",
+    CH: "7W", LL: "7W", CW: "7W", IM: "7W", SY: "13", LD: "13",
     DG: "8S", CA: "8E", LA: "8E",
     NE: "9E", SR: "9E", DH: "9E", DL: "9E",
     EH: "9S", TD: "9S", KY: "9S", FK: "9S",
@@ -161,17 +162,26 @@
     return (pc.match(/^[A-Z]{1,2}/) || [""])[0];
   }
 
+  /* Scott, 7 September: an area outside this table used to fall through to
+     London and price a scheme off a zone the site is not in, which is how a
+     made up postcode came back with a figure. Every one of the 124 real UK
+     postcode areas is in the table above, so an area that misses it is not a
+     UK site and there is nothing to look up. The two letter to one letter
+     fallback went with it: it read SG and SN as S, Sheffield, rather than
+     Hertfordshire and Wiltshire. */
   function zoneOf(postcode) {
-    var a = area(postcode);
-    if (AREA_ZONE[a]) { return AREA_ZONE[a]; }
-    if (a.length === 2 && AREA_ZONE[a.charAt(0)]) { return AREA_ZONE[a.charAt(0)]; }
-    return "1"; /* nothing recognised: London, the sheet's own worked example zone */
+    return AREA_ZONE[area(postcode)] || null;
   }
 
   function kkValue(postcode, orientation) {
     var col = ORIENTATION_COL[String(orientation || "South West").toLowerCase().trim()];
     if (col === undefined) { col = 1; } /* default South West, per the brief */
-    return KK[zoneOf(postcode)][col];
+    var zone = zoneOf(postcode);
+    if (!zone) {
+      throw new Error("site assessment: no MCS zone for postcode area \""
+                      + area(postcode) + "\"");
+    }
+    return KK[zone][col];
   }
 
   function independence(kk) {

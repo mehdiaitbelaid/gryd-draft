@@ -42,6 +42,90 @@
   var ORIENTATION = "South West";
   var POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
+  /* Scott, 7 September: a made up postcode used to price a scheme. FX2 6HD has
+     the shape of one, so the shape is no longer enough. Three gates now stand
+     in front of the engine: the format, the outward area against the 124 real
+     UK postcode areas, and a live lookup against postcodes.io, which is free,
+     needs no key and answers cross origin. If the lookup cannot be reached the
+     first two still stand and the reader is let through. */
+  var AREAS = ("AB AL B BA BB BD BH BL BN BR BS BT CA CB CF CH CM CO CR CT CV CW DA DD DE DG DH DL"
+    + " DN DT DY E EC EH EN EX FK FY G GL GU GY HA HD HG HP HR HS HU HX IG IM IP IV JE KA KT KW KY"
+    + " L LA LD LE LL LN LS LU M ME MK ML N NE NG NN NP NR NW OL OX PA PE PH PL PO PR RG RH RM S SA"
+    + " SE SG SK SL SM SN SO SP SR SS ST SW SY TA TD TF TN TQ TR TS TW UB W WA WC WD WF WN WR WS WV"
+    + " YO ZE").split(" ");
+
+  var BAD_SHAPE = "That is not a UK postcode yet.";
+  var BAD_REAL = "We can't find that postcode.";
+  var LOOKUP = "https://api.postcodes.io/postcodes/";
+  var LOOKUP_MS = 2500;
+
+  function tidy(pc) {
+    return String(pc || "").toUpperCase().replace(/\s+/g, " ").trim();
+  }
+
+  function areaOf(pc) {
+    return (tidy(pc).replace(/[^A-Z0-9]/g, "").match(/^[A-Z]{1,2}/) || [""])[0];
+  }
+
+  function formatOk(pc) { return POSTCODE.test(tidy(pc)); }
+  function areaOk(pc) { return AREAS.indexOf(areaOf(pc)) >= 0; }
+  /* both offline gates, which is also the test for whether the lookup is worth
+     a request */
+  function shapeOk(pc) { return formatOk(pc) && areaOk(pc); }
+
+  /* yes, no or unknown per postcode, so a reader who types the same one twice
+     is not looked up twice and Continue can read what input already learned */
+  var seen = {};
+
+  function verdict(pc) { return seen[tidy(pc)] || null; }
+
+  function verify(pc) {
+    var key = tidy(pc);
+    if (!shapeOk(key)) { return Promise.resolve("no"); }
+    if (seen[key]) { return Promise.resolve(seen[key]); }
+    if (typeof fetch !== "function") { seen[key] = "unknown"; return Promise.resolve("unknown"); }
+    var ctl = typeof AbortController === "function" ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) { ctl.abort(); } }, LOOKUP_MS);
+    var url = LOOKUP + encodeURIComponent(key.replace(/\s+/g, "")) + "/validate";
+    return fetch(url, ctl ? { signal: ctl.signal } : undefined)
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("http")); })
+      .then(function (body) {
+        clearTimeout(timer);
+        var out = body && body.result === false ? "no" : "yes";
+        seen[key] = out;
+        return out;
+      }, function () {
+        clearTimeout(timer);
+        /* Unreachable is recorded as unknown, not as an answer: nothing is
+           blocked on it, the format and the area gates still stand, and the
+           press that is waiting on it is let through rather than asking the
+           same dead endpoint on every keystroke. */
+        seen[key] = "unknown";
+        return "unknown";
+      });
+  }
+
+  /* the complaint to show, or "" when there is nothing to say yet */
+  function problem(pc) {
+    var v = tidy(pc);
+    if (!v) { return ""; }
+    /* the shape of a postcode and a postcode that exists are two different
+       complaints: FX2 6HD is shaped like one, so it is told it cannot be found
+       rather than that it is not one yet */
+    if (!formatOk(v)) { return BAD_SHAPE; }
+    if (!areaOk(v)) { return BAD_REAL; }
+    return verdict(v) === "no" ? BAD_REAL : "";
+  }
+
+  window.GrydPostcode = { POSTCODE: POSTCODE, AREAS: AREAS, tidy: tidy, areaOf: areaOf,
+                          formatOk: formatOk, areaOk: areaOk, shapeOk: shapeOk, verify: verify, verdict: verdict,
+                          problem: problem, BAD_SHAPE: BAD_SHAPE, BAD_REAL: BAD_REAL };
+
+  var shapeOk = window.GrydPostcode.shapeOk;
+  var verify = window.GrydPostcode.verify;
+  var verdict = window.GrydPostcode.verdict;
+  var problem = window.GrydPostcode.problem;
+
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   }
@@ -190,8 +274,33 @@
     }
 
     function canAdvance() {
-      return POSTCODE.test(v.postcode) && v.beds.length > 0
+      return shapeOk(v.postcode) && verdict(v.postcode) !== "no" && v.beds.length > 0
         && uncounted().length === 0 && !!(v.homes && v.homes > 0);
+    }
+
+    /* the postcode complaint, in the note the screen already owns */
+    function sayPostcode() {
+      var note = container.querySelector("[data-postcode-note]");
+      if (!note) { return; }
+      var msg = problem(v.postcode);
+      note.textContent = msg;
+      note.hidden = !msg;
+    }
+
+    /* The lookup runs while the reader types, a beat behind the keystrokes, so
+       the answer is usually already in hand by the time Continue is pressed. */
+    var lookupTimer = null;
+    function lookupSoon() {
+      if (lookupTimer) { clearTimeout(lookupTimer); }
+      var pc = v.postcode;
+      if (!shapeOk(pc) || verdict(pc)) { return; }
+      lookupTimer = setTimeout(function () {
+        verify(pc).then(function () {
+          if (v.postcode !== pc) { return; }
+          sayPostcode();
+          changed();
+        });
+      }, 400);
     }
 
     function values() {
@@ -255,8 +364,8 @@
       if (!key) { return; }
       if (key === "postcode") {
         v.postcode = ev.target.value;
-        var note = container.querySelector("[data-postcode-note]");
-        note.hidden = !ev.target.value || POSTCODE.test(ev.target.value);
+        sayPostcode();
+        lookupSoon();
       }
       changed();
     }
@@ -270,7 +379,20 @@
       canAdvance: canAdvance,
       values: values,
       next: function () {
-        if (!canAdvance()) { changed(); return false; }
+        /* Continue asks again rather than trusting what the typing pass left:
+           a postcode never looked up is looked up here, and the press is
+           replayed once the answer lands. */
+        if (shapeOk(v.postcode) && !verdict(v.postcode)) {
+          var pc = v.postcode;
+          verify(pc).then(function () {
+            if (v.postcode !== pc) { return; }
+            sayPostcode();
+            changed();
+            if (canAdvance()) { api.next(); }
+          });
+          return false;
+        }
+        if (!canAdvance()) { sayPostcode(); changed(); return false; }
         if (at === screens.length - 1) { onComplete(values()); return true; }
         show(at + 1);
         return true;
@@ -309,6 +431,8 @@
   }
 
   window.GrydAssessInputs = { mount: mount, POSTCODE: POSTCODE,
+                              shapeOk: shapeOk, verify: verify, verdict: verdict,
+                              problem: problem, AREAS: AREAS,
                               shareOut: shareOut, splitFromCounts: splitFromCounts,
                               bandCounts: bandCounts,
                               countTotal: countTotal, BEDS: BEDS,

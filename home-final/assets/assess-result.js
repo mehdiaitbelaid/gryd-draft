@@ -189,11 +189,22 @@
     return '<p class="ar-note">' + esc(text) + "</p>";
   }
 
-  var NOTE_DEV = "Build cost saving is the hardware Gryd funds across the whole"
-    + " scheme, counted once, so it never lands on your build budget.";
-  var NOTE_HOME = "Running cost saving is what one home of the largest size you"
-    + " counted keeps on energy over the 25 year system life, after the Gryd"
-    + " subscription.";
+  /* Scott, 7 September: both notes and both sentences are his words, kept
+     character for character, apostrophes and all. */
+  var NOTE_DEV = "The build cost saving represents the value of the hardware Gryd"
+    + " provides across the whole scheme. It's provided at zero cost so it never"
+    + " touches your bottom line.";
+  var NOTE_HOME = "The running cost saving represents the total saving of a typical"
+    + " home on the scheme over the 25 year system life, after the Gryd subscription.";
+
+  function devLine(result) {
+    return "As a Developer, working with Gryd, you could save " + money(result.developerSaving)
+      + " in build cost across the development";
+  }
+  function homeLine(result) {
+    return "The homeowner will enjoy cheaper cleaner energy, saving around "
+      + money(result.homeownerLifetimeSaving) + " over the systems lifetime";
+  }
 
   function benefits(key, title, items) {
     return '<section class="ar-sec ar-benefits" data-sec="' + key + '">'
@@ -204,10 +215,8 @@
   function summaryText(result, inputs) {
     var lines = detailRows(result, inputs).map(function (r) { return r[0] + ": " + r[1]; });
     lines.unshift("Gryd site assessment summary");
-    lines.push("As a Developer, working with Gryd, you could save " + money(result.developerSaving)
-               + " in build cost");
-    lines.push("The Homeowner will enjoy cheaper cleaner energy, saving up to "
-               + money(result.homeownerLifetimeSaving) + " over the systems lifetime");
+    lines.push(devLine(result));
+    lines.push(homeLine(result));
     return lines.join("\n");
   }
 
@@ -252,16 +261,14 @@
       + '<div class="ar-col"><article class="ar-stat ar-pin">'
       + '<span class="ar-stat-title">BUILD COST SAVING</span>'
       + '<span class="ar-fig" data-dev>' + money(result.developerSaving) + "</span>"
-      + '<p>As a Developer, working with Gryd, you could save ' + money(result.developerSaving)
-      + " in build cost</p></article>"
+      + "<p>" + esc(devLine(result)) + "</p></article>"
       + note(NOTE_DEV)
       + benefits("dev", "Developer additional benefits", dev) + "</div>"
       + '<div class="ar-col"><article class="ar-stat ar-pin">'
-      + '<span class="ar-stat-title">AVERAGE RUNNING COST SAVING</span>'
+      + '<span class="ar-stat-title">RUNNING COST SAVING</span>'
       + '<span class="ar-fig" data-home>'
       + money(result.homeownerLifetimeSaving) + "</span>"
-      + '<p>The Homeowner will enjoy cheaper cleaner energy, saving up to '
-      + money(result.homeownerLifetimeSaving) + " over the systems lifetime</p></article>"
+      + "<p>" + esc(homeLine(result)) + "</p></article>"
       + note(NOTE_HOME)
       + benefits("home", "Homeowner additional benefits", home) + "</div>"
       + "</div></section>"
