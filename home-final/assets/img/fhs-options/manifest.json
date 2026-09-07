@@ -1,0 +1,44 @@
+{
+  "note": "Clay option icons for the FHS readiness checker tiles. One file per option, keyed on the exact option value the model publishes in GRYD.OPTIONS (fhs/pages/assess-model.js). Every file is a transparent PNG at 320x320 with a 640x640 @2x beside it, drawn to match home-final/assets/img/fhs-measures and home-final/assets/img/site-assess: matte unglazed terracotta clay, isometric three quarter view, no ground shadow. The five Unsure options share one question mark sculpture, copied under each question's own filename. The solar, battery and wastewater switches are not tiles and keep the icons they already have in fhs-measures.",
+  "dir": "home-final/assets/img/fhs-options/",
+  "size": 320,
+  "size2x": 640,
+  "questions": {
+    "storeys": {
+      "1": { "file": "storeys-1.png", "file2x": "storeys-1@2x.png", "note": "Low single floor house, one row of windows. Degree: shortest of the three." },
+      "2": { "file": "storeys-2.png", "file2x": "storeys-2@2x.png", "note": "Cube house, two stacked floors split by a moulded band, two rows of windows." },
+      "3": { "file": "storeys-3.png", "file2x": "storeys-3@2x.png", "note": "Tall narrow townhouse, three stacked floors, three rows of windows. Degree: tallest." }
+    },
+    "heating": {
+      "Gas boiler": { "file": "heating-gas-boiler.png", "file2x": "heating-gas-boiler@2x.png", "note": "Gas appliance with a control panel and pipe stubs. Reads closer to a gas vessel than a wall hung combi." },
+      "Air source heat pump (ASHP)": { "file": "heating-ashp.png", "file2x": "heating-ashp@2x.png", "note": "Outdoor box with a large circular fan grille and side louvres." },
+      "Ground source heat pump (GSHP)": { "file": "heating-gshp.png", "file2x": "heating-gshp@2x.png", "note": "Small unit on a cut ground slab with a buried pipe coil in the cut face." },
+      "Electric heating": { "file": "heating-electric.png", "file2x": "heating-electric@2x.png", "note": "Ribbed panel heater on feet with a lightning bolt moulded into the front." },
+      "Other / unsure": { "file": "heating-other-unsure.png", "file2x": "heating-other-unsure@2x.png", "note": "Shared question mark sculpture used by every Unsure option." }
+    },
+    "partL": {
+      "2021 Part L (31% improvement)": { "file": "partL-2021.png", "file2x": "partL-2021@2x.png", "note": "House in ONE thin insulation sheet, one corner lifted. Degree: thin wrap." },
+      "FHS (75–80% improvement)": { "file": "partL-fhs.png", "file2x": "partL-fhs@2x.png", "note": "Same house in a THICK three layer quilted wrap. Degree: far thicker than the 2021 icon, which is how the pair is told apart." },
+      "Unsure": { "file": "partL-unsure.png", "file2x": "partL-unsure@2x.png", "note": "Shared question mark sculpture." }
+    },
+    "ventilation": {
+      "Natural ventilation only": { "file": "ventilation-natural.png", "file2x": "ventilation-natural@2x.png", "note": "Window casement swung open with air ribbons through the gap. No machinery." },
+      "MEV (mechanical extract)": { "file": "ventilation-mev.png", "file2x": "ventilation-mev@2x.png", "note": "Extract grille with a fan hub and ONE duct leaving the back. Degree: one duct." },
+      "MVHR (mechanical ventilation with heat recovery)": { "file": "ventilation-mvhr.png", "file2x": "ventilation-mvhr@2x.png", "note": "Unit with a diamond heat exchanger core and FOUR ducts in two crossing pairs. Degree: four ducts against MEV's one." },
+      "Unsure": { "file": "ventilation-unsure.png", "file2x": "ventilation-unsure@2x.png", "note": "Shared question mark sculpture." }
+    },
+    "airtightness": {
+      "≤3 m³/(h·m²) @ 50Pa": { "file": "airtightness-lte3.png", "file2x": "airtightness-lte3@2x.png", "note": "Sealed box: unbroken thick gasket, four clamp latches, nothing escaping. Degree: zero leaks, the tightest of the four." },
+      "3–5 m³/(h·m²) @ 50Pa": { "file": "airtightness-3-5.png", "file2x": "airtightness-3-5@2x.png", "note": "Medium gasket, two latches, ONE gap with one wisp escaping. Degree: one leak." },
+      "5–8 m³/(h·m²) @ 50Pa": { "file": "airtightness-5-8.png", "file2x": "airtightness-5-8@2x.png", "note": "Thin broken gasket, no latches, THREE gaps with three wisps. Degree: three leaks." },
+      "≥8 m³/(h·m²) @ 50Pa": { "file": "airtightness-gte8.png", "file2x": "airtightness-gte8@2x.png", "note": "Lid propped fully open, no gasket, wisps streaming out all round. Degree: worst of the four. The band is read off the number of escaping wisps, 0 / 1 / 3 / many." },
+      "Unsure": { "file": "airtightness-unsure.png", "file2x": "airtightness-unsure@2x.png", "note": "Shared question mark sculpture." }
+    },
+    "glazing": {
+      "Triple glazing (U ≤ 0.8)": { "file": "glazing-triple.png", "file2x": "glazing-triple@2x.png", "note": "Cutaway frame showing THREE parallel panes and two spacers. Degree: three panes." },
+      "High-performance double (U ≤ 1.2)": { "file": "glazing-double-hp.png", "file2x": "glazing-double-hp@2x.png", "note": "Cutaway frame, TWO panes, one very thick warm edge spacer and a moulded thermal break collar. Degree: two panes, heavy frame." },
+      "Standard double (U ≤ 1.4)": { "file": "glazing-double-std.png", "file2x": "glazing-double-std@2x.png", "note": "Cutaway frame, TWO panes, one thin spacer, no collar. Degree: two panes, slimmest and plainest frame of the three." },
+      "Unsure": { "file": "glazing-unsure.png", "file2x": "glazing-unsure@2x.png", "note": "Shared question mark sculpture." }
+    }
+  }
+}

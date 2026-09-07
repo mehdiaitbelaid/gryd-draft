@@ -9,9 +9,9 @@
    counts and no multi size runs. Solar, battery and wastewater heat recovery
    are switches, and the panel count is asked only once solar is on.
 
-   The result is one row per element: the clay miniature, the state word, what
-   was entered and what the standard asks for. The model's own guidance opens
-   under the row.
+   The result is one card per element: the clay miniature and the state mark,
+   the element's name, what was entered against what the standard asks for, and
+   the model's own guidance opening inside the card under What to change.
 
    The verdict and every word of it come from fhs/pages/assess-model.js, which
    is the live tool's own logic and prose. This file only chooses what to send
@@ -32,6 +32,7 @@
   var O = G.OPTIONS;
   var IMG = "../../home-final/assets/img/site-assess/";
   var MEASURE_IMG = "../../home-final/assets/img/fhs-measures/";
+  var OPT_IMG = "../../home-final/assets/img/fhs-options/";
 
   /* One clay miniature a measure, in the model's own order, keyed on the
      model's own key. The labels are carried alongside so a row can only take
@@ -51,9 +52,7 @@
   function measureArt(name, i) {
     var m = MEASURE_ART[i];
     if (!m || m[0] !== name) { return ""; }
-    return '<img class="c-art" src="' + MEASURE_IMG + m[1] + '.png" srcset="'
-      + MEASURE_IMG + m[1] + ".png 1x, " + MEASURE_IMG + m[1] + '@2x.png 2x" '
-      + 'alt="" width="28" height="28" decoding="async">';
+    return clay(MEASURE_IMG, m[1], "c-art", 64);
   }
 
   var TYPE_ART = {
@@ -92,72 +91,68 @@
     }
   }
 
-  /* ----------------------------------------------------------------- glyphs */
-  /* The house types and the bedroom counts have clay models already. Everything
-     else is drawn here as a schematic in one stroke weight, so the tiles read
-     as one set. Stroke is currentColor, which is what the tile animates on
-     selection, and the accented part takes the site's orange. */
+  /* ------------------------------------------------------------- option art */
+  /* Every option carries the same clay sculpture the house type and bedroom
+     tiles are cut from, so one question does not read as drawings and the next
+     as photographs. The map is keyed on the exact option string the model
+     publishes in GRYD.OPTIONS and named for the manifest in
+     home-final/assets/img/fhs-options: an option that is renamed upstream
+     loses its icon here rather than picking up the wrong sculpture. */
 
-  function svg(inner) {
-    return '<svg class="t-art" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" '
-      + 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
-      + 'stroke-linejoin="round">' + inner + "</svg>";
-  }
-  function bars(n) {
-    var out = "";
-    for (var i = 0; i < n; i++) {
-      var y = 34 - i * 10;
-      out += '<rect x="12" y="' + y + '" width="24" height="8" rx="1"></rect>';
-    }
-    return svg(out);
-  }
-  /* the chevron at the end of a measure row, in the same one stroke weight as
-     the tiles' schematics */
-  var CHEV = '<svg class="c-chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" '
-    + 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
-    + 'stroke-linejoin="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>';
-
-  var Q = svg('<path d="M18 18a6 6 0 1 1 6 7v3"></path><circle cx="24" cy="35" r="1.4" fill="currentColor"></circle>');
-
-  var GLYPH = {
+  var OPT_ART = {
+    storeys: { "1": "storeys-1", "2": "storeys-2", "3": "storeys-3" },
     heating: {
-      "Gas boiler": svg('<path d="M24 8c6 7 9 11 9 16a9 9 0 0 1-18 0c0-5 3-9 9-16Z" class="lit"></path><path d="M24 26c2 2 3 3.5 3 5a3 3 0 0 1-6 0c0-1.5 1-3 3-5Z"></path>'),
-      "Air source heat pump (ASHP)": svg('<rect x="9" y="13" width="30" height="22" rx="3"></rect><circle cx="24" cy="24" r="7" class="lit"></circle><path d="M24 17v14M17 24h14"></path>'),
-      "Ground source heat pump (GSHP)": svg('<path d="M6 20h36" class="lit"></path><path d="M13 20v9a5 5 0 0 0 10 0v-4a5 5 0 0 1 10 0v9"></path><path d="M18 13h12v7H18z"></path>'),
-      "Electric heating": svg('<path d="M26 6 14 27h9l-3 15 15-22h-9l3-14Z" class="lit"></path>'),
-      "Other / unsure": Q
+      "Gas boiler": "heating-gas-boiler",
+      "Air source heat pump (ASHP)": "heating-ashp",
+      "Ground source heat pump (GSHP)": "heating-gshp",
+      "Electric heating": "heating-electric",
+      "Other / unsure": "heating-other-unsure"
     },
     partL: {
-      "2021 Part L (31% improvement)": svg('<path d="M8 38h32"></path><rect x="12" y="28" width="8" height="10" class="lit"></rect><rect x="28" y="22" width="8" height="16" opacity=".35"></rect>'),
-      "FHS (75–80% improvement)": svg('<path d="M8 38h32"></path><rect x="12" y="28" width="8" height="10" opacity=".35"></rect><rect x="28" y="12" width="8" height="26" class="lit"></rect>'),
-      "Unsure": Q
+      "2021 Part L (31% improvement)": "partL-2021",
+      "FHS (75\u201380% improvement)": "partL-fhs",
+      "Unsure": "partL-unsure"
     },
     ventilation: {
-      "Natural ventilation only": svg('<rect x="10" y="10" width="28" height="28" rx="2"></rect><path d="M24 10v28"></path><path d="M31 24h9" class="lit"></path>'),
-      "MEV (mechanical extract)": svg('<rect x="10" y="10" width="28" height="28" rx="2"></rect><path d="M18 24h18m-5-5 5 5-5 5" class="lit"></path>'),
-      "MVHR (mechanical ventilation with heat recovery)": svg('<rect x="8" y="10" width="32" height="28" rx="2"></rect><path d="M14 19h20m-5-4 5 4-5 4" class="lit"></path><path d="M34 29H14m5 4-5-4 5-4"></path>'),
-      "Unsure": Q
+      "Natural ventilation only": "ventilation-natural",
+      "MEV (mechanical extract)": "ventilation-mev",
+      "MVHR (mechanical ventilation with heat recovery)": "ventilation-mvhr",
+      "Unsure": "ventilation-unsure"
     },
     airtightness: {
-      "≤3 m³/(h·m²) @ 50Pa": svg('<rect x="11" y="11" width="26" height="26" rx="2" class="lit"></rect><path d="M37 24h5"></path>'),
-      "3–5 m³/(h·m²) @ 50Pa": svg('<rect x="11" y="11" width="26" height="26" rx="2"></rect><path d="M37 18h5M37 30h5" class="lit"></path>'),
-      "5–8 m³/(h·m²) @ 50Pa": svg('<rect x="11" y="11" width="26" height="26" rx="2"></rect><path d="M37 15h6M37 24h6M37 33h6" class="lit"></path>'),
-      "≥8 m³/(h·m²) @ 50Pa": svg('<rect x="11" y="11" width="26" height="26" rx="2"></rect><path d="M37 13h7M37 20h7M37 28h7M37 35h7" class="lit"></path>'),
-      "Unsure": Q
+      "\u22643 m\u00b3/(h\u00b7m\u00b2) @ 50Pa": "airtightness-lte3",
+      "3\u20135 m\u00b3/(h\u00b7m\u00b2) @ 50Pa": "airtightness-3-5",
+      "5\u20138 m\u00b3/(h\u00b7m\u00b2) @ 50Pa": "airtightness-5-8",
+      "\u22658 m\u00b3/(h\u00b7m\u00b2) @ 50Pa": "airtightness-gte8",
+      "Unsure": "airtightness-unsure"
     },
     glazing: {
-      "Triple glazing (U ≤ 0.8)": svg('<rect x="9" y="10" width="6" height="28" rx="1" class="lit"></rect><rect x="21" y="10" width="6" height="28" rx="1" class="lit"></rect><rect x="33" y="10" width="6" height="28" rx="1" class="lit"></rect>'),
-      "High-performance double (U ≤ 1.2)": svg('<rect x="13" y="10" width="7" height="28" rx="1" class="lit"></rect><rect x="28" y="10" width="7" height="28" rx="1" class="lit"></rect>'),
-      "Standard double (U ≤ 1.4)": svg('<rect x="15" y="10" width="4" height="28" rx="1"></rect><rect x="29" y="10" width="4" height="28" rx="1"></rect>'),
-      "Unsure": Q
+      "Triple glazing (U \u2264 0.8)": "glazing-triple",
+      "High-performance double (U \u2264 1.2)": "glazing-double-hp",
+      "Standard double (U \u2264 1.4)": "glazing-double-std",
+      "Unsure": "glazing-unsure"
     }
   };
 
-  function glyphFor(field, value) {
-    if (field === "storeys") { return bars(Number(value)); }
-    var set = GLYPH[field];
-    return (set && set[value]) || Q;
+  /* One image tag for every clay miniature on the page, retina file included.
+     cls is what tells a 72px tile from a 64px result icon; nothing else about
+     them differs. */
+  function clay(dir, file, cls, px) {
+    return '<img' + (cls ? ' class="' + cls + '"' : "") + ' src="' + dir + file
+      + '.png" srcset="' + dir + file + ".png 1x, " + dir + file + '@2x.png 2x" '
+      + 'alt="" width="' + px + '" height="' + px + '" decoding="async">';
   }
+
+  function optionArt(field, value) {
+    var set = OPT_ART[field];
+    var file = set && set[value];
+    return file ? clay(OPT_IMG, file, "", 72) : "";
+  }
+
+  /* the chevron on a result card, in the site's one stroke weight */
+  var CHEV = '<svg class="c-chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" '
+    + 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
+    + 'stroke-linejoin="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>';
 
   /* ------------------------------------------------------------------ tiles */
 
@@ -176,7 +171,7 @@
       } else if (field === "bedrooms") {
         art = '<img src="' + IMG + BED_ART[v] + '.png" alt="" width="300" height="300" decoding="async">';
       } else {
-        art = glyphFor(opt.glyph || field, v);
+        art = optionArt(field, v);
       }
       return tile(field, v, name, art, String(current) === String(v));
     }).join("");
@@ -206,8 +201,12 @@
 
   function row(label, ctl, opt) {
     opt = opt || {};
+    /* A switch has no tiles, so its row would be the one question on the run
+       with no picture in it. opt.icon puts the measure's own clay miniature
+       beside the label instead. */
+    var art = opt.icon ? clay(MEASURE_IMG, opt.icon, "fm-lab-art", 28) : "";
     return '<div class="fm-row"' + (opt.attr || "") + (opt.hidden ? " hidden" : "") + ">"
-      + '<span class="fm-lab">' + esc(label) + "</span>"
+      + '<span class="fm-lab">' + art + "<span>" + esc(label) + "</span></span>"
       + '<div class="fm-ctl">' + ctl + "</div></div>";
   }
 
@@ -244,7 +243,7 @@
       stand: "The systems in the spec today, and how much solar is on the roof.",
       body: function () {
         return row("Heating", group("heating", O.heating, a.heating))
-          + row("Solar PV in spec", switchCtl("hasSolar", a.hasSolar))
+          + row("Solar PV in spec", switchCtl("hasSolar", a.hasSolar), { icon: "solar" })
           + row("Panels per home",
                 '<input class="f-text f-big" id="fm-panels" type="number" min="1" step="1"'
                 + ' inputmode="numeric" data-panels aria-label="Number of panels"'
@@ -252,10 +251,11 @@
                 + '<p class="fm-hint">However many are on the house type, to the panel.</p>'
                 + '<p class="fm-flag" data-panel-note role="status" hidden></p>',
                 { attr: ' data-panel-row', hidden: !a.hasSolar })
-          + row("Battery in spec", switchCtl("hasBattery", a.hasBattery))
+          + row("Battery in spec", switchCtl("hasBattery", a.hasBattery), { icon: "battery" })
           + row("Wastewater heat recovery", switchCtl("hasWWHR", a.hasWWHR)
                 + '<p class="fm-hint">WWHR systems recover heat from shower wastewater to '
-                + "preheat incoming cold water, reducing hot water energy demand.</p>");
+                + "preheat incoming cold water, reducing hot water energy demand.</p>",
+                { icon: "wwhr" });
       }
     }
   ];
@@ -631,10 +631,11 @@
   }
 
   /* The result, in the same vocabulary as the assessment summary that shipped:
-     the model's verdict as the card's title, one hairline row per element with
-     its state, what was entered and what the standard asks for, and the model's
-     guidance folded under the row. assess-result.css supplies the rows, the
-     fold and the hover; nothing is redeclared here. */
+     the model's verdict at display size over a grid of eight element cards,
+     each carrying its state mark, what was entered against what the standard
+     asks for, and the model's guidance opening inside it. The root takes
+     .ar-assess so the shared sheet sets the site's own type scale rather than
+     the summary's smaller one. */
   function renderResult(m, r) {
     var host = el("[data-result]");
 
@@ -643,18 +644,20 @@
       return '<li class="rise" style="--d:' + (STAGGER * (i + 2))
         + 'ms"><button type="button" class="r-chip state-' + x.state.toLowerCase()
         + '" data-chip="' + i + '" aria-expanded="false" aria-controls="r-note-' + i + '">'
-        + measureArt(x.name, i)
+        + '<span class="c-top">' + measureArt(x.name, i)
+        + '<span class="c-state">' + esc(x.state) + "</span></span>"
         + '<span class="c-name" data-live>' + esc(x.name) + "</span>"
         + '<span class="c-cell c-ent"><span class="c-cap">You entered</span>'
         + '<span class="c-val" data-live>' + esc(entered(key, r)) + "</span></span>"
         + '<span class="c-cell c-req"><span class="c-cap">FHS requires</span>'
         + '<span class="c-val" data-live>' + esc(required(key, r)) + "</span></span>"
-        + '<span class="c-state">' + esc(x.state) + "</span>" + CHEV + "</button>"
+        + '<span class="c-more"><span class="c-more-lab">What to change</span>'
+        + CHEV + "</span></button>"
         + '<div class="r-note" id="r-note-' + i + '" data-note="' + i + '" hidden>'
         + '<div class="r-note-in"><p data-live>' + x.note + "</p></div></div></li>";
     }).join("");
 
-    host.innerHTML = '<div class="ar-root ar-hover">'
+    host.innerHTML = '<div class="ar-root ar-assess ar-hover">'
       + '<header class="fhs-verdict band-' + esc(m.band) + '">'
       + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(a.bedrooms)
       + " bed &middot; " + esc(a.storeys) + (Number(a.storeys) === 1 ? " storey" : " storeys")
