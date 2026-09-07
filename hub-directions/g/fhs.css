@@ -143,6 +143,33 @@
 }
 .fhs-block > .fhs-reqs + p { margin-top: 30px; }
 
+/* the two column bullet lists in the zero cost section */
+.fhs-cols {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 34px;
+}
+.fhs-bullets { list-style: none; margin: 12px 0 0; padding: 0; }
+.fhs-bullets li {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  padding: 10px 0 0 18px;
+  position: relative;
+  text-wrap: pretty;
+}
+.fhs-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--flare);
+}
+
 .fhs-start { margin-top: 40px; }
 .fhs-start[hidden] { display: none; }
 /* the masthead copy of the button carries the masthead's own gap */
@@ -158,21 +185,22 @@
    run sits straight on the paper under the masthead, centred, the way it did
    when he approved it. The rail, the eyebrow, the heading, the hint, the tiles
    and the step count are the whole of it. */
-.fhs-check { padding-top: 80px; }
+/* Scott, 7 September: the check is a popup now, on the site's one modal plate.
+   site-modal.css draws the scrim, the plate, the close control and the primary
+   button; what follows is only what the run puts inside it. */
 .fhs-check[hidden] { display: none; }
 
-.fm { display: block; color: var(--red110); }
+.fm { color: var(--red110); text-align: left; }
 
-.fm-box {
-  position: relative;
-  text-align: left;
-  width: 100%;
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
+.fhs-pop .sam-box {
+  width: min(1040px, 100%);
+  max-height: min(860px, calc(100vh - 48px));
+  padding: 26px 34px 24px;
 }
+.fhs-pop .fm-prog { margin-right: 46px; }
+.fhs-pop .fm-body { overflow: auto; padding-right: 4px; }
+.fhs-pop .fhs-result { padding: 0; }
+.fhs-pop .fhs-result .ar-root { --ar-paper: var(--modal-plate, #F8F6F2); }
 
 
 /* --------------------------------------------------------- the step change */
@@ -255,9 +283,10 @@
    the column is free to be as tall as the question needs. */
 .fm-body {
   flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .fm .fhs-q h2 {
   font-size: 34px;
@@ -366,16 +395,38 @@
    rather than stretching to fill the column. */
 .fm .f-tiles { gap: 20px; margin: 0; align-items: stretch; }
 .fm .f-tiles.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 212px; }
-.fm .f-tiles.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 328px; }
-.fm .f-tiles.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 444px; }
-.fm .f-tiles.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 560px; }
+/* the cells are wide enough for the longest single word any option carries,
+   set on a .16em track: High-performance is the widest at about 130px */
+.fm .f-tiles.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 465px; }
+.fm .f-tiles.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 620px; }
+.fm .f-tiles.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 765px; }
 .fm .f-tile { padding-bottom: 14px; }
+/* the site's small caps label, track and all: the 15px floor's one exception
+   is a 12px label on a .16em track, so the track stays and the cells grow to
+   fit the longest whole word instead */
 .fm .f-tile .t-name {
   font-size: 12px;
   line-height: 1.25;
   letter-spacing: .16em;
-  overflow-wrap: anywhere;
 }
+
+/* Scott, 7 September: no label may break in the middle of a word. Hyphenation
+   is off, the browser's last resort break is off, and every word of a label is
+   carried in a span that refuses to wrap, so a hyphenated option such as
+   Semi-detached stays whole and only the gaps between words are wrap points. */
+.fm .f-tile .t-name,
+.r-chip .c-name,
+.r-chip .c-val,
+.r-chip .c-cap,
+.r-chip .c-state,
+.fhs-verdict .v-meta,
+.fm-lab {
+  overflow-wrap: normal;
+  word-break: normal;
+  -webkit-hyphens: none;
+  hyphens: none;
+}
+.t-w { white-space: nowrap; }
 /* every option is clay now, at the one tile size all three question surfaces
    share */
 .fm .f-tile img {
@@ -443,7 +494,8 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  margin-top: 30px;
+  margin-top: 0;
+  padding-top: 20px;
   flex: none;
 }
 .fm-go {
@@ -493,12 +545,39 @@
 .fhs-result { padding-top: var(--sec-pad); padding-bottom: 20px; }
 .fhs-result .ar-root { --ar-paper: var(--paper); }
 
-/* the verdict card: the model's heading, then the two coverage plates, then
-   the model's one line summary under them */
-.fhs-verdict { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.fhs-verdict .ar-title { font-size: clamp(28px, 3vw, 44px); max-width: 20ch; margin: 0; }
-.fhs-verdict .eyebrow { color: var(--warm-grey); }
+/* Scott, 7 September: the verdict is a box. The overall mark on the left, the
+   headline and the model's summary beside it, and the house type, the bedrooms
+   and the storeys as one line at the foot of the box. */
+.fhs-verdict {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 26px 28px 24px;
+  border: 1px solid var(--stone-mid);
+  border-radius: 8px;
+  background: var(--stonelight);
+}
+.fhs-verdict .v-mark {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: block;
+  color: #1F7A4D;
+}
+.fhs-verdict.v-close .v-mark { color: #B45309; }
+.fhs-verdict.v-fail .v-mark { color: var(--flare); }
+.fhs-verdict .v-glyph { display: block; }
+.fhs-verdict .v-body { min-width: 0; }
+.fhs-verdict .ar-title { font-size: 34px; max-width: 24ch; margin: 0; }
+.fhs-verdict .fhs-sub { margin: 10px 0 0; }
+.fhs-verdict .v-meta {
+  margin: 18px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--warm-grey);
+}
 .fhs-result .ar-chartcard { margin-top: 22px; }
+.fhs-result .fhs-verdict + .fhs-measures { margin-top: 30px; }
 .fhs-result .ar-stat { padding: 20px 22px 18px; }
 .fhs-result .ar-fig { font-size: clamp(40px, 4vw, 52px); }
 .fhs-result .ar-stat .f-lab {
@@ -589,24 +668,28 @@
 /* the state mark, in the site's pill: the brown ink for a pass, an orange
    outline for a close call, solid orange for a failure. There is no green in
    the palette and the word carries the state on its own. */
+/* Scott, 7 September, his explicit ask: every pill carries a mark as well as
+   its word, so a card can be read at a glance. Green appears here and in the
+   verdict box and nowhere else on the site; the word still carries the state
+   on its own, so colour is never the only signal. */
 .r-chip .c-state {
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   padding: 5px 12px;
   border-radius: 999px;
-  background: var(--stonelight);
-  color: var(--red110);
+  background: #E4F1E9;
+  color: #1F7A4D;
   white-space: nowrap;
 }
-.r-chip.state-close .c-state {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--ember);
-  color: var(--ember);
-}
-.r-chip.state-fails .c-state { background: var(--flare); color: #ffffff; }
+.r-chip .c-mark { flex: none; display: block; }
+.r-chip.state-close .c-state { background: #FBEEDA; color: #B45309; }
+.r-chip.state-fail .c-state { background: var(--flare); color: #ffffff; }
 .r-chip:focus-visible { outline: 2px solid var(--flare); outline-offset: 2px; }
 .r-chip[aria-expanded="true"] .c-name { color: var(--ember); }
 
@@ -674,7 +757,11 @@
   .fm .fhs-q h2 { font-size: 26px; }
   .fm-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 14px 0 12px; }
   .fm-row .fm-lab { padding-top: 0; }
-  .fm .f-tiles.cols-4, .fm .f-tiles.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* two to a row on a phone: three cells are narrower than the longest single
+     word an option carries, and no word is allowed to break */
+  .fm .f-tiles.cols-3, .fm .f-tiles.cols-4, .fm .f-tiles.cols-5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .fm .f-tile img { width: 56px; height: 56px; }
   .fm-gate { grid-template-columns: 1fr; gap: 16px; }
   /* one card to a row on a phone */
@@ -682,6 +769,12 @@
   .r-chip { padding: 18px 16px 16px; }
   .r-note { padding: 0 16px; }
   .fhs-reqs, .fhs-how { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .fhs-cols { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .fhs-pop .sam-box { padding: 22px 20px 20px; max-height: calc(100vh - 24px); }
+  .fhs-pop .fm-prog { margin-right: 40px; }
+  .fhs-verdict { flex-direction: column; gap: 14px; padding: 20px 18px 18px; }
+  .fhs-verdict .ar-title { font-size: 26px; }
+  .fm-count { margin-bottom: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .fm, .fm-box, .fm .f-tile img, .fm-seg i, .r-chip { transition: none; }
@@ -737,13 +830,14 @@
 /* backwards, not both: the fill holds the start state through the delay and
    then lets go, so the finished animation never freezes a transform on top of
    the hover lift the rows and the plates carry. */
-.fhs .rise {
+.fhs .rise,
+.fhs-pop .rise {
   animation: fhs-rise .22s cubic-bezier(.2,.7,.3,1) backwards;
   animation-delay: var(--d, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fhs .rise { animation: none; }
+  .fhs .rise, .fhs-pop .rise { animation: none; }
   .r-chip .c-chev, .r-note { transition: none; }
 }
 

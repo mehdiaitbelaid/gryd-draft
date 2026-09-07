@@ -42,7 +42,7 @@
     ["Heating", "heating"],
     ["Solar PV", "solar"],
     ["Battery Storage", "battery"],
-    ["Part L Target", "partL"],
+    ["Part L Target", "partL"],   /* the model's own name; shown as Compliance target */
     ["Ventilation", "ventilation"],
     ["Airtightness", "airtightness"],
     ["Glazing", "glazing"],
@@ -66,7 +66,26 @@
 
   /* the beat between one revealing part of the result and the next */
   var STAGGER = 40;
-  var STATE = { green: "Pass", amber: "Close", red: "Fails" };
+  /* Scott, 7 September: every pill carries a mark as well as its word, so a
+     card reads at a glance. Green is his explicit ask and lives here and
+     nowhere else on the site. */
+  var STATE = { green: "Pass", amber: "Close", red: "Fail" };
+  var BAND_KEY = { green: "pass", amber: "close", red: "fail" };
+
+  /* One mark a state, drawn in the site's single stroke weight. px is the only
+     thing that separates the 12px pill mark from the 40px verdict mark. */
+  var MARK_PATH = {
+    pass: '<path d="M4.5 10.4 8.4 14.4 15.5 5.8"/>',
+    close: '<path d="M10 4.8v6.4"/><path d="M10 14.5v.2"/>',
+    fail: '<path d="M5.6 5.6 14.4 14.4"/><path d="M14.4 5.6 5.6 14.4"/>'
+  };
+
+  function mark(key, px, cls) {
+    return '<svg class="' + cls + '" viewBox="0 0 20 20" width="' + px + '" height="'
+      + px + '" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"'
+      + ' stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+      + (MARK_PATH[key] || "") + "</svg>";
+  }
 
   var a = null;      /* the answer set the model reads */
   var contact = { name: "", company: "", email: "" };
@@ -79,6 +98,15 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
   }
+  /* Scott, 7 September: no label may break in the middle of a word, and a
+     hyphenated option like Semi-detached is one word. CSS alone cannot hold a
+     hyphen together, so every word of a label is put in its own span that
+     refuses to wrap and the gaps between them stay the only wrap points. */
+  function words(text) {
+    return String(text == null ? "" : text).split(/\s+/).filter(Boolean)
+      .map(function (w) { return '<span class="t-w">' + esc(w) + "</span>"; }).join(" ");
+  }
+
   function el(sel) { return d.querySelector(sel); }
   function all(sel) { return Array.prototype.slice.call(d.querySelectorAll(sel)); }
   function all2(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
@@ -159,7 +187,7 @@
   function tile(field, value, label, art, on) {
     return '<button type="button" class="f-tile" aria-pressed="' + (on ? "true" : "false")
       + '" data-f="' + esc(field) + '" data-v="' + esc(value) + '">' + art
-      + '<span class="t-name">' + esc(label) + "</span></button>";
+      + '<span class="t-name">' + words(label) + "</span></button>";
   }
 
   function tiles(field, list, current, opt) {
@@ -222,8 +250,8 @@
         return row("House type", group("houseType", O.houseTypes, a.houseType))
           + row("Bedrooms", group("bedrooms", O.bedrooms, a.bedrooms,
                                   { name: function (v) { return v + " bed"; } })
-                + '<p class="fm-flag" data-odd hidden>This combination is unusual '
-                + "&mdash; please contact us for a bespoke assessment.</p>")
+                + '<p class="fm-flag" data-odd data-live hidden>This combination is '
+                + "unusual &mdash; please contact us for a bespoke assessment.</p>")
           + row("Storeys", group("storeys", O.storeys, a.storeys,
                                  { name: function (v) { return v === 1 ? "1 storey" : v + " storeys"; } }));
       }
@@ -232,7 +260,7 @@
       key: "fabric", head: "Fabric",
       stand: "What the house type is built to today.",
       body: function () {
-        return row("Part L target", group("partL", O.partL, a.partL))
+        return row("Compliance target", group("partL", O.partL, a.partL))
           + row("Ventilation", group("ventilation", O.ventilation, a.ventilation))
           + row("Airtightness", group("airtightness", O.airtightness, a.airtightness))
           + row("Glazing", group("glazing", O.glazing, a.glazing));
@@ -287,21 +315,113 @@
 
   /* ------------------------------------------------------------------ shell */
 
+  /* Scott, 7 September: the article and the tool are two different things, so
+     the check moved off the page and onto the site's one modal plate, the same
+     one the site assessment popup uses. site-modal.css draws the scrim, the
+     plate, the close control and the button; everything inside the body is the
+     run's own, unchanged. */
+  var pop = null;
+
   function mountCheck() {
-    var host = el("[data-check]");
-    host.innerHTML = '<div class="fm"><div class="fm-box">'
+    pop = d.createElement("div");
+    pop.className = "sam fhs-pop";
+    pop.hidden = true;
+    pop.innerHTML = '<div class="sam-box fm" role="dialog" aria-modal="true"'
+      + ' aria-labelledby="fhs-pop-title">'
+      + '<button type="button" class="sam-close" data-close aria-label="Close">&times;</button>'
       + '<div class="fm-prog" data-prog aria-hidden="true"></div>'
       + '<span class="fm-count" data-count></span>'
       + '<div class="fm-body">'
+      + '<section class="fhs-check" data-check>'
       + '<section class="fhs-q" data-qn="0">'
-      + '<h2 data-head></h2>'
+      + '<h2 id="fhs-pop-title" data-head></h2>'
       + '<p class="fm-stand" data-stand hidden></p><div data-fields></div></section>'
+      + "</section>"
+      + '<section class="fhs-result" data-result hidden></section>'
       + "</div>"
       + '<div class="fm-nav">'
       + '<button type="button" class="fm-back" data-back hidden>Back</button>'
       + '<button type="button" class="btn fm-go" data-go>Continue</button>'
-      + "</div></div></div>";
-    return host;
+      + "</div></div>";
+    d.body.appendChild(pop);
+    wirePop();
+    return pop;
+  }
+
+  /* ------------------------------------------------------------ open, close */
+  /* The plate borrows the assessment popup's own behaviour as well as its
+     drawing: the page behind is made inert rather than merely covered, Escape
+     closes, Tab cannot leave the plate, and the button that opened it gets the
+     focus back. */
+
+  var opener = null, closeTimer = null, generation = 0;
+
+  function behind(off) {
+    Array.prototype.slice.call(d.body.children).forEach(function (node) {
+      if (node === pop) { return; }
+      if (off) {
+        node.setAttribute("data-fhs-inert", "");
+        node.setAttribute("inert", "");
+        node.style.pointerEvents = "none";
+      } else if (node.hasAttribute("data-fhs-inert")) {
+        node.removeAttribute("data-fhs-inert");
+        node.removeAttribute("inert");
+        node.style.pointerEvents = "";
+      }
+    });
+  }
+
+  function openPop(trigger) {
+    if (!pop) { return; }
+    generation += 1;
+    if (closeTimer) { w.clearTimeout(closeTimer); closeTimer = null; }
+    opener = trigger || null;
+    pop.hidden = false;
+    behind(true);
+    d.documentElement.style.overflow = "hidden";
+    requestAnimationFrame(function () { pop.classList.add("open"); });
+    var first = pop.querySelector(".fm-body .f-tile, .fm-body input, [data-go]");
+    if (first && first.focus) { first.focus({ preventScroll: true }); }
+  }
+
+  function closePop() {
+    if (!pop || pop.hidden) { return; }
+    var gen = (generation += 1);
+    pop.classList.remove("open");
+    behind(false);
+    d.documentElement.style.overflow = "";
+    var back_to = opener;
+    if (closeTimer) { w.clearTimeout(closeTimer); }
+    closeTimer = w.setTimeout(function () {
+      closeTimer = null;
+      if (gen === generation) { pop.hidden = true; }
+    }, 200);
+    if (w.location.hash === "#check") {
+      w.history.replaceState(null, "", w.location.pathname + w.location.search);
+    }
+    if (back_to && back_to.focus) { back_to.focus(); }
+  }
+
+  function wirePop() {
+    pop.addEventListener("click", function (ev) {
+      if (ev.target === pop || ev.target.closest("[data-close]")) { closePop(); }
+    });
+    /* on the document, not on the plate: a reader who opened the popup from a
+       shared link and has not touched anything yet still has the focus on the
+       body, and a listener on the plate would never hear their Escape */
+    d.addEventListener("keydown", function (ev) {
+      if (!pop || pop.hidden) { return; }
+      if (ev.key === "Escape") { ev.preventDefault(); closePop(); return; }
+      if (ev.key !== "Tab") { return; }
+      var box = pop.querySelector(".sam-box");
+      var can = Array.prototype.slice.call(box.querySelectorAll(
+        'button, [href], input, textarea, summary, [tabindex]:not([tabindex="-1"])'))
+        .filter(function (n) { return !n.hidden && !n.disabled && n.offsetParent !== null; });
+      if (!can.length) { return; }
+      var first = can[0], last = can[can.length - 1];
+      if (ev.shiftKey && d.activeElement === first) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && d.activeElement === last) { ev.preventDefault(); first.focus(); }
+    });
   }
 
   /* Two digits, the way the run labels itself on screen. */
@@ -347,6 +467,7 @@
     w.setTimeout(function () {
       at = next;
       paint(dir);
+      toTop();
       moving = false;
     }, STEP_MS);
   }
@@ -448,22 +569,13 @@
     paint();
   }
 
-  function revealCheck() {
-    var host = el("[data-check]");
-    var rows = d.querySelectorAll("[data-start-row]");
-    var i;
-    for (i = 0; i < rows.length; i += 1) { rows[i].hidden = true; }
-    host.hidden = false;
-    w.setTimeout(function () {
-      host.scrollIntoView({ behavior: "smooth", block: "start" });
-      var tile = host.querySelector(".f-tile");
-      // preventScroll so the focus ring never fights the smooth scroll above
-      if (tile && tile.focus) { tile.focus({ preventScroll: true }); }
-    }, 20);
+  function toTop() {
+    var body = pop && pop.querySelector(".fm-body");
+    if (body) { body.scrollTop = 0; }
   }
 
-  /* The result takes the run's place in the column rather than sitting under an
-     answered questionnaire. Start over puts the run back. */
+  /* The result takes the run's place inside the plate rather than sitting under
+     an answered questionnaire. Start over puts the run back. */
   function hideCheck() { el("[data-check]").hidden = true; }
 
   /* ------------------------------------------------------------- the lead */
@@ -526,6 +638,12 @@
   var MEASURE_KEY = ["heating", "solar", "battery", "partL", "ventilation",
                      "airtightness", "glazing", "wwhr"];
 
+  /* Scott, 7 September: Part L target is builder's shorthand and the reader is
+     not always a builder. The model keeps its own name; everywhere the reader
+     sees it, including the lead notes, it reads Compliance target. */
+  var SHOWN = { "Part L Target": "Compliance target" };
+  function shown(name) { return SHOWN[name] || name; }
+
   /* The check as plain text: the house type, its size, and every element with
      what was entered, what the standard asks for and how it lands. */
   function leadNotes(m, r) {
@@ -540,7 +658,7 @@
     ];
     m.measures.forEach(function (x, i) {
       var key = MEASURE_KEY[i];
-      lines.push(x.name + ": " + x.state
+      lines.push(shown(x.name) + ": " + x.state
         + ". Entered: " + entered(key, r)
         + ". FHS requires: " + required(key, r) + ".");
     });
@@ -645,31 +763,38 @@
 
     var rows = m.measures.map(function (x, i) {
       var key = MEASURE_KEY[i];
+      var st = x.state.toLowerCase();
       return '<li class="rise" style="--d:' + (STAGGER * (i + 2))
-        + 'ms"><button type="button" class="r-chip state-' + x.state.toLowerCase()
+        + 'ms"><button type="button" class="r-chip state-' + st
         + '" data-chip="' + i + '" aria-expanded="false" aria-controls="r-note-' + i + '">'
         + '<span class="c-top">' + measureArt(x.name, i)
-        + '<span class="c-state">' + esc(x.state) + "</span></span>"
-        + '<span class="c-name" data-live>' + esc(x.name) + "</span>"
+        + '<span class="c-state">' + mark(st, 12, "c-mark")
+        + '<span class="c-state-lab">' + esc(x.state) + "</span></span></span>"
+        + '<span class="c-name">' + words(shown(x.name)) + "</span>"
         + '<span class="c-cell c-ent"><span class="c-cap">You entered</span>'
-        + '<span class="c-val" data-live>' + esc(entered(key, r)) + "</span></span>"
+        + '<span class="c-val" data-live>' + words(entered(key, r)) + "</span></span>"
         + '<span class="c-cell c-req"><span class="c-cap">FHS requires</span>'
-        + '<span class="c-val" data-live>' + esc(required(key, r)) + "</span></span>"
+        + '<span class="c-val" data-live>' + words(required(key, r)) + "</span></span>"
         + '<span class="c-more"><span class="c-more-lab">What to change</span>'
         + CHEV + "</span></button>"
         + '<div class="r-note" id="r-note-' + i + '" data-note="' + i + '" hidden>'
         + '<div class="r-note-in"><p data-live>' + x.note + "</p></div></div></li>";
     }).join("");
 
-    host.innerHTML = '<div class="ar-root ar-assess ar-hover">'
-      + '<header class="fhs-verdict band-' + esc(m.band) + '">'
-      + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(a.bedrooms)
-      + " bed &middot; " + esc(a.storeys) + (Number(a.storeys) === 1 ? " storey" : " storeys")
-      + "</span>"
-      + '<h2 class="ar-title" data-live>' + esc(m.heading) + "</h2></header>"
+    /* Scott, 7 September: the house type as a section label over a bare
+       heading did not read as a result. The verdict is a box now: the overall
+       mark, the headline and the summary beside it, and the house type, the
+       bedrooms and the storeys as one line at the foot of the box. */
+    var band = BAND_KEY[m.band] || "close";
+    var meta = a.houseType + ", " + a.bedrooms + " bed, " + a.storeys
+      + (Number(a.storeys) === 1 ? " storey" : " storeys");
 
-      + '<section class="ar-chartcard"><p class="fhs-sub" data-live>'
-      + esc(m.sub) + "</p></section>"
+    host.innerHTML = '<div class="ar-root ar-assess ar-hover">'
+      + '<header class="fhs-verdict band-' + esc(m.band) + " v-" + band + '">'
+      + '<span class="v-mark" aria-hidden="true">' + mark(band, 40, "v-glyph") + "</span>"
+      + '<div class="v-body"><h2 class="ar-title" data-live>' + esc(m.heading) + "</h2>"
+      + '<p class="fhs-sub" data-live>' + esc(m.sub) + "</p>"
+      + '<p class="v-meta">' + words(meta) + "</p></div></header>"
 
       + '<section class="ar-sec fhs-measures"><h3>How every element measures up</h3>'
       + '<p class="fhs-hint">Tap a measure to see what to change.</p>'
@@ -743,9 +868,15 @@
   function show(m, r) {
     renderResult(m, r);
     hideCheck();
-    w.setTimeout(function () {
-      el("[data-result]").scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 220);
+    el("[data-back]").hidden = true;
+    var go = el("[data-go]");
+    go.disabled = false;
+    go.textContent = "Close";
+    el(".fm-count").textContent = "Your readiness check";
+    Array.prototype.forEach.call(el("[data-prog]").children, function (seg) {
+      seg.className = "fm-seg done";
+    });
+    toTop();
   }
 
   /* The send is not allowed to cost the reader their result. It is tried, and
@@ -775,7 +906,7 @@
     host.innerHTML = "";
     begin();
     el("[data-check]").hidden = false;
-    el("[data-check]").scrollIntoView({ behavior: "smooth", block: "start" });
+    toTop();
   }
 
   /* One note open at a time, under the row it belongs to. hidden is taken off
@@ -840,7 +971,7 @@
       var t = ev.target;
       if (!t || !t.closest) { return; }
 
-      if (t.closest("[data-start]")) { revealCheck(); return; }
+      if (t.closest("[data-start]")) { openPop(t.closest("[data-start]")); return; }
       if (t.closest("[data-restart]")) { reset(); return; }
 
       var chip = t.closest(".r-chip");
@@ -865,12 +996,17 @@
 
       if (t.closest("[data-back]")) { goTo(Math.max(0, at - 1), "back"); return; }
       if (t.closest("[data-go]")) {
+        /* the result leaves Continue standing as the way out of the plate */
+        if (!el("[data-result]").hidden) { closePop(); return; }
         if (moving) { return; }
         if (!gate()) { return; }
         if (!onGate()) { goTo(at + 1, "fwd"); return; }
         finish();
       }
     });
+
+    w.addEventListener("hashchange", fromHash);
+    fromHash();
 
     d.addEventListener("input", function (ev) {
       var pf = ev.target && ev.target.closest ? ev.target.closest("[data-panels]") : null;
@@ -885,6 +1021,12 @@
       contact[f.getAttribute("data-k")] = f.value.trim();
       gate();
     });
+  }
+
+  /* #check is the shared link: it opens the popup over the article rather than
+     landing the reader on a page that no longer holds the tool. */
+  function fromHash() {
+    if (w.location.hash === "#check") { openPop(d.querySelector("[data-start]")); }
   }
 
   if (d.readyState === "loading") { d.addEventListener("DOMContentLoaded", start); }
