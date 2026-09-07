@@ -90,9 +90,9 @@
   color: var(--warm-grey);
 }
 /* The three requirements and the three steps are the page's own blocks rather
-   than a run of small print: each one is a clay tile or a numbered block at the
-   site's reading size, three across, hairline over each. Not a word changes;
-   the number and the miniature are reading aids over the live copy. */
+   than a run of small print: each one is a photograph or a numbered block at
+   the site's reading size, three across, hairline over each. Not a word
+   changes; the number and the picture are reading aids over the live copy. */
 .fhs-reqs, .fhs-how {
   margin: 0;
   padding: 0;
@@ -122,12 +122,24 @@
   color: var(--flare);
   font-variant-numeric: tabular-nums;
 }
-.req-art {
+/* Mehdi, 7 September: photographs, not clay. The three requirements each get a
+   real picture at the column width, so the block reads as the site's other
+   photo runs rather than as an icon list. 3:2 is baked into the derivatives and
+   held here as well, so the card keeps its shape before the file decodes. */
+.req-fig {
   display: block;
-  width: 88px;
-  height: 88px;
+  width: 100%;
   margin: 2px 0 0;
-  object-fit: contain;
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+  background: var(--stonelight);
+}
+.req-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
 }
 .fhs-block > .fhs-reqs + p { margin-top: 30px; }
 
