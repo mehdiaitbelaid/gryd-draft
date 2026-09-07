@@ -1,12 +1,17 @@
 /* The FHS readiness tool on the hub.
 
-   Mehdi, 4 September: the check is the page. It was behind a button and a
-   popup and he could not see the thing he had approved, so the run is mounted
-   inline under the masthead and the first question is on screen when the page
-   loads. It asks the live tool's twelve questions in the live tool's own words,
-   one to a screen, and takes the same name and email before it prints
-   anything. Nothing about the questions, the tiles or the model changed; only
-   where they are drawn.
+   Mehdi, 7 September, to Scott's Monday notes: the page comes back in front of
+   the check. The masthead, the requirement titles and the live page's own
+   explanatory copy are read first, and the button under them reveals the run.
+
+   The run is four screens rather than twelve: the home, the fabric, the systems
+   and the gate. It works on one house type at a time, so there are no plot
+   counts and no multi size runs. Solar, battery and wastewater heat recovery
+   are switches, and the panel count is asked only once solar is on.
+
+   The result is one row per element: the clay miniature, the state word, what
+   was entered and what the standard asks for. The model's own guidance opens
+   under the row.
 
    The verdict and every word of it come from fhs/pages/assess-model.js, which
    is the live tool's own logic and prose. This file only chooses what to send
@@ -60,21 +65,12 @@
   };
   var BED_ART = { 1: "beds-1", 2: "beds-2", 3: "beds-3", 4: "beds-4", 5: "beds-5" };
 
-  var PANELS = [2, 4, 8, 12, 16, 20];
   /* the beat between one revealing part of the result and the next */
   var STAGGER = 40;
   var STATE = { green: "Pass", amber: "Close", red: "Fails" };
 
   var a = null;      /* the answer set the model reads */
-  /* Bedrooms are picked the way the site assessment picks them: every size on
-     the scheme, then how many plots of each. beds holds the sizes in tile
-     order and bedCounts holds the plots against each size. */
-  var beds = [];
-  var bedCounts = {};
-  /* what was typed under each tile, kept beside the parsed count so a blank, a
-     0, a minus or a decimal is reported rather than quietly read as one plot */
-  var bedRaw = {};
-  var contact = { name: "", email: "" };
+  var contact = { name: "", company: "", email: "" };
   var at = 0;
 
   /* --------------------------------------------------------------- helpers */
@@ -112,16 +108,6 @@
     for (var i = 0; i < n; i++) {
       var y = 34 - i * 10;
       out += '<rect x="12" y="' + y + '" width="24" height="8" rx="1"></rect>';
-    }
-    return svg(out);
-  }
-  function cells(n, total) {
-    var out = "", cols = 4, s = 8, gap = 2, x0 = 8, y0 = 10;
-    for (var i = 0; i < total; i++) {
-      var cx = x0 + (i % cols) * (s + gap);
-      var cy = y0 + Math.floor(i / cols) * (s + gap);
-      out += '<rect x="' + cx + '" y="' + cy + '" width="' + s + '" height="' + s
-        + '" rx="1" stroke-width="1.4"' + (i < n ? ' class="lit"' : "") + "></rect>";
     }
     return svg(out);
   }
@@ -164,15 +150,11 @@
       "High-performance double (U ≤ 1.2)": svg('<rect x="13" y="10" width="7" height="28" rx="1" class="lit"></rect><rect x="28" y="10" width="7" height="28" rx="1" class="lit"></rect>'),
       "Standard double (U ≤ 1.4)": svg('<rect x="15" y="10" width="4" height="28" rx="1"></rect><rect x="29" y="10" width="4" height="28" rx="1"></rect>'),
       "Unsure": Q
-    },
-    yes: svg('<circle cx="24" cy="24" r="15"></circle><path d="M17 24.5l5 5 9-11" class="lit"></path>'),
-    no: svg('<circle cx="24" cy="24" r="15"></circle><path d="M18 18l12 12M30 18L18 30"></path>')
+    }
   };
 
   function glyphFor(field, value) {
     if (field === "storeys") { return bars(Number(value)); }
-    if (field === "panels") { return cells(Math.round(Number(value) / 2), 12); }
-    if (field === "yesno") { return value === "Yes" ? GLYPH.yes : GLYPH.no; }
     var set = GLYPH[field];
     return (set && set[value]) || Q;
   }
@@ -203,152 +185,122 @@
   function group(field, list, current, opt) {
     opt = opt || {};
     return '<div class="f-tiles cols-' + Math.min(5, list.length)
-      + (opt.narrow ? " narrow" : "") + (opt.cls ? " " + opt.cls : "") + '" role="group">'
+      + (opt.cls ? " " + opt.cls : "") + '" role="group">'
       + tiles(field, list, current, opt) + "</div>";
   }
 
-  /* The bedroom tiles are the site assessment's control, markup and classes
-     included: a cell a size, the clay tile inside it and the plot count under
-     the tile, revealed when the size is picked. */
-  function bedGroup() {
-    var cells = O.bedrooms.map(function (v, i) {
-      var on = beds.indexOf(v) >= 0;
-      var art = '<img src="' + IMG + BED_ART[v] + '.png" alt="" width="300" height="300" decoding="async">';
-      var has = bedRaw[v] !== undefined && bedRaw[v] !== "";
-      return '<div class="f-tile-cell" style="--i:' + i + '">'
-        + tile("bedrooms", v, v + " bed", art, on)
-        + '<input class="f-count" type="number" min="1" step="1" inputmode="numeric" data-count="'
-        + v + '" aria-label="' + v + ' bed plots" placeholder="0"'
-        + (has ? ' value="' + esc(bedRaw[v]) + '"' : "")
-        + (on ? "" : " hidden") + "></div>";
-    }).join("");
-    return '<div class="f-tiles cols-5 beds" role="group" aria-label="Bedrooms">' + cells + "</div>"
-      + '<p class="fm-flag" data-count-note role="status" hidden></p>';
+  /* The switch. Scott asked for a switch rather than a pair of tiles or a
+     native checkbox, so it is a button carrying its own state: a hairline
+     track, a knob that travels, and the word beside it for anyone who cannot
+     read the position. */
+  function switchCtl(field, on) {
+    return '<button type="button" class="fm-switch" role="switch" data-sw="' + esc(field)
+      + '" aria-checked="' + (on ? "true" : "false") + '">'
+      + '<span class="sw-track"><span class="sw-knob"></span></span>'
+      + '<span class="sw-state">' + (on ? "Yes" : "No") + "</span></button>";
   }
 
-  function sizeLine() {
-    return beds.map(function (b) { return b + " bed x " + plotsFor(b); }).join(", ");
-  }
-  /* Every picked size carries its own count by the time the run moves on, so
-     there is nothing to stand in for. */
-  function plotsFor(b) { return bedCounts[b]; }
+  /* ------------------------------------------------------------------ rows */
+  /* One question to a row, in the site assessment's own shape: the label in
+     small caps on the left, the control on the right. */
 
-  /* A plot count is a whole number of plots, one or more. Nothing else is read
-     as one. */
-  function wholePlots(text) {
-    var t = String(text === undefined || text === null ? "" : text).trim();
-    return /^\d+$/.test(t) && Number(t) > 0;
+  function row(label, ctl, opt) {
+    opt = opt || {};
+    return '<div class="fm-row"' + (opt.attr || "") + (opt.hidden ? " hidden" : "") + ">"
+      + '<span class="fm-lab">' + esc(label) + "</span>"
+      + '<div class="fm-ctl">' + ctl + "</div></div>";
   }
 
-  function uncounted() {
-    return beds.filter(function (b) { return !wholePlots(bedRaw[b]); });
-  }
+  /* ------------------------------------------------------------- the screens */
+  /* Scott, 7 September: twelve screens became four. Every question the live
+     tool asks is still asked, grouped by what it is about. */
 
-  function yesNo(field, current) {
-    return '<div class="f-tiles cols-2 narrow" role="group">'
-      + ["Yes", "No"].map(function (v) {
-          return tile(field, v, v, glyphFor("yesno", v), (current ? "Yes" : "No") === v);
-        }).join("")
-      + "</div>";
-  }
-
-  /* ------------------------------------------------------------- questions */
-  /* One question to a screen, in the live tool's order, with the live tool's
-     own label as the question. A tap answers and moves on, so there is no
-     Continue until the gate. */
-
-  var QUESTIONS = [
-    { key: "houseType", head: "House type",
+  var SCREENS = [
+    {
+      key: "home", head: "Your home",
       stand: "Tell us about the house type you're assessing.",
-      body: function () { return group("houseType", O.houseTypes, a.houseType); } },
-    { key: "bedrooms", head: "Number of bedrooms",
-      stand: "Pick every size on the scheme, then say how many of each.",
       body: function () {
-        return bedGroup()
-          + '<p class="fm-flag" data-odd hidden><span data-odd-sizes></span>'
-          + "This combination is unusual — "
-          + "please contact us for a bespoke assessment.</p>";
-      } },
-    { key: "storeys", head: "Number of storeys",
+        return row("House type", group("houseType", O.houseTypes, a.houseType))
+          + row("Bedrooms", group("bedrooms", O.bedrooms, a.bedrooms,
+                                  { name: function (v) { return v + " bed"; } })
+                + '<p class="fm-flag" data-odd hidden>This combination is unusual '
+                + "&mdash; please contact us for a bespoke assessment.</p>")
+          + row("Storeys", group("storeys", O.storeys, a.storeys,
+                                 { name: function (v) { return v === 1 ? "1 storey" : v + " storeys"; } }));
+      }
+    },
+    {
+      key: "fabric", head: "Fabric",
+      stand: "What the house type is built to today.",
       body: function () {
-        return group("storeys", O.storeys, a.storeys,
-                     { name: function (v) { return v === 1 ? "1 storey" : v + " storeys"; } });
-      } },
-    { key: "heating", head: "Planned heating system",
-      body: function () { return group("heating", O.heating, a.heating); } },
-    { key: "partL", head: "Current Part L target",
-      body: function () { return group("partL", O.partL, a.partL); } },
-    { key: "ventilation", head: "Ventilation strategy",
-      body: function () { return group("ventilation", O.ventilation, a.ventilation); } },
-    { key: "airtightness", head: "Airtightness target",
-      body: function () { return group("airtightness", O.airtightness, a.airtightness); } },
-    { key: "glazing", head: "Glazing specification",
-      body: function () { return group("glazing", O.glazing, a.glazing); } },
-    { key: "hasSolar", head: "Solar PV already in spec?",
-      body: function () { return yesNo("hasSolar", a.hasSolar); } },
-    { key: "panels", head: "Number of panels", solarOnly: true,
+        return row("Part L target", group("partL", O.partL, a.partL))
+          + row("Ventilation", group("ventilation", O.ventilation, a.ventilation))
+          + row("Airtightness", group("airtightness", O.airtightness, a.airtightness))
+          + row("Glazing", group("glazing", O.glazing, a.glazing));
+      }
+    },
+    {
+      key: "systems", head: "Heating, solar and battery",
+      stand: "The systems in the spec today, and how much solar is on the roof.",
       body: function () {
-        return group("panels", PANELS, a.panels,
-                     { name: function (v) { return v + " panels"; } });
-      } },
-    { key: "hasBattery", head: "Battery storage in spec?",
-      body: function () { return yesNo("hasBattery", a.hasBattery); } },
-    { key: "hasWWHR", head: "Wastewater heat recovery (WWHR) in spec?",
-      body: function () {
-        return yesNo("hasWWHR", a.hasWWHR)
-          + '<p class="fm-hint">WWHR systems recover heat from shower wastewater to '
-          + "preheat incoming cold water, reducing hot water energy demand.</p>";
-      } }
+        return row("Heating", group("heating", O.heating, a.heating))
+          + row("Solar PV in spec", switchCtl("hasSolar", a.hasSolar))
+          + row("Panels per home",
+                '<input class="f-text f-big" id="fm-panels" type="number" min="1" step="1"'
+                + ' inputmode="numeric" data-panels aria-label="Number of panels"'
+                + ' placeholder="0" value="' + (a.panels > 0 ? esc(a.panels) : "") + '">'
+                + '<p class="fm-hint">However many are on the house type, to the panel.</p>'
+                + '<p class="fm-flag" data-panel-note role="status" hidden></p>',
+                { attr: ' data-panel-row', hidden: !a.hasSolar })
+          + row("Battery in spec", switchCtl("hasBattery", a.hasBattery))
+          + row("Wastewater heat recovery", switchCtl("hasWWHR", a.hasWWHR)
+                + '<p class="fm-hint">WWHR systems recover heat from shower wastewater to '
+                + "preheat incoming cold water, reducing hot water energy demand.</p>");
+      }
+    }
   ];
 
   var GATE = {
-    key: "gate", head: "Your Details",
+    key: "gate", head: "Your details",
     stand: "Tell us a bit about you and your project.",
     body: function () {
       return '<div class="fm-gate">'
         + '<div class="fm-in"><label for="fm-name">Full name</label>'
         + '<input id="fm-name" type="text" data-k="name" aria-label="Full name" '
         + 'placeholder="Jane Smith" autocomplete="name" value="' + esc(contact.name) + '"></div>'
+        + '<div class="fm-in"><label for="fm-co">Company</label>'
+        + '<input id="fm-co" type="text" data-k="company" aria-label="Company" '
+        + 'placeholder="Your company name" autocomplete="organization" value="'
+        + esc(contact.company) + '"></div>'
         + '<div class="fm-in"><label for="fm-email">Work email</label>'
         + '<input id="fm-email" type="email" data-k="email" aria-label="Work email" '
         + 'placeholder="jane@company.co.uk" autocomplete="email" value="'
         + esc(contact.email) + '"></div></div>'
-        + '<p class="fm-hint">Gryd stores the name and the email to send the check and to talk '
-        + "about the standard. Nothing else.</p>";
+        + '<p class="fm-hint">Gryd stores the name, the company and the email to send the '
+        + "check and to talk about the standard. Nothing else.</p>";
     }
   };
 
-  /* The panel count is only asked of a spec that already has solar, so the run
-     is eleven questions or twelve and the count on screen says which. */
-  function seq() {
-    return QUESTIONS.filter(function (q) { return !q.solarOnly || a.hasSolar; });
-  }
-  function paneAt(i) {
-    var q = seq();
-    return i < q.length ? q[i] : GATE;
-  }
-  function onGate() { return at >= seq().length; }
+  function paneAt(i) { return i < SCREENS.length ? SCREENS[i] : GATE; }
+  function onGate() { return at >= SCREENS.length; }
+  function total() { return SCREENS.length + 1; }
 
   /* ------------------------------------------------------------------ shell */
-  /* The run's own markup, mounted in the page rather than over it. The .fm
-     class stays on the shell so the pane, the tiles, the gate and the type all
-     keep the sizes they were signed off at; only its own box rules changed
-     from a floating plate to a panel in the column. */
 
   function mountCheck() {
     var host = el("[data-check]");
     host.innerHTML = '<div class="fm"><div class="fm-box">'
       + '<div class="fm-prog" data-prog aria-hidden="true"></div>'
+      + '<span class="fm-count" data-count></span>'
       + '<div class="fm-body">'
       + '<section class="fhs-q" data-qn="0">'
-      + '<span class="eyebrow" data-eyebrow>FHS readiness check</span>'
       + '<h2 data-head></h2>'
       + '<p class="fm-stand" data-stand hidden></p><div data-fields></div></section>'
       + "</div>"
       + '<div class="fm-nav">'
       + '<button type="button" class="fm-back" data-back hidden>Back</button>'
-      + '<button type="button" class="btn fm-go" data-go hidden>See your readiness check</button>'
-      + '<span class="fm-count" data-count></span></div></div></div>';
+      + '<button type="button" class="btn fm-go" data-go>Continue</button>'
+      + "</div></div></div>";
     return host;
   }
 
@@ -356,29 +308,18 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
 
   /* ------------------------------------------------------- the step change */
-  /* Answering moves through the run rather than redrawing the panel. The
-     question on screen slides out the way the run is going, the next one comes
-     in from the other side and rises, and its tiles land one after another.
-     Everything is on the site's standing curve, the same .34s the result's
-     rows and plates use. Back plays the move in reverse. */
+  /* Continue moves through the run rather than redrawing the panel. The screen
+     on show slides out the way the run is going, the next comes in from the
+     other side and rises, and its tiles land one after another. Everything is
+     on the site's standing curve, the same .34s the result's rows use. Back
+     plays the move in reverse. */
   var STEP_MS = 340;
   var moving = false;
-  /* The tap that answers a question waits a beat before the pane leaves. That
-     beat used to be spent holding nothing but a timer, so a second tap landing
-     on the outgoing pane advanced from wherever the run had reached by then and
-     stepped straight over the bedroom question and its guard. The advance now
-     carries the step it was started on and is dropped if the run has moved. */
-  var pending = null;
-
-  function cancelPending() {
-    if (pending) { w.clearTimeout(pending); pending = null; }
-  }
 
   function reduced() {
     return !!(w.matchMedia && w.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }
 
-  /* The incoming pane and its tiles, staggered in the order they are read. */
   function revealPane(dir) {
     var pane = el(".fhs-q");
     pane.classList.remove("q-out");
@@ -392,11 +333,10 @@
     });
   }
 
-  /* The run holds still while a change is in flight, so a second tap during
-     the slide cannot land the reader two questions on. */
+  /* The run holds still while a change is in flight, so a second press during
+     the slide cannot land the reader two screens on. */
   function goTo(next, dir) {
     if (moving) { return; }
-    cancelPending();
     if (reduced()) { at = next; paint(dir); return; }
     var pane = el(".fhs-q");
     moving = true;
@@ -412,7 +352,7 @@
   }
 
   function paint(dir) {
-    var n = seq().length;
+    var n = total();
     var q = paneAt(at);
     var pane = el(".fhs-q");
 
@@ -423,9 +363,9 @@
     stand.hidden = !q.stand;
     el("[data-fields]").innerHTML = q.body();
 
-    /* The segments are built once per run length and only their state changes
-       after that, because a segment replaced on every question would start at
-       its finished width and the fill would never be seen to move. */
+    /* The segments are built once per run and only their state changes after
+       that, because a segment replaced on every screen would start at its
+       finished width and the fill would never be seen to move. */
     var prog = el("[data-prog]");
     if (prog.children.length !== n) {
       prog.innerHTML = new Array(n + 1).join("x").split("").map(function () {
@@ -435,90 +375,91 @@
     Array.prototype.forEach.call(prog.children, function (seg, i) {
       seg.className = "fm-seg" + (i < at ? " done" : (i === at ? " on" : ""));
     });
-    /* the plot count fields carry data-count too, so the step label is read by
-       its own class rather than by the attribute */
     el(".fm-count").textContent = onGate()
       ? "Your details" : "Step " + pad(at + 1) + " of " + pad(n);
 
     el("[data-back]").hidden = at === 0;
-    /* The bedroom step takes several answers, so it is the one question with a
-       Continue under it. It is the same button the gate uses. */
     var go = el("[data-go]");
-    go.hidden = !onGate() && q.key !== "bedrooms";
     go.textContent = onGate() ? "See your readiness check" : "Continue";
-    if (q.key === "bedrooms") { flagOdd(); }
+    if (q.key === "home") { flagOdd(); }
     gate();
     revealPane(dir || "fwd");
   }
 
   /* The live tool's guard: some house type and bedroom pairs have no published
-     floor area, and the run stops on the bedroom question until the pair is one
-     the model can size. */
-  function unsupportedBeds() {
-    return beds.filter(function (b) {
-      return !G.isSupported({ houseType: a.houseType, bedrooms: b });
-    });
+     floor area, and the run stops on the home screen until the pair is one the
+     model can size. */
+  function unsupportedPair() {
+    return !!(a.houseType && a.bedrooms
+              && !G.isSupported({ houseType: a.houseType, bedrooms: a.bedrooms }));
   }
 
   function flagOdd() {
     var odd = el("[data-odd]");
-    if (!odd) { return; }
-    var bad = unsupportedBeds();
-    odd.hidden = !a.houseType || !beds.length || !bad.length;
-    var names = el("[data-odd-sizes]");
-    if (names) {
-      names.textContent = bad.length
-        ? bad.map(function (b) { return b + " bed"; }).join(", ") + ". "
-        : "";
-    }
+    if (odd) { odd.hidden = !unsupportedPair(); }
+  }
+
+  /* A panel count is a whole number, one or more. Nothing else is read as one. */
+  function wholeNumber(text) {
+    var t = String(text === undefined || text === null ? "" : text).trim();
+    return /^\d+$/.test(t) && Number(t) > 0;
   }
 
   function ready() {
-    if (paneAt(at).key === "bedrooms") {
-      return beds.length > 0 && unsupportedBeds().length === 0 && uncounted().length === 0;
+    var q = paneAt(at);
+    if (q.key === "home") {
+      return !!(a.houseType && a.bedrooms && a.storeys) && !unsupportedPair();
     }
-    return !onGate() || !!(contact.name && contact.email.indexOf("@") > 0);
+    if (q.key === "fabric") {
+      return !!(a.partL && a.ventilation && a.airtightness && a.glazing);
+    }
+    if (q.key === "systems") {
+      return !!a.heating && (!a.hasSolar || wholeNumber(a.panels));
+    }
+    return !!(contact.name && contact.company && contact.email.indexOf("@") > 0);
   }
 
-  /* Continue stays off until every picked size has its plots, and the line
-     under the tiles says which sizes are still waiting rather than leaving the
-     reader to guess why the button will not move. */
-  function countNote() {
-    var note = el("[data-count-note]");
+  /* The complaint under the panel field, in the same off state the guard uses,
+     so it needs no style of its own. */
+  function panelNote() {
+    var note = el("[data-panel-note]");
     if (!note) { return; }
-    var bad = uncounted();
-    note.hidden = !beds.length || !bad.length;
-    note.textContent = bad.length
-      ? "How many plots of " + bad.map(function (b) { return b + " bed"; }).join(", ")
-        + "? A whole number, one or more."
-      : "";
+    var bad = a.hasSolar && a.panels !== 0 && !wholeNumber(a.panels);
+    note.hidden = !bad;
+    note.textContent = bad ? "A whole number of panels, one or more." : "";
   }
 
   function gate() {
     var go = el("[data-go]");
     if (go) { go.disabled = !ready(); }
-    if (paneAt(at).key === "bedrooms") { countNote(); }
+    if (paneAt(at).key === "systems") { panelNote(); }
     return ready();
   }
 
-  /* The run starts itself. There is no button to press and nothing to open:
-     the page loads on question one. */
+  /* The run is mounted on load and waits behind the page's own button. */
   function begin() {
-    cancelPending();
     a = G.defaults();
     a.houseType = null; a.bedrooms = null; a.storeys = null;
     a.heating = null; a.partL = null; a.ventilation = null;
     a.airtightness = null; a.glazing = null;
     a.hasSolar = false; a.panels = 0; a.hasBattery = false; a.hasWWHR = false;
-    beds = []; bedCounts = {}; bedRaw = {};
-    contact = { name: "", email: "" };
+    contact = { name: "", company: "", email: "" };
     at = 0;
-    el("[data-check]").hidden = false;
     paint();
   }
 
-  /* The result takes the run's place in the column rather than sitting under
-     an answered questionnaire. Start over puts the run back. */
+  function revealCheck() {
+    var host = el("[data-check]");
+    var startRow = el("[data-start-row]");
+    if (startRow) { startRow.hidden = true; }
+    host.hidden = false;
+    w.setTimeout(function () {
+      host.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 20);
+  }
+
+  /* The result takes the run's place in the column rather than sitting under an
+     answered questionnaire. Start over puts the run back. */
   function hideCheck() { el("[data-check]").hidden = true; }
 
   /* ------------------------------------------------------------- the lead */
@@ -541,47 +482,78 @@
                    : { first: t.slice(0, cut), last: t.slice(cut + 1) };
   }
 
-  /* The check as plain text: what was answered, a verdict line for every size
-     on the scheme, every measure of the size that drives the headline with its
-     state word, and the two coverage figures. */
-  function leadNotes(runs, best) {
-    var m = best.m, r = best.r;
+  /* --------------------------------------------- entered against required */
+  /* Scott, 7 September: a row has to say what was entered next to what the
+     standard asks for. The requirement wording is the live tool's own option
+     text and its own notes, so the two columns read in one vocabulary. The
+     model's arithmetic supplies the solar figures and nothing here changes
+     them. */
+
+  var REQUIRES = {
+    heating: "Air source or ground source heat pump",
+    battery: "Not mandated",
+    partL: "FHS (75–80% improvement)",
+    ventilation: "MVHR (mechanical ventilation with heat recovery)",
+    airtightness: "≤3 m³/(h·m²) @ 50Pa",
+    glazing: "Triple glazing (U ≤ 0.8) or high-performance double (U ≤ 1.2)",
+    wwhr: "In the notional dwelling, not mandated"
+  };
+
+  function entered(key, r) {
+    if (key === "heating") { return a.heating; }
+    if (key === "solar") {
+      return a.hasSolar ? a.panels + " panels (" + r.userKwp.toFixed(1) + " kWp)" : "None";
+    }
+    if (key === "battery") { return a.hasBattery ? "In the spec" : "Not in the spec"; }
+    if (key === "partL") { return a.partL; }
+    if (key === "ventilation") { return a.ventilation; }
+    if (key === "airtightness") { return a.airtightness; }
+    if (key === "glazing") { return a.glazing; }
+    return a.hasWWHR ? "In the spec" : "Not in the spec";
+  }
+
+  function required(key, r) {
+    if (key === "solar") {
+      return r.requiredKwp + " kWp (~" + r.minPanels + " panels)";
+    }
+    return REQUIRES[key];
+  }
+
+  var MEASURE_KEY = ["heating", "solar", "battery", "partL", "ventilation",
+                     "airtightness", "glazing", "wwhr"];
+
+  /* The check as plain text: the house type, its size, and every element with
+     what was entered, what the standard asks for and how it lands. */
+  function leadNotes(m, r) {
     var lines = [
       "House type: " + a.houseType,
-      "Bed sizes: " + sizeLine(),
+      "Bedrooms: " + a.bedrooms + " bed",
       "Storeys: " + a.storeys,
-      "Heating: " + a.heating,
-      "Part L target: " + a.partL,
-      "Ventilation: " + a.ventilation,
-      "Airtightness: " + a.airtightness,
-      "Glazing: " + a.glazing,
-      "Solar in spec: " + (a.hasSolar ? a.panels + " panels" : "None"),
-      "Battery in spec: " + (a.hasBattery ? "Yes" : "No"),
-      "Wastewater heat recovery: " + (a.hasWWHR ? "Yes" : "No"),
       "",
-      "Headline size: " + best.bed + " bed",
+      "Verdict: " + m.heading,
       "Summary: " + m.sub,
       ""
     ];
-    runs.forEach(function (x) {
-      lines.push("Verdict (" + x.bed + " bed): " + x.m.heading);
+    m.measures.forEach(function (x, i) {
+      var key = MEASURE_KEY[i];
+      lines.push(x.name + ": " + x.state
+        + ". Entered: " + entered(key, r)
+        + ". FHS requires: " + required(key, r) + ".");
     });
-    lines.push("");
-    m.measures.forEach(function (x) { lines.push(x.name + ": " + x.state); });
     lines.push("");
     lines.push("Energy covered on your spec: " + r.user.coverage + "%");
     lines.push("Energy covered on a Gryd system: " + r.gryd.coverage + "%");
-    lines.push("Figures are for the " + best.bed + " bed size.");
     return lines.join("\n");
   }
 
-  function leadPayload(runs, best) {
+  function leadPayload(m, r) {
     var n = splitName(contact.name);
     var fields = [
       { objectTypeId: "0-1", name: "email", value: contact.email },
       { objectTypeId: "0-1", name: "firstname", value: n.first },
       { objectTypeId: "0-1", name: "lastname", value: n.last },
-      { objectTypeId: "0-1", name: "fhs_assessment_notes", value: leadNotes(runs, best) }
+      { objectTypeId: "0-1", name: "company", value: contact.company },
+      { objectTypeId: "0-1", name: "fhs_assessment_notes", value: leadNotes(m, r) }
     ];
     return {
       fields: fields,
@@ -595,11 +567,11 @@
     };
   }
 
-  function sendLead(runs, best) {
+  function sendLead(m, r) {
     return w.fetch(HS_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(leadPayload(runs, best))
+      body: JSON.stringify(leadPayload(m, r))
     }).then(function (res) {
       if (!res.ok) { throw new Error("hubspot " + res.status); }
       return true;
@@ -607,37 +579,6 @@
   }
 
   /* ----------------------------------------------------------------- result */
-
-  function specRows() {
-    var rows = [
-      ["Bed sizes", sizeLine()],
-      ["Heating", a.heating],
-      ["Storeys", a.storeys],
-      ["Part L target", a.partL],
-      ["Ventilation", a.ventilation],
-      ["Airtightness", a.airtightness],
-      ["Glazing", a.glazing],
-      ["Solar in spec", a.hasSolar ? a.panels + " panels" : "None"],
-      ["Battery in spec", a.hasBattery ? "Yes" : "No"],
-      ["Wastewater heat recovery", a.hasWWHR ? "Yes" : "No"]
-    ];
-    return rows.map(function (r) {
-      return '<div class="s-row"><dt>' + esc(r[0]) + "</dt><dd>"
-        + esc(r[1]) + "</dd></div>";
-    }).join("");
-  }
-
-  function specBlock() {
-    return '<section class="fhs-spec">'
-      + "<h4>What you told us</h4>"
-      + "<dl>" + specRows() + "</dl></section>";
-  }
-
-  function plate(label, value, i) {
-    return '<div class="ar-stat ar-pin r-fig rise" style="--d:' + (STAGGER * i)
-      + 'ms"><span class="ar-fig f-val num">' + esc(value)
-      + '%</span><p class="f-lab">' + esc(label) + "</p></div>";
-  }
 
   /* The model prints one long page. It is read here rather than shown: the
      verdict, the eight measures and the comparison table are lifted out of it
@@ -690,92 +631,45 @@
   }
 
   /* The result, in the same vocabulary as the assessment summary that shipped:
-     the model's verdict as the card's title, the two coverage figures as
-     plates pinned at the top of it, the eight measures as hairline rows, and
-     the detail folded away. assess-result.css supplies the plates, the rows,
-     the fold and the hover; nothing is redeclared here. */
-  /* The model answers one bed size at a time, and a scheme can carry several.
-     So the check is run once for every size picked, with its plot count beside
-     it. The headline is the worst performing size, because a scheme is only as
-     ready as the size that misses, and the fold below lists every size with its
-     count and its own verdict. */
-  var BAND_RANK = { green: 0, amber: 1, red: 2 };
-
-  /* Two sizes can land in the same band and not be the same answer: a 5 bed
-     with a solar shortfall and a 2 bed with a single soft measure both read
-     amber, and taking the first of them hid the shortfall behind the smaller
-     home. The size with the most required measures still outstanding wins, and
-     the larger home wins a tie after that. */
-  function worseThan(x, worst) {
-    if (BAND_RANK[x.m.band] !== BAND_RANK[worst.m.band]) {
-      return BAND_RANK[x.m.band] > BAND_RANK[worst.m.band];
-    }
-    if (x.r.unresolved !== worst.r.unresolved) {
-      return x.r.unresolved > worst.r.unresolved;
-    }
-    return x.bed > worst.bed;
-  }
-
-  function bedRuns() {
-    return beds.map(function (b) {
-      var spec = {};
-      for (var k in a) {
-        if (Object.prototype.hasOwnProperty.call(a, k)) { spec[k] = a[k]; }
-      }
-      spec.bedrooms = b;
-      return { bed: b, count: plotsFor(b), m: modelParts(spec), r: G.estimate(spec) };
-    });
-  }
-
-  function worstRun(runs) {
-    return runs.reduce(function (worst, x) {
-      return worseThan(x, worst) ? x : worst;
-    }, runs[0]);
-  }
-
-  function sizeBlock(runs) {
-    var rows = runs.map(function (x) {
-      return '<div class="s-row"><dt>' + esc(x.bed + " bed x " + x.count)
-        + "</dt><dd>" + esc(x.m.heading) + "</dd></div>";
-    }).join("");
-    return '<section class="fhs-spec"><h4>Every size on the scheme</h4><dl>'
-      + rows + "</dl></section>";
-  }
-
-  function renderResult(runs, best) {
-    var m = best.m;
-    var r = best.r;
+     the model's verdict as the card's title, one hairline row per element with
+     its state, what was entered and what the standard asks for, and the model's
+     guidance folded under the row. assess-result.css supplies the rows, the
+     fold and the hover; nothing is redeclared here. */
+  function renderResult(m, r) {
     var host = el("[data-result]");
 
     var rows = m.measures.map(function (x, i) {
+      var key = MEASURE_KEY[i];
       return '<li class="rise" style="--d:' + (STAGGER * (i + 2))
         + 'ms"><button type="button" class="r-chip state-' + x.state.toLowerCase()
         + '" data-chip="' + i + '" aria-expanded="false" aria-controls="r-note-' + i + '">'
         + measureArt(x.name, i)
         + '<span class="c-name" data-live>' + esc(x.name) + "</span>"
+        + '<span class="c-cell c-ent"><span class="c-cap">You entered</span>'
+        + '<span class="c-val" data-live>' + esc(entered(key, r)) + "</span></span>"
+        + '<span class="c-cell c-req"><span class="c-cap">FHS requires</span>'
+        + '<span class="c-val" data-live>' + esc(required(key, r)) + "</span></span>"
         + '<span class="c-state">' + esc(x.state) + "</span>" + CHEV + "</button>"
         + '<div class="r-note" id="r-note-' + i + '" data-note="' + i + '" hidden>'
         + '<div class="r-note-in"><p data-live>' + x.note + "</p></div></div></li>";
     }).join("");
 
-    host.innerHTML = '<div class="ar-root">'
+    host.innerHTML = '<div class="ar-root ar-hover">'
       + '<header class="fhs-verdict band-' + esc(m.band) + '">'
-      + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(sizeLine()) + "</span>"
-      + '<h2 class="ar-title" data-live>' + esc(m.heading) + "</h2>"
-      + '<p class="fhs-hint" data-drives>Every figure and every measure below is the '
-      + esc(best.bed) + " bed size, the one that sets this verdict.</p></header>"
+      + '<span class="eyebrow">' + esc(a.houseType) + " &middot; " + esc(a.bedrooms)
+      + " bed &middot; " + esc(a.storeys) + (Number(a.storeys) === 1 ? " storey" : " storeys")
+      + "</span>"
+      + '<h2 class="ar-title" data-live>' + esc(m.heading) + "</h2></header>"
 
-      + '<section class="ar-chartcard"><div class="ar-pins"><div class="ar-plates">'
-      + plate("Energy covered on your spec", r.user.coverage, 0)
-      + plate("Energy covered on a Gryd system", r.gryd.coverage, 1)
-      + '</div></div><p class="fhs-sub" data-live>' + esc(m.sub) + "</p></section>"
+      + '<section class="ar-chartcard"><p class="fhs-sub" data-live>'
+      + esc(m.sub) + "</p></section>"
 
-      + '<section class="ar-sec fhs-measures"><h3>What the check looked at</h3>'
-      + '<p class="fhs-hint">Tap a measure to see why.</p>'
+      + '<section class="ar-sec fhs-measures"><h3>How every element measures up</h3>'
+      + '<p class="fhs-hint">Tap a measure to see what to change.</p>'
       + '<ul class="ar-list fhs-rows">' + rows + "</ul></section>"
 
       + '<details class="ar-sec ar-fold r-detail rise" style="--d:' + (STAGGER * 10)
-      + 'ms"><summary><h3>Your answers and the comparison</h3>'
+      + 'ms"><summary><h3>The system comparison</h3>'
       + '<span class="ar-foldcue"><span class="ar-show">Show the detail</span>'
       + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
       + ' aria-hidden="true" focusable="false">'
@@ -783,7 +677,7 @@
       + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
       + "</svg></span></summary>"
       + '<div class="ar-foldbody"><div class="ar-foldinner">'
-      + '<div class="r-detail-in" data-summary>' + m.flags + sizeBlock(runs) + specBlock() + m.table
+      + '<div class="r-detail-in" data-summary>' + m.flags + m.table
       + "</div></div></div></details>"
 
       + '<p class="ar-foot note rise" style="--d:' + (STAGGER * 11) + 'ms" data-live>' + esc(m.disclaimer) + "</p>"
@@ -839,8 +733,8 @@
     });
   }
 
-  function show(runs, best) {
-    renderResult(runs, best);
+  function show(m, r) {
+    renderResult(m, r);
     hideCheck();
     w.setTimeout(function () {
       el("[data-result]").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -850,11 +744,11 @@
   /* The send is not allowed to cost the reader their result. It is tried, and
      if it does not go the gate says so once and the check is drawn anyway. */
   function finish() {
-    var runs = bedRuns();
-    var best = worstRun(runs);
+    var m = modelParts(a);
+    var r = G.estimate(a);
     var go = el("[data-go]");
     go.disabled = true;
-    sendLead(runs, best).then(function () { show(runs, best); }, function () {
+    sendLead(m, r).then(function () { show(m, r); }, function () {
       var note = el("[data-sent]");
       if (!note) {
         note = d.createElement("p");
@@ -864,7 +758,7 @@
       }
       note.textContent = "We could not send this just now, your result is below.";
       note.hidden = false;
-      w.setTimeout(function () { show(runs, best); }, 1400);
+      w.setTimeout(function () { show(m, r); }, 1400);
     });
   }
 
@@ -873,6 +767,7 @@
     host.hidden = true;
     host.innerHTML = "";
     begin();
+    el("[data-check]").hidden = false;
     el("[data-check]").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -905,36 +800,28 @@
   /* ---------------------------------------------------------------- wiring */
 
   function setField(field, raw) {
-    if (field === "hasSolar" || field === "hasBattery" || field === "hasWWHR") {
-      a[field] = raw === "Yes";
-      if (field === "hasSolar" && !a.hasSolar) { a.panels = 0; }
-    } else if (field === "storeys" || field === "panels") {
-      a[field] = Number(raw);
-    } else {
-      a[field] = raw;
-    }
+    if (field === "storeys" || field === "bedrooms") { a[field] = Number(raw); }
+    else { a[field] = raw; }
   }
 
-  /* A bedroom tile toggles rather than answers, and reveals or clears its own
-     plot count. a.bedrooms holds the smallest size picked so the guard and the
-     model always have a number to work with. */
-  function toggleBed(btn) {
-    var v = Number(btn.getAttribute("data-v"));
-    var on = btn.getAttribute("aria-pressed") === "true";
-    btn.setAttribute("aria-pressed", on ? "false" : "true");
-    var field = btn.parentNode.querySelector(".f-count");
-    if (on) {
-      beds = beds.filter(function (b) { return b !== v; });
-      delete bedCounts[v];
-      delete bedRaw[v];
-      if (field) { field.hidden = true; field.value = ""; }
-    } else {
-      if (beds.indexOf(v) < 0) { beds.push(v); }
-      beds.sort(function (x, y) { return x - y; });
-      if (field) { field.hidden = false; }
+  /* The panel row only exists while solar is on, so it is revealed and cleared
+     by the switch rather than living on a screen of its own. */
+  function toggleSwitch(btn) {
+    var field = btn.getAttribute("data-sw");
+    var on = btn.getAttribute("aria-checked") !== "true";
+    btn.setAttribute("aria-checked", on ? "true" : "false");
+    var word = btn.querySelector(".sw-state");
+    if (word) { word.textContent = on ? "Yes" : "No"; }
+    a[field] = on;
+    if (field === "hasSolar") {
+      var panelRow = el("[data-panel-row]");
+      if (panelRow) { panelRow.hidden = !on; }
+      if (!on) {
+        a.panels = 0;
+        var pf = el("[data-panels]");
+        if (pf) { pf.value = ""; }
+      }
     }
-    a.bedrooms = beds.length ? beds[0] : null;
-    flagOdd();
     gate();
   }
 
@@ -946,38 +833,31 @@
       var t = ev.target;
       if (!t || !t.closest) { return; }
 
-      if (t.closest("[data-restart]")) { cancelPending(); reset(); return; }
+      if (t.closest("[data-start]")) { revealCheck(); return; }
+      if (t.closest("[data-restart]")) { reset(); return; }
 
       var chip = t.closest(".r-chip");
       if (chip) { showNote(Number(chip.getAttribute("data-chip"))); return; }
 
+      var sw = t.closest(".fm-switch");
+      if (sw) { toggleSwitch(sw); return; }
+
       var tileEl = t.closest(".fm .f-tile");
       if (tileEl) {
-        /* a pane on its way out is not the question the reader is answering */
         if (moving) { return; }
         var field = tileEl.getAttribute("data-f");
-        if (field === "bedrooms") { toggleBed(tileEl); return; }
         setField(field, tileEl.getAttribute("data-v"));
         var groupEls = tileEl.parentNode.querySelectorAll(".f-tile");
         for (var i = 0; i < groupEls.length; i++) {
           groupEls[i].setAttribute("aria-pressed", String(groupEls[i] === tileEl));
         }
-        /* A single choice answers the question, so the run moves on by itself.
-           The pause is one beat, long enough to see the tile take the answer
-           before the pane starts leaving. */
-        cancelPending();
-        var from = at;
-        pending = w.setTimeout(function () {
-          pending = null;
-          if (moving || at !== from || at >= seq().length) { return; }
-          goTo(at + 1, "fwd");
-        }, 160);
+        if (field === "houseType" || field === "bedrooms") { flagOdd(); }
+        gate();
         return;
       }
 
-      if (t.closest("[data-back]")) { cancelPending(); goTo(Math.max(0, at - 1), "back"); return; }
+      if (t.closest("[data-back]")) { goTo(Math.max(0, at - 1), "back"); return; }
       if (t.closest("[data-go]")) {
-        cancelPending();
         if (moving) { return; }
         if (!gate()) { return; }
         if (!onGate()) { goTo(at + 1, "fwd"); return; }
@@ -986,12 +866,10 @@
     });
 
     d.addEventListener("input", function (ev) {
-      var cf = ev.target && ev.target.closest ? ev.target.closest(".f-count") : null;
-      if (cf) {
-        var b = Number(cf.getAttribute("data-count"));
-        bedRaw[b] = cf.value.trim();
-        if (wholePlots(bedRaw[b])) { bedCounts[b] = Number(bedRaw[b]); }
-        else { delete bedCounts[b]; }
+      var pf = ev.target && ev.target.closest ? ev.target.closest("[data-panels]") : null;
+      if (pf) {
+        var raw = pf.value.trim();
+        a.panels = wholeNumber(raw) ? Number(raw) : (raw === "" ? 0 : raw);
         gate();
         return;
       }
