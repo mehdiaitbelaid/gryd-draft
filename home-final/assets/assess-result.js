@@ -219,7 +219,7 @@
      height to the file so the model is never squashed. */
   var BEN_ICON = {
     dev: ["benefit-developer", "A clay hard hat resting on a rolled site drawing"],
-    home: ["benefit-homeowner", "A clay model of a pair of semi detached houses"]
+    home: ["benefit-homeowner", "A clay model of a house"]
   };
 
   function benefits(key, title, items) {
