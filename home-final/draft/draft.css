@@ -446,7 +446,10 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
 .a-quotes .q-rail:focus-within .q-track { animation-play-state: paused; }
 @keyframes quote-drift { to { transform: translateX(-50%); } }
 
-.a-quotes .q-set { gap: 0; padding-right: 0; align-items: flex-start; }
+/* stretch, not flex-start: every card takes the height of the tallest one in
+   the set, which is what lets each footer sit on a shared baseline however long
+   the quote above it runs. */
+.a-quotes .q-set { gap: 0; padding-right: 0; align-items: stretch; }
 .a-quotes .qc {
   display: flex;
   gap: 18px;
@@ -459,6 +462,10 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   box-shadow: none;
   border-left: 1px solid var(--stone-mid);
 }
+/* align-self overrides the card's own flex-start, so the text column runs the
+   full height of the card and its footer can fall to the floor. */
+.a-quotes .qc > div { display: flex; flex-direction: column; flex: 1 1 auto;
+  align-self: stretch; }
 .a-quotes .qc blockquote {
   margin: 0;
   font-style: normal;
@@ -466,21 +473,27 @@ html:not(.nav-live) .dnav, html:not(.nav-live) .dnav-tab { transition: none !imp
   line-height: 1.55;
   color: var(--red110);
 }
+/* Scott, 8 September: the attribution reads as three lines, name, then role and
+   company, then the mark, and it is pinned to the foot of the card so the
+   footers line up across the row. */
 .a-quotes .qc figcaption {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 16px;
-  padding-top: 0;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 16px;
+  flex-wrap: nowrap;
 }
 .a-quotes .qc figcaption strong { font-weight: 500; font-size: 14.5px; }
 /* One step darker than --warm-grey, which reads at 3.55:1 on the stone ground
    and misses AA on 14px text. Same hue, 5.07:1, and only the role line moves:
    the press wordmarks stay in the grey because a brand mark is a logo. */
 .a-quotes .qc figcaption > span { color: #705F57; font-size: 14px; }
-.a-quotes .qlogo { margin-left: 0; }
-.a-quotes .qlogo img { height: 20px; }
+.a-quotes .qlogo { margin-left: 0; display: block; }
+.a-quotes .qlogo img { height: 20px; display: block; }
+a.qlogo { text-decoration: none; }
+a.qlogo:hover img { opacity: .72; }
 .a-quotes .qlogo.word {
   font-size: 14px;
   letter-spacing: normal;

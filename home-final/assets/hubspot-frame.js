@@ -10,16 +10,26 @@
    The form's own words, fields and order stay HubSpot's. What is asked for
    here is only the face, the colours, the field rule and the button.
 
-   Known limit, 4 September. HubSpot has moved this portal onto its newer
-   embed, ui-forms-embed-components-app, and that renderer ignores the css
-   option: the string arrives on the frame as data-css and is dropped. It is
-   still passed, because it is honoured by the older renderer and by any form
-   that has no styling of its own in HubSpot, and because it costs one request
-   that is cached across both modals. Until then the inside of the two forms
-   is set in HubSpot itself, at portal 144906745, on forms
-   8ce7ddd3-fe9e-4433-8741-077aae8f72c3 (Get in touch) and
+   Known limit, retested 8 September. HubSpot has moved this portal onto its
+   newer embed, ui-forms-embed-components-app, and that renderer ignores the
+   css option: the string arrives on the frame as data-css and is dropped.
+
+   The legacy entry point is not a way round it. hbspt.forms.create off
+   forms/embed/v2.js was tested again against this portal on 8 September and it
+   builds the same div.hs-form-frame and the same cross origin
+   ui-forms-embed-components-app iframe, with data-css dropped exactly as
+   above. There is no inline render left to reach, so no sheet on this page and
+   no option on this call can change what the form looks like.
+
+   gryd.energy is on the same renderer, so the live site's form and ours draw
+   identically: same button, same fields, verified 8 September. The look is a
+   property of the form, and it is set in HubSpot itself, at portal 144906745,
+   on forms 8ce7ddd3-fe9e-4433-8741-077aae8f72c3 (Get in touch) and
    300acd1e-5c44-4728-b375-f51164c018b5 (case study download). The plate around
    them, which is what a page can reach, matches the site.
+
+   The string is still passed. It costs one request cached across both modals,
+   and it is honoured the moment a form is served without its own styling.
 
    window.GRYD_HS_CSS */
 window.GRYD_HS_CSS = [
