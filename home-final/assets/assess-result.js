@@ -16,6 +16,12 @@
 (function () {
   "use strict";
 
+  /* The clay icons are resolved against this file rather than the document, so
+     the same renderer works from the popup and from the tools page, which sit
+     at different depths. */
+  var me = document.currentScript;
+  var IMG = new URL("img/site-assess/", me ? me.src : location.href).href;
+
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   }
@@ -206,9 +212,25 @@
       + money(result.homeownerLifetimeSaving) + " over the systems lifetime";
   }
 
+  /* Scott, 8 September: a clay icon over each column heading, so a reader can
+     tell the developer half from the homeowner half at a glance. The width and
+     height carried on the tag are the file's own square, which reserves the
+     right box before the image decodes; the sheet sizes it and leaves the
+     height to the file so the model is never squashed. */
+  var BEN_ICON = {
+    dev: ["benefit-developer", "A clay hard hat resting on a rolled site drawing"],
+    home: ["benefit-homeowner", "A clay model of a pair of semi detached houses"]
+  };
+
   function benefits(key, title, items) {
+    var ic = BEN_ICON[key];
+    var icon = ic
+      ? '<img class="ar-benicon" src="' + IMG + ic[0] + '.png" srcset="'
+        + IMG + ic[0] + '.png 1x, ' + IMG + ic[0] + '@2x.png 2x" alt="'
+        + esc(ic[1]) + '" width="320" height="320" decoding="async">'
+      : "";
     return '<section class="ar-sec ar-benefits" data-sec="' + key + '">'
-      + "<h3>" + esc(title) + "</h3>"
+      + '<div class="ar-benhead">' + icon + "<h3>" + esc(title) + "</h3></div>"
       + '<ul class="ar-list">' + items + "</ul></section>";
   }
 

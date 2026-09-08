@@ -347,14 +347,65 @@
   text-wrap: pretty;
 }
 
-.ar-assess .ar-benefits { border-top: 1px solid var(--ar-line); margin-top: 12px; padding-top: 12px; }
+.ar-assess .ar-benefits { border-top: 1px solid var(--ar-line); margin-top: 32px; padding-top: 32px; }
 .ar-assess .ar-col .ar-benefits { margin-bottom: 0; }
+
+/* ------------------------------------------------------- Scott, 8 September */
+/* "More padding and more space", and a clay icon standing over each benefit
+   column so the developer half and the homeowner half read apart. The whole
+   rhythm of the result screen is set here, in one block, on the site's own
+   steps rather than on new numbers:
+
+     56px from the project details to the two result boxes, and again above the
+     chart and above the table, so the four long blocks are separated by one
+     interval rather than by three different ones,
+     36px of padding inside a result box, 40px between the two columns,
+     32px from a box to the benefit column under it, the hairline halfway,
+     14px on a benefit row and on a table row, so a list breathes at the same
+     rate as the table it sits above,
+     and 28px from the table to the footnote and from the footnote to the two
+     buttons, which used to close on 10px and read as an afterthought.
+
+   The details block still closes on the only hairline above the chart card. */
+.ar-assess .ar-head { margin-bottom: 28px; }
+.ar-assess .ar-project { margin-bottom: 0; }
+.ar-assess .ar-detail { padding: 14px 20px 14px 0; }
+.ar-assess .ar-chartcard { padding-top: 56px; margin-bottom: 64px; }
+.ar-assess .ar-pins { margin-bottom: 64px; }
+.ar-assess .ar-plates { gap: 10px 40px; }
+.ar-assess .ar-stat { padding: 36px; }
+.ar-assess .ar-note { margin-top: 20px; }
+.ar-assess .ar-list li { padding: 14px 0; }
+.ar-assess .ar-chart-head { margin-bottom: 18px; }
+.ar-assess .ar-table th { padding-bottom: 14px; }
+.ar-assess .ar-table td { padding: 14px 14px 14px 0; }
+.ar-assess .ar-foot { margin-top: 28px; }
+.ar-assess .ar-acts { margin-top: 28px; gap: 14px; }
+
+/* The icon stands over its heading rather than beside it: at this size a clay
+   object next to a 12px small caps label reads as a bullet, and above it it
+   reads as the column's mark. height is left to the file so neither model is
+   ever squashed. */
+.ar-benhead { display: block; margin-bottom: 18px; }
+.ar-benhead h3 { margin: 0; }
+.ar-benicon { display: block; width: 64px; height: auto; margin: 0 0 14px; }
 
 @media (max-width: 720px) {
   .ar-assess .ar-title { font-size: 28px; }
   .ar-assess .ar-fig { font-size: 40px; }
   .ar-assess .ar-table { font-size: 14px; }
   .ar-assess .ar-table th { font-size: 12px; }
+  /* the box padding comes down on a phone, and the two columns are stacked
+     here, so the gap between them has to be a row gap rather than a column one */
+  .ar-assess .ar-head { margin-bottom: 22px; }
+  .ar-assess .ar-detail { padding: 12px 14px 12px 0; }
+  .ar-assess .ar-chartcard { padding-top: 40px; margin-bottom: 44px; }
+  .ar-assess .ar-pins { margin-bottom: 44px; }
+  .ar-assess .ar-plates { gap: 40px; }
+  .ar-assess .ar-stat { padding: 24px; }
+  .ar-assess .ar-table td { padding: 12px 12px 12px 0; }
+  .ar-benhead { margin-bottom: 16px; }
+  .ar-benicon { width: 56px; margin-bottom: 12px; }
 }
 
 /* The two columns are one grid, not two stacks: the plates share a row and the
