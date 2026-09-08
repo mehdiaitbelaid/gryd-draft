@@ -64,70 +64,68 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="stylesheet" href="../assets/tokens.css">
 <link rel="stylesheet" href="g.css">
 <style>
-  /* Three tools, three cards on paper, each carrying a preview of itself at 4:3
-     with the pill, title, paragraph, meta line and link under it. The dark
-     plates and the line marks the page used to carry are gone: a line mark says
-     nothing a photograph of the tool at work does not say better.
+  /* Direction A: one editorial row per tool, read down the page in order rather
+     than scanned across three cards. The row carries an index, a photograph, the
+     copy and one button, on the hairlines the rest of the tree uses.
 
      Battery modelling came off the page on Scott's call of 3 September and is
      named in the closing note rather than listed as a tool. */
 
-  /* The headline and the standfirst sit side by side so the cards begin inside
-     the first viewport. */
-  .t-mast {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: var(--gutter) 56px;
-    align-items: end;
-    padding: 0 0 32px;
+  /* The width and height attributes on the images are presentational hints, so
+     the shared img rule needs height released for aspect-ratio to hold. */
+  .t-page img { height: auto; }
+
+  .t-page { padding-bottom: 8px; }
+
+  .a-mast { padding: 0 0 44px; border-bottom: 1px solid var(--stone-mid); }
+  .a-mast h1 {
+    font-size: clamp(34px, 5.4vw, 74px);
+    max-width: 16ch;
+    margin: 20px 0 0;
   }
-  .t-mast .eyebrow { grid-column: 1 / -1; }
-  .t-mast h1 {
-    font-size: clamp(30px, 3.4vw, 44px);
-    max-width: 18ch;
-    margin: 18px 0 0;
-  }
-  .t-mast .stand {
-    margin: 18px 0 0;
+  .a-mast .stand {
+    margin: 26px 0 0;
     font-size: 17px;
     line-height: 1.5;
     color: #6B4A3E;
-    max-width: 52ch;
+    max-width: 58ch;
   }
 
-  .t-cards {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .a-list { list-style: none; margin: 0; padding: 0; }
+  .a-row {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 32px;
+    grid-template-columns: 44px 260px minmax(0, 1fr) auto;
+    gap: 0 40px;
+    align-items: center;
+    padding: 40px 0;
+    border-bottom: 1px solid var(--stone-mid);
   }
-  .t-card {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--stone-mid);
-    border-radius: var(--radius-panel);
-    padding: 18px 18px 26px;
+  .a-n {
+    font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--warm-grey);
+    align-self: start;
+    padding-top: 6px;
+    letter-spacing: 0.02em;
   }
 
-  .t-prev {
+  .a-art {
     display: block;
-    position: relative;
     border-radius: var(--radius-chip);
     overflow: hidden;
     background: var(--stonelight);
   }
-  .t-prev img {
-    display: block;
+  .a-art img {
     width: 100%;
-    height: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
+    transition: transform .5s cubic-bezier(.22,.61,.36,1);
   }
+  .a-row:hover .a-art img { transform: scale(1.02); }
   /* A crop of a running tool is a screen, so it takes the hairline every screen
      on this site takes. The photographs sit on their own ground and take none. */
-  .t-prev.shot::after {
+  .a-art.shot { position: relative; }
+  .a-art.shot::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -136,98 +134,47 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     pointer-events: none;
   }
 
-  .t-card .g-pill { align-self: flex-start; margin-top: 22px; }
-  .t-card h2 {
-    margin-top: var(--label-gap);
-    font-size: 24px;
-    line-height: 1.1;
-    max-width: 22ch;
-  }
-  .t-dek {
-    margin: var(--head-gap) 0 0;
-    font-size: 15px;
+  .a-body .g-pill { margin-bottom: 16px; }
+  .a-body h2 { font-size: clamp(24px, 2.6vw, 34px); max-width: 24ch; }
+  .a-body .dek {
+    margin: 16px 0 0;
+    font-size: 16px;
     line-height: 1.55;
     color: #6B4A3E;
+    max-width: 58ch;
   }
-  .t-facts {
-    margin: 16px 0 0;
-    font-size: 14px;
-    color: #6B4A3E;
+  .a-meta {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
     display: flex;
-    gap: var(--gutter);
+    gap: 26px;
     flex-wrap: wrap;
-  }
-  .t-go {
-    display: inline-block;
-    text-decoration: none;
-    margin-top: auto;
-    padding-top: 18px;
-    font-size: 15px;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--warm-grey);
     font-weight: 500;
-    color: var(--ember);
-  }
-  .t-go:hover, .t-card:hover .t-go { text-decoration: underline; }
-  .t-go:focus-visible {
-    outline: 2px solid var(--ember);
-    outline-offset: 6px;
-    border-radius: var(--radius-chip);
   }
 
-  /* Hover, the site's own device: the card lifts 2px, the preview zooms 1.5
-     percent, the keyline under the title draws out to the full column, and the
-     arrow moves the 4px the hub's card links move. Nothing gains a shadow. */
-  .t-card { transition: transform .45s cubic-bezier(.22,.61,.36,1); }
-  .t-card:hover { transform: translateY(-2px); }
-  .t-card .t-prev img {
-    transform: none;
-    transition: transform .5s cubic-bezier(.22,.61,.36,1);
-  }
-  .t-card:hover .t-prev img { transform: scale(1.015); }
-
-  .t-card .key {
-    display: block;
-    height: 2px;
-    width: 100%;
-    margin-top: 14px;
-    background: var(--flare);
-    transform-origin: left center;
-    transform: scaleX(0.14);
-    transition: transform .62s cubic-bezier(.22,.61,.36,1);
-  }
-  .t-card:hover .key { transform: scaleX(1); }
-
-  .t-card .ar {
-    display: inline-block;
-    transition: transform .4s cubic-bezier(.22,.61,.36,1);
-  }
-  .t-card:hover .ar { transform: translateX(4px); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .t-card,
-    .t-card .t-prev img,
-    .t-card .key,
-    .t-card .ar { transition: none; }
-    .t-card:hover { transform: none; }
-    .t-card:hover .t-prev img { transform: none; }
-    .t-card:hover .ar { transform: none; }
-    .t-card .key, .t-card:hover .key { transform: scaleX(1); }
-  }
-
-  .t-note {
-    margin: 48px auto 0;
-    max-width: 62ch;
-    text-align: center;
-    font-size: 15px;
-    color: #6B4A3E;
-  }
+  .a-act .btn { margin: 0; white-space: nowrap; }
+  .a-note { margin: 40px 0 0; max-width: 62ch; font-size: 15px; color: #6B4A3E; }
   .t-page .g-close { margin-top: 56px; }
 
-  @media (max-width: 1080px) {
-    .t-mast { grid-template-columns: 1fr; align-items: start; }
-    .t-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (prefers-reduced-motion: reduce) {
+    .a-art img { transition: none; }
+    .a-row:hover .a-art img { transform: none; }
   }
-  @media (max-width: 760px) {
-    .t-cards { grid-template-columns: 1fr; }
+
+  @media (max-width: 1040px) {
+    .a-row { grid-template-columns: 40px 170px minmax(0, 1fr); gap: 0 28px; }
+    .a-act { grid-column: 2 / -1; margin-top: 24px; }
+  }
+  @media (max-width: 700px) {
+    .a-row { grid-template-columns: 1fr; gap: 0; padding: 32px 0; }
+    .a-n { padding: 0 0 14px; }
+    .a-art { max-width: 260px; margin-bottom: 22px; }
+    .a-act { grid-column: auto; margin-top: 22px; }
   }
 </style>
 <!-- SEO head, generated by _seo.py. Do not hand edit. -->
@@ -238,13 +185,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:title" content="Tools, Gryd">
 <meta property="og:description" content="The three Gryd tools live at launch: the site assessment, the Future Homes Standard readiness checker, and the Council Solar Index.">
 <meta property="og:url" content="https://gryd.energy/hub-directions/g/tools.html">
-<meta property="og:image" content="https://gryd.energy/hub-directions/img/tools/site-assess-800.jpg">
+<meta property="og:image" content="https://gryd.energy/hub-directions/img/listing/tools-site-assessment-800.jpg">
 <meta property="og:image:width" content="800">
-<meta property="og:image:height" content="436">
+<meta property="og:image:height" content="533">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tools, Gryd">
 <meta name="twitter:description" content="The three Gryd tools live at launch: the site assessment, the Future Homes Standard readiness checker, and the Council Solar Index.">
-<meta name="twitter:image" content="https://gryd.energy/hub-directions/img/tools/site-assess-800.jpg">
+<meta name="twitter:image" content="https://gryd.energy/hub-directions/img/listing/tools-site-assessment-800.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://gryd.energy/#organization","name":"Gryd","legalName":"Gryd Energy Ltd","url":"https://gryd.energy/","logo":"https://gryd.energy/home-final/assets/img/gryd-lockup@2x.png","identifier":"15092056","address":{"@type":"PostalAddress","addressLocality":"London","addressCountry":"GB"},"areaServed":{"@type":"Country","name":"United Kingdom"},"sameAs":["https://www.linkedin.com/company/grydenergy","https://www.crunchbase.com/organization/gryd-energy","https://find-and-update.company-information.service.gov.uk/company/15092056"],"contactPoint":[{"@type":"ContactPoint","contactType":"sales","email":"hello@gryd.energy","telephone":"+442045726364","areaServed":"GB","availableLanguage":"English"},{"@type":"ContactPoint","contactType":"press","email":"press@gryd.energy","areaServed":"GB","availableLanguage":"English"}]},{"@type":"BreadcrumbList","@id":"https://gryd.energy/hub-directions/g/tools.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://gryd.energy/home-final/draft/index.html"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://gryd.energy/hub-directions/g/tools.html"}]}]}</script>
 <!-- /SEO head -->
 </head>
@@ -257,62 +204,68 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <div class="wrap">
 
-  <header class="t-mast">
+  <header class="a-mast">
     <span class="eyebrow">Tools</span>
     <h1>Three tools. Each answers a question before you commit a plot.</h1>
     <p class="stand">One sizes the solar and battery on a scheme and puts a number against it. One checks a house type specification against the incoming Future Homes Standard. One maps what UK council housing has installed so far.</p>
   </header>
 
-  <ol class="t-cards">
+  <ol class="a-list">
 
-    <li class="t-card">
-      <span class="t-prev">
+    <li class="a-row">
+      <span class="a-n">01</span>
+      <span class="a-art">
         <picture>
-          <source type="image/webp" srcset="../img/tools/site-assess-800.webp 800w, ../img/tools/site-assess-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 380px">
-          <img src="../img/tools/site-assess-800.jpg" srcset="../img/tools/site-assess-800.jpg 800w, ../img/tools/site-assess-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 380px" alt="An overhead view of a new build scheme with a printed site plan laid out in the foreground" width="1600" height="871" loading="eager" decoding="async">
+          <source type="image/webp" srcset="../img/listing/tools-site-assessment-800.webp 800w, ../img/listing/tools-site-assessment-1200.webp 1200w" sizes="(max-width: 700px) 260px, (max-width: 1040px) 170px, 260px">
+          <img src="../img/listing/tools-site-assessment-800.jpg" srcset="../img/listing/tools-site-assessment-800.jpg 800w, ../img/listing/tools-site-assessment-1200.jpg 1200w" sizes="(max-width: 700px) 260px, (max-width: 1040px) 170px, 260px" alt="A new build street of houses with one terrace roof fully laid with solar panels" width="1200" height="800" loading="eager" decoding="async">
         </picture>
       </span>
-      <span class="g-pill">Developers</span>
-      <h2>See what a scheme carries before it is priced</h2>
-      <span class="key" aria-hidden="true"></span>
-      <p class="t-dek">Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.</p>
-      <p class="t-facts"><span>Scheme level</span><span>Under two minutes</span></p>
-      <a class="t-go" href="site-assessment.html">Open the tool <span class="ar">&rarr;</span></a>
+      <div class="a-body">
+        <span class="g-pill">Developers</span>
+        <h2>See what a scheme carries before it is priced</h2>
+        <p class="dek">Roof by roof solar and battery sizing across the house types on a site, with the build cost saving and the generation set against the plot count.</p>
+        <ul class="a-meta"><li>Scheme level</li><li>Under two minutes</li></ul>
+      </div>
+      <div class="a-act"><a class="btn" href="site-assessment.html">Open the tool</a></div>
     </li>
 
-    <li class="t-card">
-      <span class="t-prev">
+    <li class="a-row">
+      <span class="a-n">02</span>
+      <span class="a-art">
         <picture>
-          <source type="image/webp" srcset="../img/tools/fhs-800.webp 800w, ../img/tools/fhs-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 380px">
-          <img src="../img/tools/fhs-800.jpg" srcset="../img/tools/fhs-800.jpg 800w, ../img/tools/fhs-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 380px" alt="A new build front elevation with an energy rating card pinned to the sales board" width="1600" height="871" loading="eager" decoding="async">
+          <source type="image/webp" srcset="../img/listing/tools-fhs-checker-800.webp 800w, ../img/listing/tools-fhs-checker-1200.webp 1200w" sizes="(max-width: 700px) 260px, (max-width: 1040px) 170px, 260px">
+          <img src="../img/listing/tools-fhs-checker-800.jpg" srcset="../img/listing/tools-fhs-checker-800.jpg 800w, ../img/listing/tools-fhs-checker-1200.jpg 1200w" sizes="(max-width: 700px) 260px, (max-width: 1040px) 170px, 260px" alt="A new build semi detached pair with solar panels on both roof slopes and an air source heat pump beside each front door" width="1200" height="800" loading="eager" decoding="async">
         </picture>
       </span>
-      <span class="g-pill">Future Homes Standard</span>
-      <h2>Check a house type against the published standard</h2>
-      <span class="key" aria-hidden="true"></span>
-      <p class="t-dek">Three questions on house type, specification and contact details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.</p>
-      <p class="t-facts"><span>House type level</span><span>60 seconds</span></p>
-      <a class="t-go" href="fhs.html">Open the checker <span class="ar">&rarr;</span></a>
+      <div class="a-body">
+        <span class="g-pill">Future Homes Standard</span>
+        <h2>Check a house type against the published standard</h2>
+        <p class="dek">Four screens on the house type, the fabric, the systems in the spec and your details return a readiness summary, the gaps against the standard, and a solar and battery specification that closes them.</p>
+        <ul class="a-meta"><li>House type level</li><li>60 seconds</li></ul>
+      </div>
+      <div class="a-act"><a class="btn" href="fhs.html">Open the checker</a></div>
     </li>
 
-    <li class="t-card">
-      <span class="t-prev shot">
+    <li class="a-row">
+      <span class="a-n">03</span>
+      <span class="a-art shot">
         <picture>
-          <source type="image/webp" srcset="../img/tools/csi-map-800.webp 800w, ../img/tools/csi-map-1600.webp 1600w" sizes="(max-width: 760px) 92vw, 380px">
-          <img src="../img/tools/csi-map-800.jpg" srcset="../img/tools/csi-map-800.jpg 800w, ../img/tools/csi-map-1600.jpg 1600w" sizes="(max-width: 760px) 92vw, 380px" alt="The Council Solar Index map of the UK, shaded by council homes with solar" width="1600" height="888" loading="eager" decoding="async">
+          <source type="image/webp" srcset="../img/tools/csi-map-800.webp 800w, ../img/tools/csi-map-1600.webp 1600w" sizes="(max-width: 700px) 260px, (max-width: 1040px) 170px, 260px">
+          <img src="../img/tools/csi-map-800.jpg" srcset="../img/tools/csi-map-800.jpg 800w, ../img/tools/csi-map-1600.jpg 1600w" sizes="(max-width: 700px) 260px, (max-width: 1040px) 170px, 260px" alt="The Council Solar Index map of the UK, shaded by council homes with solar" width="1600" height="888" loading="eager" decoding="async">
         </picture>
       </span>
-      <span class="g-pill">Council housing</span>
-      <h2>See how far council housing has got with rooftop solar</h2>
-      <span class="key" aria-hidden="true"></span>
-      <p class="t-dek">Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.</p>
-      <p class="t-facts"><span>UK wide</span><span>2025 and 2026 returns</span></p>
-      <a class="t-go" href="council-solar-index.html">Open the map <span class="ar">&rarr;</span></a>
+      <div class="a-body">
+        <span class="g-pill">Council housing</span>
+        <h2>See how far council housing has got with rooftop solar</h2>
+        <p class="dek">Interactive UK map of council-owned housing rooftop solar uptake and EPC ratings, built from figures reported by UK councils on their solar installations.</p>
+        <ul class="a-meta"><li>UK wide</li><li>2025 and 2026 returns</li></ul>
+      </div>
+      <div class="a-act"><a class="btn" href="council-solar-index.html">Open the map</a></div>
     </li>
 
   </ol>
 
-  <p class="t-note">Battery modelling and a grid constraint check are still in design. Each is listed here once it is ready to be used rather than looked at.</p>
+  <p class="a-note">Battery modelling and a grid constraint check are still in design. Each is listed here once it is ready to be used rather than looked at.</p>
 
   <div class="g-close">
     <h2>Not sure which one you need?</h2>
