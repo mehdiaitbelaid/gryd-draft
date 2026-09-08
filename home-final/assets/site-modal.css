@@ -7,7 +7,8 @@
    button, so opening two of them in a row showed two different products. The
    assessment popup was the best drawn of the three, so its plate is the one kept
    and the other two are re-expressed on it here. The per modal sheets now carry
-   only what is genuinely theirs: the stage dash, the HubSpot fallback note.
+   only what is genuinely theirs: the stage dash, the contact plate's band and
+   photograph.
 
    Loaded by site-assess-modal.js on first open, by the homepage head for the
    contact modal and by the hub head for the download gate, so any page that can
@@ -50,6 +51,12 @@
 .sam[hidden],
 .gc-modal[hidden],
 .dl-gate[hidden] { display: none; }
+
+/* A dialog has to stand over everything the page can put in front of it. The
+   cookie notice is z-index 300, and at 390 it sits exactly where the download
+   gate's send button is, so a first time reader on a phone could not reach it.
+   The contact modal already cleared it; the gate does now too. */
+.dl-gate { z-index: 5000; }
 
 /* The assessment popup paints the scrim on the container and fades the whole
    thing; the two form modals carry a scrim element, because a click on it
@@ -143,11 +150,7 @@
    a modal opened from a page that does not carry that sheet still matches it.
    Any change to .btn in tokens.css has to be made here in the same commit. */
 .sam-go,
-.ar-btn,
-.gc-form input[type="submit"],
-.gc-form .hs-button,
-.dl-form input[type="submit"],
-.dl-form .hs-button {
+.ar-btn {
   display: inline-block;
   font-family: "DM Sans", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
@@ -164,15 +167,9 @@
   appearance: none;
 }
 .sam-go:hover,
-.ar-btn:hover,
-.gc-form input[type="submit"]:hover,
-.gc-form .hs-button:hover,
-.dl-form input[type="submit"]:hover,
-.dl-form .hs-button:hover { background: var(--modal-flare-press); }
+.ar-btn:hover { background: var(--modal-flare-press); }
 .sam-go:focus-visible,
-.ar-btn:focus-visible,
-.gc-form input[type="submit"]:focus-visible,
-.dl-form input[type="submit"]:focus-visible {
+.ar-btn:focus-visible {
   outline: 2px solid var(--modal-flare);
   outline-offset: 3px;
 }
@@ -190,14 +187,21 @@
 
 /* -------------------------------------------------------------- the fields */
 
-/* One hairline per field, no box, on the assessment popup's own numbers. The
-   HubSpot embed brings its own markup, so what is reachable from a host sheet
-   is set here and the rest is left to it. */
-.sam-field input,
-.gc-form input[type="text"], .gc-form input[type="email"], .gc-form input[type="tel"],
-.gc-form select, .gc-form textarea,
-.dl-form input[type="text"], .dl-form input[type="email"], .dl-form input[type="tel"],
-.dl-form select, .dl-form textarea {
+/* The form fills its column so the nav can sit at the foot of it, which is the
+   composition of the approved sheet: fields at the top, the rail and the two
+   buttons on the plate's bottom edge. */
+.hs-form { display: flex; flex-direction: column; min-height: 100%; }
+.hs-form .hs-step { display: flex; flex-direction: column; flex: 1 1 auto; }
+
+/* Both lead forms are drawn by assets/hs-form.js now rather than served in a
+   HubSpot iframe, so the field is the site's own again: label above in small
+   caps, value in Borna on a single hairline, nothing boxed. These are the
+   numbers of the approved sheet, home-final/proto-forms/direction-A.html, and
+   they are stated here rather than in either modal's own sheet because the
+   contact popup and the hub's download gate have to draw the same field. */
+/* The assessment popup's own field, unchanged: the site's sans at 16px on the
+   same hairline. */
+.sam-field input {
   font: inherit;
   font-size: 16px;
   width: 100%;
@@ -209,41 +213,135 @@
   padding: 6px 0 7px;
   transition: border-color .2s ease;
 }
+
+.hs-form input[type="text"], .hs-form input[type="email"], .hs-form input[type="tel"],
+.hs-form textarea {
+  font: inherit;
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  width: 100%;
+  background: transparent;
+  color: var(--modal-ink);
+  border: 0;
+  border-bottom: 1px solid var(--modal-line);
+  border-radius: 0;
+  padding: 4px 0 8px;
+  transition: border-color .2s ease;
+}
+.hs-form textarea { font-size: 19px; line-height: 1.45; resize: none; }
 .sam-field input:focus,
-.gc-form input:focus, .gc-form select:focus, .gc-form textarea:focus,
-.dl-form input:focus, .dl-form select:focus, .dl-form textarea:focus {
+.hs-form input:focus, .hs-form textarea:focus {
   outline: 0;
   border-bottom-color: var(--modal-flare);
 }
+.hs-form .hs-f.is-focus input, .hs-form .hs-f.is-focus textarea {
+  border-bottom-width: 2px;
+  padding-bottom: 7px;
+}
+.hs-form .hs-f.is-error input, .hs-form .hs-f.is-error textarea {
+  border-bottom-color: var(--modal-flare);
+}
 .sam-field ::placeholder,
-.gc-form ::placeholder,
-.dl-form ::placeholder { color: var(--modal-grey); opacity: .8; }
+.hs-form ::placeholder { color: var(--modal-grey); opacity: .8; }
 
-.sam-field label,
-.gc-form label,
-.dl-form label {
+.sam-field label { display: block; font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--modal-grey); margin-bottom: 2px; }
+
+.hs-form .hs-f { margin: 0 0 22px; }
+.hs-form .hs-f > label {
   display: block;
-  font-size: 10px;
-  letter-spacing: .1em;
+  font-size: 12px;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--modal-grey);
-  margin-bottom: 2px;
+  margin: 0 0 6px;
 }
-.gc-form .hs-form-field,
-.dl-form .hs-form-field { margin-bottom: 16px; }
+.hs-form .hs-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-/* The embed draws into an iframe whenever the form carries HubSpot styling, and
-   an iframe's own body is white, which puts a white card on the paper plate.
-   The frame is made transparent here and the document inside it is painted by
-   the css option passed to hbspt.forms.create. */
-.gc-form, .dl-form { margin-top: 0; }
-.gc-form iframe, .dl-form iframe {
-  width: 100%;
-  border: 0;
-  display: block;
-  background: transparent;
-  color-scheme: light;
+/* The form's own heading and standfirst, which are HubSpot's words on the
+   site's type ramp. */
+.hs-form .hs-title {
+  font-family: "Borna", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  margin: 0 0 10px;
 }
+.hs-form .hs-stand {
+  margin: 0 0 26px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #6B4A3E;
+  max-width: 34ch;
+}
+.hs-form .hs-done .hs-stand { margin-bottom: 12px; }
+
+/* The validation lines: under the field, and once over the form. Both are
+   HubSpot's own strings, in the palette's alarm rather than in browser red. */
+.hs-form .hs-err {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--modal-flare);
+}
+.hs-form .hs-global {
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--modal-flare);
+}
+
+/* CONSENT SLOT. Neither lead form carries a consent module in the portal, so
+   there is no line to draw and none is invented here. The row would sit between
+   the last field and the rail, on the same 15px body size as the standfirst. */
+
+/* The step rail, on the palette rather than on HubSpot's. */
+.hs-form .hs-rail-row { margin-top: 22px; }
+.hs-form .hs-rail-n {
+  font-size: 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--modal-grey);
+  margin: 0 0 6px;
+}
+.hs-form .hs-rail {
+  height: 2px;
+  background: var(--modal-line);
+  border-radius: 2px;
+  position: relative;
+}
+.hs-form .hs-rail i {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  display: block;
+  background: var(--modal-flare);
+  border-radius: 2px;
+}
+
+/* Back beside Send, Send alone on a single step form. */
+/* The nav is pushed to the foot of the form column, which is what holds the
+   two plates to one baseline whatever a step's field count is. */
+.hs-form .hs-nav {
+  display: flex;
+  margin-top: auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 26px;
+}
+.hs-form .hs-nav.end { justify-content: flex-end; }
+.hs-form .ar-btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* The send itself failed. The answers stay where they are and the send is
+   offered again. */
+.hs-form .hs-retry { margin: 22px 0 0; }
+.hs-form .hs-retry-note { margin: 0 0 12px; font-size: 15px; color: var(--modal-flare); }
+
+/* The released file, under the words the form ends on. */
+.dl-done { margin: 4px 0 0; }
 
 .gc-note, .dl-note { margin: 0; font-size: 15px; color: #6B4A3E; }
 .gc-note a { color: var(--modal-flare); }
@@ -252,6 +350,8 @@ html.dl-open, html.gc-open { overflow: hidden; }
 
 @media (max-width: 720px) {
   .sam, .gc-modal, .dl-gate { padding: 12px; }
+  .hs-form .hs-pair { grid-template-columns: 1fr; gap: 0; }
+  .hs-form .hs-title { font-size: 26px; }
   .sam-box, .gc-panel, .dl-panel { padding: 22px 20px 20px; border-radius: 22px; }
   .gc-panel, .dl-panel { padding-top: 58px; }
 }

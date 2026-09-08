@@ -23,9 +23,9 @@
   width: min(1080px, 100%);
   padding: 0;
   overflow: hidden;
-  /* The band takes 74px off the top and the embedded form is 672px tall, so the
-     shared 640px ceiling left the submit button below the fold of a column with
-     no visible scrollbar. The plate is wider and taller than the shared one for
+  /* The band takes 74px off the top and the form runs past the shared 640px
+     ceiling, which left the send button below the fold of a column with no
+     visible scrollbar. The plate is wider and taller than the shared one for
      the photograph's sake as much as the form's: a narrow column turns a
      landscape frame into a crop tight enough to cut two of the three faces. */
   max-height: min(760px, calc(100vh - 48px));

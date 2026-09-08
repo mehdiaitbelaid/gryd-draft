@@ -281,7 +281,7 @@ html.gryd-js.intro-done .d-hero .b1 { filter: opacity(1); }
   addEventListener('pagehide', save);
 })();
 </script>
-<script src="../assets/hubspot-frame.js"></script>
+<script src="../assets/hs-form.js"></script>
 <script src="../assets/site-assess-modal.js" defer></script>
 <noscript><link rel="stylesheet" href="showcase.css"><link rel="stylesheet" href="battery-scrub.css"><link rel="stylesheet" href="../assets/site-modal.css"><link rel="stylesheet" href="contact-modal.css"></noscript>
 <style>
@@ -1885,7 +1885,7 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
     </div>
   </div></section>
 
-<section class="d-batt" id="battery">
+<section class="d-batt" id="battery" data-batt>
   <div class="pin-card">
     <div class="wrap">
       <div class="band-grid">
@@ -1895,11 +1895,16 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
         </div>
         <div class="card-live">
           <div class="visual">
-            <picture class="still">
-              <source type="image/webp" srcset="../assets/img/battery/clay-evening.webp">
-              <img src="../assets/img/battery/clay-evening.jpg" width="1880" height="1080" loading="lazy" decoding="async"
-                   alt="The same clay house in the evening, windows lit and the battery carrying the house">
+            <picture class="poster">
+              <source type="image/webp" srcset="../assets/img/battery/clay-day.webp">
+              <img src="../assets/img/battery/clay-day.jpg" width="1880" height="1080" loading="lazy" decoding="async"
+                   alt="A clay model of a house in midday sun, solar panels on the roof and a battery on the wall beside the door">
             </picture>
+            <video class="clip" preload="none" muted loop playsinline
+                   data-src-mp4="../assets/video/battery-day-to-evening.mp4" data-src-webm="../assets/video/battery-day-to-evening.webm"
+                   aria-label="The same clay house running from midday to midnight, playing on a loop"></video>
+            <div class="still rest" role="img"
+                 aria-label="The same clay house in the evening, windows lit and the battery carrying the house"></div>
             <span class="visual-tag">Powered by the sun, midday to midnight</span>
           </div>
         </div>
@@ -1978,7 +1983,7 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
     </div>
     <button class="gc-close" type="button" data-contact-close aria-label="Close">&times;</button>
     <div class="gc-body">
-      <div class="gc-col"><div class="gc-form" id="gc-contact-form"></div></div>
+      <div class="gc-col"><div class="gc-form hs-form" id="gc-contact-form"></div></div>
       <picture class="gc-shot">
         <source type="image/webp" sizes="(max-width: 720px) 92vw, 600px"
                 srcset="../assets/img/contact-team-800.webp 800w,
@@ -1998,6 +2003,10 @@ body.on-flare .stub .btn.ghost { padding: 14px 30px; font-size: 15px; }
 <!-- the ambient layer reads the step the driver above writes, so it loads after it -->
 <script src="system-live.js" data-sprites="../assets/img/system/"></script>
 <!-- the band's entry motion; the sticky label above owns its own geometry -->
+<!-- the band loops a clip of its own; it attaches no source until the band is
+     within a viewport, so it costs first paint nothing, and it touches nothing
+     in the band but the picture -->
+<script src="battery-loop.js"></script>
 <script src="audience.js"></script>
 <script src="showcase-video.js"></script>
 <script src="contact-modal.js"></script>
