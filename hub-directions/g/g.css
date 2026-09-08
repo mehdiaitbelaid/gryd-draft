@@ -449,8 +449,13 @@
    body colour was too quiet to find in running prose, so a link is flare with
    its own underline and deepens to ember on hover. Flare on paper is 2.95:1,
    which is under AA for body text; it is the site's accent colour and the
-   choice is deliberate. The return link and the download button opt out. */
-.g-body p a:not(.btn), .g-body li a:not(.btn), .g-body td a:not(.btn), .g-body blockquote a:not(.btn) {
+   choice is deliberate. The return link and the download button opt out.
+
+   Mehdi, 8 September: the FHS reading column is not a .g-body article, but its
+   prose links are the same links, so it joins this rule rather than carrying a
+   second one of its own. */
+.g-body p a:not(.btn), .g-body li a:not(.btn), .g-body td a:not(.btn), .g-body blockquote a:not(.btn),
+.fhs-col p a:not(.btn), .fhs-col li a:not(.btn) {
   color: var(--flare);
   text-decoration: underline;
   text-decoration-color: var(--flare);
@@ -460,12 +465,14 @@
   transition: color 0.16s ease, text-decoration-color 0.16s ease;
 }
 .g-body p a:not(.btn):visited, .g-body li a:not(.btn):visited,
-.g-body td a:not(.btn):visited, .g-body blockquote a:not(.btn):visited {
+.g-body td a:not(.btn):visited, .g-body blockquote a:not(.btn):visited,
+.fhs-col p a:not(.btn):visited, .fhs-col li a:not(.btn):visited {
   color: var(--flare);
   text-decoration-color: var(--flare);
 }
 .g-body p a:not(.btn):hover, .g-body li a:not(.btn):hover, .g-body td a:not(.btn):hover,
-.g-body blockquote a:not(.btn):hover {
+.g-body blockquote a:not(.btn):hover,
+.fhs-col p a:not(.btn):hover, .fhs-col li a:not(.btn):hover {
   color: var(--ember);
   text-decoration-color: var(--ember);
   text-decoration-thickness: 2px;
