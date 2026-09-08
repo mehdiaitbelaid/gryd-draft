@@ -1043,3 +1043,75 @@
   if (d.readyState === "loading") { d.addEventListener("DOMContentLoaded", start); }
   else { start(); }
 })(window, document);
+
+/* The contents index beside the article. A click travels to its section rather
+   than snapping to it, the section lands clear of the pill nav, and the index
+   says which section the reader is in whether they clicked or scrolled there.
+   The behaviour is the FAQ index's, so the two read alike. */
+(function () {
+  var nav = document.querySelector('.fhs-index');
+  if (!nav) return;
+  var links = [].slice.call(nav.querySelectorAll('a[href^="#"]'));
+  if (!links.length) return;
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* The pill is fixed and can be tucked away mid scroll, so its clearance is
+     measured from the untransformed box rather than a client rect that reads
+     negative while the bar is retracted. GAP is the space under the pill. */
+  var GAP = 6;
+  var clearance = 120;
+  function measure() {
+    var pill = document.querySelector('.dnav');
+    if (!pill) return;
+    var h = pill.offsetHeight;
+    if (!h) return;          // not laid out at all, so the last reading stands
+    var top = parseFloat(getComputedStyle(pill).top);
+    if (!isFinite(top)) top = 16;
+    clearance = Math.round(top + h + GAP);
+    document.documentElement.style.setProperty('--fhs-anchor', clearance + 'px');
+  }
+  measure();
+  addEventListener('resize', measure);
+  addEventListener('load', measure);
+
+  function target(a) {
+    var id = a.getAttribute('href').slice(1);
+    return id ? document.getElementById(id) : null;
+  }
+
+  function mark(a) {
+    links.forEach(function (l) {
+      if (l === a) l.setAttribute('aria-current', 'true');
+      else l.removeAttribute('aria-current');
+    });
+  }
+
+  links.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var sec = target(a);
+      if (!sec) return;
+      e.preventDefault();
+      measure();
+      mark(a);
+      var y = sec.getBoundingClientRect().top + scrollY - clearance;
+      scrollTo({ top: Math.max(0, y), behavior: reduced.matches ? 'auto' : 'smooth' });
+      if (history.replaceState) history.replaceState(null, '', a.getAttribute('href'));
+    });
+  });
+
+  /* Scrolling marks the index too. The band starts under the pill, and a
+     section's foot overlaps the next section's head there, so the current
+     section is the last one crossing the band rather than the first. */
+  if (!('IntersectionObserver' in window)) return;
+  var seen = {};
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) { seen[en.target.id] = en.isIntersecting; });
+    var pick = null;
+    links.forEach(function (l) {
+      var sec = target(l);
+      if (sec && seen[sec.id]) pick = l;
+    });
+    if (pick) mark(pick);
+  }, { rootMargin: '-' + clearance + 'px 0px -55% 0px', threshold: 0 });
+  links.forEach(function (l) { var s = target(l); if (s) io.observe(s); });
+})();

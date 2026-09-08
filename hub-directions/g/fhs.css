@@ -78,10 +78,17 @@
   color: var(--ink-soft);
 }
 .fhs-index a span { color: var(--flare); font-weight: 500; }
-.fhs-index a:hover { color: var(--red110); }
+.fhs-index a:hover, .fhs-index a:focus-visible { color: var(--flare); }
+/* the section the reader is in, whether they clicked it or scrolled into it.
+   The same mark the FAQ index uses, so the two indexes read alike. */
+.fhs-index a[aria-current="true"] { color: var(--flare); font-weight: 500; }
 
 .fhs-col { max-width: 68ch; }
 .fhs-sec { padding-bottom: var(--sec-pad); }
+/* scroll-margin keeps a jumped-to section clear of the fixed pill nav. fhs.js
+   measures the pill and writes --fhs-anchor; the literal is the fallback for a
+   first paint and for the case where the script never runs. */
+.fhs-sec { scroll-margin-top: var(--fhs-anchor, 120px); }
 .fhs-sec:last-child { padding-bottom: 0; }
 .fhs-sec + .fhs-sec { border-top: 1px solid var(--stone-mid); padding-top: 56px; }
 .fhs-sec h2 {
@@ -191,7 +198,6 @@
   border-radius: var(--radius-panel);
   padding: 30px;
 }
-.fhs-cols .fhs-ccard { background: var(--blush); }
 .fhs-clay { display: block; width: 72px; height: 72px; margin-bottom: 14px; }
 .fhs-bullets { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .fhs-bullets li {
@@ -795,6 +801,8 @@
 .fhs-result .tbl .fhs-gryd-col .sub { color: var(--flare); }
 .fhs-result .num { font-variant-numeric: tabular-nums; }
 .fhs-result .note { font-size: 15px; line-height: 1.6; color: var(--warm-grey); max-width: 74ch; margin: 22px 0 0; }
+/* Mehdi, 8 September: the closing disclaimer alone drops below the floor. */
+.fhs-result .ar-foot.note { font-size: 13px; }
 .fhs-result .note.flag { color: var(--ember); }
 .fhs-result .r-detail-in .note { margin: 0 0 14px; }
 .fhs-result .ar-acts { gap: 18px; margin-top: 26px; flex-wrap: wrap; }
