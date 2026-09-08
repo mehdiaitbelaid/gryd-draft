@@ -736,6 +736,17 @@
       table.classList.add("ar-table-wrap");
       var t = table.querySelector("table");
       if (t) { t.classList.add("ar-table"); }
+      /* Mehdi, 7 September: the Gryd column is the answer the fold exists to
+         give, so it is tinted rather than left as one of four equal columns.
+         The class goes on the cells because the table has no colgroup and a
+         column cannot be styled without one. */
+      if (t) {
+        Array.prototype.forEach.call(t.querySelectorAll("tr"), function (row) {
+          var cells = row.children;
+          var last = cells[cells.length - 1];
+          if (last) { last.classList.add("fhs-gryd-col"); }
+        });
+      }
     }
     var flags = Array.prototype.filter.call(box.children, function (n) {
       return n.classList && n.classList.contains("note");
@@ -801,7 +812,7 @@
       + '<ul class="ar-list fhs-rows">' + rows + "</ul></section>"
 
       + '<details class="ar-sec ar-fold r-detail rise" style="--d:' + (STAGGER * 10)
-      + 'ms"><summary><h3>The system comparison</h3>'
+      + 'ms"><summary><h3>What Gryd could offer</h3>'
       + '<span class="ar-foldcue"><span class="ar-show">Show the detail</span>'
       + '<svg class="ar-chev" viewBox="0 0 12 12" width="12" height="12"'
       + ' aria-hidden="true" focusable="false">'

@@ -93,13 +93,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <div class="fhs">
 <div class="wrap">
 
-  <!-- Mehdi, 7 September: Scott asked for the page back in front of the check,
-       and read as a page rather than as a wall of small print. The masthead,
-       the three requirements as clay tiles and the three steps as numbered
-       blocks are read first, and the check is revealed by the button under
-       them. Every live line carries data-live and is word for word with
-       hub-directions/fhs-live-source.md; the numbers and the miniatures are
-       reading aids over that copy and change none of it. -->
+  <!-- Mehdi, 8 September: direction A, the article spine. The page reads as a
+       document: a masthead, a sticky index of the four sections on the left, a
+       68ch reading column on the right, and the check offered as a bordered
+       panel inside section 03. Every live line carries data-live and is word
+       for word with hub-directions/fhs-live-source.md and with
+       https://gryd.energy/are-you-fhs-ready/; the numbers, the index, the
+       photographs and the section labels are reading aids over that copy and
+       change none of it. The six FHS FAQs the live page shows sit on the hub's
+       own FAQ page, hub-directions/g/faq.html, which is where this tree keeps
+       question and answer copy and where the FAQPage schema is emitted. -->
 
   <header class="fhs-mast">
     <span class="eyebrow">Future Homes Standard</span>
@@ -115,76 +118,110 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </ul>
   </header>
 
-  <!-- the live page's copy, in its own order, then the button that reveals the
-       check -->
   <section class="fhs-intro">
 
-    <div class="fhs-lede">
-      <p data-live>The Future Homes Standard represents the most significant upgrade to how we build homes in England in a generation. Published on 24 March 2026, the new regulations require new homes to produce 75% fewer greenhouse gas emissions, achieved through on-site renewable energy generation on most new roofs (in practice, rooftop solar PV), low-carbon heating systems such as air source heat pumps replacing gas boilers, and enhanced building fabric performance including improved airtightness. The regulations come into force on 24 March 2027, with a 12-month transition period. Building work must have commenced under previous regulations by 24 March 2028.</p>
-      <p data-live>For developers, this is a clear signal: the homes being designed today must be ready for a low-carbon future. For homeowners, it means stepping into a home that is cheaper to run, more comfortable to live in, and built to perform for decades, not just pass a minimum standard. The FHS does not just raise the bar. It redefines what a new home should be.</p>
-    </div>
-
-    <div class="fhs-block">
-      <h2 data-live>The Future Homes Standard is here. Are you ready?</h2>
-      <p data-live>The FHS requires new homes in England to produce 75% fewer greenhouse gas emissions than homes built under the 2013 Building Regulations. For most developers, that means three things:</p>
-      <ol class="fhs-reqs">
-        <li><span class="req-n">01</span><picture class="req-fig"><source type="image/webp" srcset="../img/listing/fhs-req-solar-800.webp 800w, ../img/listing/fhs-req-solar-1200.webp 1200w" sizes="(max-width: 760px) 100vw, 33vw"><img src="../img/listing/fhs-req-solar-800.jpg" srcset="../img/listing/fhs-req-solar-800.jpg 800w, ../img/listing/fhs-req-solar-1200.jpg 1200w" sizes="(max-width: 760px) 100vw, 33vw" width="800" height="533" loading="lazy" decoding="async" alt="Solar panels being fitted to a tiled roof, with scaffolding still standing around the building"></picture><span data-live>On-site renewable electricity generation &mdash; equivalent to the capacity of solar covering at least 40% of the building's ground floor area. In practice, rooftop solar PV is the most realistic way to meet this requirement.</span></li>
-        <li><span class="req-n">02</span><picture class="req-fig"><source type="image/webp" srcset="../img/listing/fhs-req-heating-800.webp 800w, ../img/listing/fhs-req-heating-1200.webp 1200w" sizes="(max-width: 760px) 100vw, 33vw"><img src="../img/listing/fhs-req-heating-800.jpg" srcset="../img/listing/fhs-req-heating-800.jpg 800w, ../img/listing/fhs-req-heating-1200.jpg 1200w" sizes="(max-width: 760px) 100vw, 33vw" width="800" height="533" loading="lazy" decoding="async" alt="An air source heat pump unit standing against the rear wall of a newly built brick bungalow"></picture><span data-live>Low-carbon heating &mdash; heat pumps or heat networks replace gas boilers as standard</span></li>
-        <li><span class="req-n">03</span><picture class="req-fig"><source type="image/webp" srcset="../img/listing/fhs-req-fabric-800.webp 800w, ../img/listing/fhs-req-fabric-1200.webp 1200w" sizes="(max-width: 760px) 100vw, 33vw"><img src="../img/listing/fhs-req-fabric-800.jpg" srcset="../img/listing/fhs-req-fabric-800.jpg 800w, ../img/listing/fhs-req-fabric-1200.jpg 1200w" sizes="(max-width: 760px) 100vw, 33vw" width="800" height="533" loading="lazy" decoding="async" alt="Two new homes under construction seen from above, one still in bare blockwork before its brick outer skin goes on"></picture><span data-live>High-performance building fabric &mdash; better insulation, airtightness and ventilation</span></li>
+    <nav class="fhs-index" aria-label="On this page">
+      <span class="eyebrow">Contents</span>
+      <ol>
+        <li><a href="#fhs-standard"><span>01</span>What the standard requires</a></li>
+        <li><a href="#fhs-ready"><span>02</span>Are you ready</a></li>
+        <li><a href="#fhs-how"><span>03</span>How the check works</a></li>
+        <li><a href="#fhs-zero-cost"><span>04</span>Solar at zero cost</a></li>
       </ol>
-      <p data-live>On-site renewables are no longer optional. The regulations were published on 24 March 2026, with compliance required from March 2028. For most homes, solar is the only practical route. The question isn't whether to install it, it's how much, what specification, and who pays for it.</p>
-    </div>
+    </nav>
 
-    <div class="fhs-block">
-      <h2 data-live>Check your housing specification in 60 seconds</h2>
-      <p class="fhs-how-lab" data-live>How it works:</p>
-      <ol class="fhs-how">
-        <li><span class="req-n">01</span><span data-live>Tell us about your house type &mdash; select from detached, semi-detached, terraced, or apartment. Enter number of bedrooms and approximate floor area.</span></li>
-        <li><span class="req-n">02</span><span data-live>Current spec &mdash; what heating system is planned? Is solar already in the specification? If so, what size system?</span></li>
-        <li><span class="req-n">03</span><span data-live>Get your results &mdash; a personalised FHS compliance summary showing where you stand today, what gaps exist, and a recommended solar + battery specification to close them.</span></li>
-      </ol>
-    </div>
+    <article class="fhs-col">
 
-    <!-- Mehdi, 7 September: this section was on the live page and not here.
-         Added in the live page's own position, between the sixty seconds block
-         and the FAQs, word for word. -->
-    <div class="fhs-block">
-      <h2 data-live>Solar that meets FHS &mdash; at zero cost to you</h2>
-      <p data-live>Gryd funds, installs and manages solar + battery systems on new-build homes. Developers get homes with FHS-compliant solar without adding to build cost. Homeowners get cheaper, cleaner energy from day one.</p>
-      <div class="fhs-cols">
-        <div>
-          <p class="fhs-how-lab" data-live>For developers:</p>
-          <ul class="fhs-bullets">
-            <li data-live>&pound;0 upfront cost per plot &mdash; Gryd funds the hardware</li>
-            <li data-live>Systems sized to maximise bill savings, not just meet FHS minimums</li>
-            <li data-live>Works across all tenures: private sale, affordable, build-to-rent</li>
-            <li data-live>Solutions for both single family homes and apartment buildings</li>
-          </ul>
+      <section class="fhs-sec" id="fhs-standard">
+        <span class="eyebrow">What the standard requires</span>
+        <p class="fhs-lead" data-live>The Future Homes Standard represents the most significant upgrade to how we build homes in England in a generation. Published on 24 March 2026, the new regulations require new homes to produce 75% fewer greenhouse gas emissions, achieved through on-site renewable energy generation on most new roofs (in practice, rooftop solar PV), low-carbon heating systems such as air source heat pumps replacing gas boilers, and enhanced building fabric performance including improved airtightness. The regulations come into force on 24 March 2027, with a 12-month transition period. Building work must have commenced under previous regulations by 24 March 2028.</p>
+        <p data-live>For developers, this is a clear signal: the homes being designed today must be ready for a low-carbon future. For homeowners, it means stepping into a home that is cheaper to run, more comfortable to live in, and built to perform for decades, not just pass a minimum standard. The FHS does not just raise the bar. It redefines what a new home should be.</p>
+      </section>
+
+      <section class="fhs-sec" id="fhs-ready">
+        <span class="eyebrow">Are you ready</span>
+        <h2 data-live>The Future Homes Standard is here. Are you ready?</h2>
+        <p data-live>The FHS requires new homes in England to produce 75% fewer greenhouse gas emissions than homes built under the 2013 Building Regulations. For most developers, that means three things:</p>
+        <ol class="fhs-reqs">
+          <li class="req">
+            <div class="req-head">
+              <span class="req-n">01</span>
+              <picture class="req-fig"><source type="image/webp" srcset="../img/listing/fhs-req-solar-800.webp 800w, ../img/listing/fhs-req-solar-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 30vw"><img src="../img/listing/fhs-req-solar-800.jpg" srcset="../img/listing/fhs-req-solar-800.jpg 800w, ../img/listing/fhs-req-solar-1200.jpg 1200w" sizes="(max-width: 900px) 100vw, 30vw" width="800" height="533" loading="lazy" decoding="async" alt="Solar panels being fitted to a tiled roof, with scaffolding still standing around the building"></picture>
+            </div>
+            <p data-live>On-site renewable electricity generation &mdash; equivalent to the capacity of solar covering at least 40% of the building's ground floor area. In practice, rooftop solar PV is the most realistic way to meet this requirement.</p>
+          </li>
+          <li class="req">
+            <div class="req-head">
+              <span class="req-n">02</span>
+              <picture class="req-fig"><source type="image/webp" srcset="../img/listing/fhs-req-heating-800.webp 800w, ../img/listing/fhs-req-heating-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 30vw"><img src="../img/listing/fhs-req-heating-800.jpg" srcset="../img/listing/fhs-req-heating-800.jpg 800w, ../img/listing/fhs-req-heating-1200.jpg 1200w" sizes="(max-width: 900px) 100vw, 30vw" width="800" height="533" loading="lazy" decoding="async" alt="An air source heat pump unit standing against the rear wall of a newly built brick bungalow"></picture>
+            </div>
+            <p data-live>Low-carbon heating &mdash; heat pumps or heat networks replace gas boilers as standard</p>
+          </li>
+          <li class="req">
+            <div class="req-head">
+              <span class="req-n">03</span>
+              <picture class="req-fig"><source type="image/webp" srcset="../img/listing/fhs-req-fabric-800.webp 800w, ../img/listing/fhs-req-fabric-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 30vw"><img src="../img/listing/fhs-req-fabric-800.jpg" srcset="../img/listing/fhs-req-fabric-800.jpg 800w, ../img/listing/fhs-req-fabric-1200.jpg 1200w" sizes="(max-width: 900px) 100vw, 30vw" width="800" height="533" loading="lazy" decoding="async" alt="Two new homes under construction seen from above, one still in bare blockwork before its brick outer skin goes on"></picture>
+            </div>
+            <p data-live>High-performance building fabric &mdash; better insulation, airtightness and ventilation</p>
+          </li>
+        </ol>
+        <p class="fhs-pull" data-live>On-site renewables are no longer optional. The regulations were published on 24 March 2026, with compliance required from March 2028. For most homes, solar is the only practical route. The question isn't whether to install it, it's how much, what specification, and who pays for it.</p>
+      </section>
+
+      <section class="fhs-sec" id="fhs-how">
+        <span class="eyebrow">How the check works</span>
+        <div class="fhs-panel">
+          <h2 data-live>Check your housing specification in 60 seconds</h2>
+          <p class="fhs-how-lab" data-live>How it works:</p>
+          <ol class="fhs-how">
+            <li><span class="req-n">01</span><p data-live>Tell us about your house type &mdash; select from detached, semi-detached, terraced, or apartment. Enter number of bedrooms and approximate floor area.</p></li>
+            <li><span class="req-n">02</span><p data-live>Current spec &mdash; what heating system is planned? Is solar already in the specification? If so, what size system?</p></li>
+            <li><span class="req-n">03</span><p data-live>Get your results &mdash; a personalised FHS compliance summary showing where you stand today, what gaps exist, and a recommended solar + battery specification to close them.</p></li>
+          </ol>
+          <div class="fhs-start" data-start-row>
+            <button type="button" class="btn" data-start data-live>Check your FHS readiness</button>
+          </div>
         </div>
-        <div>
-          <p class="fhs-how-lab" data-live>For homeowners:</p>
-          <ul class="fhs-bullets">
-            <li data-live>~20% energy bill reduction from day one</li>
-            <li data-live>70%+ energy covered by solar + battery</li>
-            <li data-live>Fixed subscription price for 25 years &mdash; protection from energy price volatility and future inflation</li>
-            <li data-live>maintenance, repair and replacement included</li>
-            <li data-live>The option to take ownership available at any time</li>
-          </ul>
+      </section>
+
+      <section class="fhs-sec" id="fhs-zero-cost">
+        <span class="eyebrow">Solar at zero cost</span>
+        <h2 data-live>Solar that meets FHS &mdash; at zero cost to you</h2>
+        <p data-live>Gryd funds, installs and manages solar + battery systems on new-build homes. Developers get homes with FHS-compliant solar without adding to build cost. Homeowners get cheaper, cleaner energy from day one.</p>
+        <div class="fhs-cols">
+          <div class="fhs-ccard">
+            <img class="fhs-clay" src="../../home-final/assets/img/fhs-measures/solar.png" srcset="../../home-final/assets/img/fhs-measures/solar.png 1x, ../../home-final/assets/img/fhs-measures/solar@2x.png 2x" width="72" height="72" loading="lazy" decoding="async" alt="">
+            <p class="fhs-how-lab" data-live>For developers:</p>
+            <ul class="fhs-bullets">
+              <li data-live>&pound;0 upfront cost per plot &mdash; Gryd funds the hardware</li>
+              <li data-live>Systems sized to maximise bill savings, not just meet FHS minimums</li>
+              <li data-live>Works across all tenures: private sale, affordable, build-to-rent</li>
+              <li data-live>Solutions for both single family homes and apartment buildings</li>
+            </ul>
+          </div>
+          <div class="fhs-hcard">
+            <img class="fhs-clay" src="../../home-final/assets/img/fhs-measures/battery.png" srcset="../../home-final/assets/img/fhs-measures/battery.png 1x, ../../home-final/assets/img/fhs-measures/battery@2x.png 2x" width="72" height="72" loading="lazy" decoding="async" alt="">
+            <p class="fhs-how-lab" data-live>For homeowners:</p>
+            <ul class="fhs-bullets">
+              <li data-live>~20% energy bill reduction from day one</li>
+              <li data-live>70%+ energy covered by solar + battery</li>
+              <li data-live>Fixed subscription price for 25 years &mdash; protection from energy price volatility and future inflation</li>
+              <li data-live>maintenance, repair and replacement included</li>
+              <li data-live>The option to take ownership available at any time</li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
 
-    <div class="fhs-start" data-start-row>
-      <button type="button" class="btn" data-start data-live>Check your FHS readiness</button>
-    </div>
-
+    </article>
   </section>
 
   <!-- Scott, 7 September: the article and the tool are separate things. The
-       check is a popup on the shared modal plate now, built by fhs.js and
-       appended to the body, so nothing of the tool stands in this column. -->
+       check is a popup on the shared modal plate, built by fhs.js and appended
+       to the body, so nothing of the tool stands in this column. -->
 
   <div class="g-close">
+    <span class="eyebrow">Next step</span>
     <h2>Want this checked properly?</h2>
     <p>Send us the scheme. We will size the solar and battery on every house type on it and come back with the numbers.</p>
     <a class="btn" href="request-site-assessment.html">Request a site assessment</a>

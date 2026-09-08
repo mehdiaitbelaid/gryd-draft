@@ -1,9 +1,9 @@
 /* The FHS readiness page, in the hub's Daylight skin.
 
-   Two surfaces. The page is the live FHS page's copy in Build G's layout: a
-   masthead, then sections that carry the heading in the content column and the
-   label with its orange rule in the right column. The check itself runs in a
-   popup, and that popup borrows its whole visual vocabulary from the site
+   Two surfaces. The page is direction A, the article spine: a masthead, then a
+   sticky index of the four sections beside a 68ch reading column, with the
+   check offered as a bordered panel inside section 03. The check itself runs
+   in a popup, and that popup borrows its whole visual vocabulary from the site
    assessment modal: paper plate, segmented stage dash, hairline gate fields,
    pill go button. Those rules are copied here under an fm- prefix rather than
    shared, so the assessment modal's own file is not touched.
@@ -17,7 +17,7 @@
 
 /* ------------------------------------------------------------------ masthead */
 
-.fhs-mast { padding-bottom: 0; }
+.fhs-mast { padding-bottom: 56px; border-bottom: 1px solid var(--stone-mid); }
 .fhs-mast h1 {
   font-size: clamp(40px, 5.6vw, 74px);
   max-width: 17ch;
@@ -52,118 +52,160 @@
   color: var(--ink-soft);
 }
 
-/* ------------------------------------------------------- the landing copy */
-/* Scott, 7 September: the page is read before the check. This is the live
-   page's own copy in the hub's type: a lede at reading size, then two blocks
-   with a heading and a numbered list, then the button that reveals the run. */
+/* ------------------------------------------------------- the article spine */
+/* Direction A, chosen 8 September. The landing copy is one reading column at
+   68ch, and the four sections are listed beside it in an index that stays with
+   the reader. Nothing in the copy changes; the index, the numbers and the
+   photographs are reading aids over the live page's own words. */
 
-.fhs-intro { padding-top: 64px; }
-.fhs-lede p {
-  margin: 0 0 18px;
-  font-size: 17px;
-  line-height: 1.7;
-  color: var(--ink-soft);
-  max-width: 74ch;
+.fhs-intro {
+  padding-top: 64px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 72px;
 }
-.fhs-lede p:last-child { margin-bottom: 0; }
-.fhs-block { margin-top: 56px; }
-.fhs-block h2 {
+
+.fhs-index { position: sticky; top: 108px; align-self: start; }
+.fhs-index ol { list-style: none; margin: 22px 0 0; padding: 0; }
+.fhs-index li + li { border-top: 1px solid var(--stone-mid); }
+.fhs-index a {
+  display: flex;
+  gap: 12px;
+  padding: 13px 0;
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+.fhs-index a span { color: var(--flare); font-weight: 500; }
+.fhs-index a:hover { color: var(--red110); }
+
+.fhs-col { max-width: 68ch; }
+.fhs-sec { padding-bottom: var(--sec-pad); }
+.fhs-sec:last-child { padding-bottom: 0; }
+.fhs-sec + .fhs-sec { border-top: 1px solid var(--stone-mid); padding-top: 56px; }
+.fhs-sec h2 {
   font-size: clamp(26px, 2.6vw, 34px);
   letter-spacing: -0.025em;
   line-height: 1.2;
-  margin: 0 0 16px;
+  margin: var(--label-gap) 0 var(--head-gap);
   max-width: 24ch;
 }
-.fhs-block > p {
+.fhs-sec p {
   margin: 0 0 18px;
   font-size: 17px;
   line-height: 1.7;
   color: var(--ink-soft);
-  max-width: 74ch;
 }
-.fhs-block > p:last-child { margin-bottom: 0; }
+.fhs-sec > p:last-child { margin-bottom: 0; }
+.fhs-sec > .eyebrow + p { margin-top: var(--label-gap); }
+.fhs-lead { font-size: clamp(18px, 1.35vw, 21px) !important; line-height: 1.6; color: var(--red110) !important; }
 .fhs-how-lab {
   font-size: 12px;
   font-weight: 500;
   letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--warm-grey);
+  margin: 0 0 14px;
 }
-/* The three requirements and the three steps are the page's own blocks rather
-   than a run of small print: each one is a photograph or a numbered block at
-   the site's reading size, three across, hairline over each. Not a word
-   changes; the number and the picture are reading aids over the live copy. */
-.fhs-reqs, .fhs-how {
-  margin: 0;
+
+/* the three requirements: the number and the photograph in a narrow column,
+   the live sentence beside them */
+.fhs-reqs {
+  margin: 34px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 32px;
+  gap: 26px;
 }
-.fhs-reqs { margin-top: 30px; }
-.fhs-how { margin-top: 24px; }
-.fhs-reqs li, .fhs-how li {
+.fhs-reqs .req {
   border-top: 1px solid var(--stone-mid);
-  padding-top: 16px;
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--ink-soft);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
 }
-.req-n {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--flare);
-  font-variant-numeric: tabular-nums;
-}
-/* Mehdi, 7 September: photographs, not clay. The three requirements each get a
-   real picture at the column width, so the block reads as the site's other
-   photo runs rather than as an icon list. 3:2 is baked into the derivatives and
-   held here as well, so the card keeps its shape before the file decodes. */
-.req-fig {
-  display: block;
-  width: 100%;
-  margin: 2px 0 0;
-  border-radius: var(--radius-chip);
-  overflow: hidden;
-  background: var(--stonelight);
-}
-.req-fig img {
+.fhs-reqs .req-head { display: grid; gap: 12px; }
+.fhs-reqs .req-n { font-size: 22px; }
+.fhs-reqs .req-fig img {
   display: block;
   width: 100%;
   height: auto;
+  border-radius: 14px;
   aspect-ratio: 3 / 2;
   object-fit: cover;
+  background: var(--stonelight);
 }
-.fhs-block > .fhs-reqs + p { margin-top: 30px; }
+.fhs-reqs p { margin: 0; }
 
-/* the two column bullet lists in the zero cost section */
-.fhs-cols {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 34px;
+.req-n {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--flare);
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
-.fhs-bullets { list-style: none; margin: 12px 0 0; padding: 0; }
+
+/* the line Scott wanted to land, set as a quote rather than another paragraph */
+.fhs-pull {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.9vw, 26px) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.02em;
+  color: var(--red110) !important;
+  border-left: 2px solid var(--flare);
+  padding-left: 24px;
+  margin: 34px 0 0 !important;
+}
+
+/* the check, offered inside the article as a bordered panel */
+.fhs-panel {
+  margin-top: var(--label-gap);
+  border: 1px solid var(--stone-mid);
+  border-radius: var(--radius-panel);
+  background: var(--stonelight);
+  padding: 40px;
+}
+.fhs-panel h2 { margin-top: 0; }
+.fhs-how { list-style: none; margin: 0; padding: 0; display: grid; }
+.fhs-how li {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 14px;
+  padding: 20px 0;
+  border-top: 1px solid var(--stone-mid);
+}
+.fhs-how .req-n { font-size: 20px; }
+.fhs-how p { margin: 0; }
+
+/* the zero cost block, two cards with the measure clay on each */
+.fhs-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+  margin-top: 34px;
+}
+.fhs-cols > div {
+  border: 1px solid var(--stone-mid);
+  border-radius: var(--radius-panel);
+  padding: 30px;
+}
+.fhs-cols .fhs-ccard { background: var(--blush); }
+.fhs-clay { display: block; width: 72px; height: 72px; margin-bottom: 14px; }
+.fhs-bullets { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .fhs-bullets li {
-  font-size: 17px;
+  position: relative;
+  padding-left: 18px;
+  font-size: 15px;
   line-height: 1.6;
   color: var(--ink-soft);
-  padding: 10px 0 0 18px;
-  position: relative;
-  text-wrap: pretty;
 }
 .fhs-bullets li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 20px;
+  top: 9px;
   width: 5px;
   height: 5px;
   border-radius: 999px;
@@ -174,6 +216,21 @@
 .fhs-start[hidden] { display: none; }
 /* the masthead copy of the button carries the masthead's own gap */
 .fhs-mast .fhs-start { margin-top: var(--btn-gap-top); }
+.fhs-panel .fhs-start { margin-top: 30px; }
+
+/* the closing band keeps its label above the heading */
+.fhs .g-close .eyebrow { justify-content: center; }
+.fhs .g-close h2 { margin-top: var(--label-gap); }
+
+@media (max-width: 1000px) {
+  .fhs-intro { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .fhs-index { position: static; margin-bottom: 44px; }
+  .fhs-col { max-width: none; }
+}
+@media (max-width: 900px) {
+  .fhs-reqs .req { grid-template-columns: minmax(0, 1fr); }
+  .fhs-reqs .req-fig img { max-width: 320px; }
+}
 
 /* =============================================================== the check */
 /* Mehdi, 4 September: the run is the page. .fm stays as the shell's class so
@@ -729,6 +786,13 @@
 .r-detail-in { padding: 6px 0 10px; }
 .fhs-result .ar-table-wrap { margin-top: 22px; }
 .fhs-result .tbl .sub { display: block; font-size: 15px; color: var(--warm-grey); }
+
+/* Mehdi, 8 September: the last column of the comparison carries fhs-gryd-col
+   from fhs.js. The tinted plate was turned down; the column reads in orange at
+   the same font, size and weight as its neighbours, and nothing else. */
+.fhs-result .tbl td.fhs-gryd-col,
+.fhs-result .tbl th.fhs-gryd-col,
+.fhs-result .tbl .fhs-gryd-col .sub { color: var(--flare); }
 .fhs-result .num { font-variant-numeric: tabular-nums; }
 .fhs-result .note { font-size: 15px; line-height: 1.6; color: var(--warm-grey); max-width: 74ch; margin: 22px 0 0; }
 .fhs-result .note.flag { color: var(--ember); }
@@ -752,7 +816,6 @@
   .fhs-result .ar-stat { padding: 16px 16px 14px; }
   .fhs-check { padding-top: 52px; }
   .fhs-intro { padding-top: 44px; }
-  .fhs-block { margin-top: 40px; }
   .fm-nav { margin-top: 26px; }
   .fm .fhs-q h2 { font-size: 26px; }
   .fm-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 14px 0 12px; }
@@ -768,7 +831,6 @@
   .ar-list.fhs-rows { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .r-chip { padding: 18px 16px 16px; }
   .r-note { padding: 0 16px; }
-  .fhs-reqs, .fhs-how { grid-template-columns: minmax(0, 1fr); gap: 22px; }
   .fhs-cols { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .fhs-pop .sam-box { padding: 22px 20px 20px; max-height: calc(100vh - 24px); }
   .fhs-pop .fm-prog { margin-right: 40px; }
