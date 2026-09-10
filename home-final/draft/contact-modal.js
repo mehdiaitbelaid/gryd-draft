@@ -109,6 +109,7 @@
     finished = false;
     form = window.GrydHsForm.mount(host, SPEC, {
       name: "contact",
+      source: "contact",
       onSuccess: function () { finished = true; }
     });
   }

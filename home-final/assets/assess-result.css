@@ -333,7 +333,7 @@
 .ar-assess .ar-xtick,
 .ar-assess .ar-axis { font-size: 13px; }
 .ar-assess .ar-tip { font-size: 15px; min-width: 210px; }
-.ar-assess .ar-foot { font-size: 15px; line-height: 1.5; }
+.ar-assess .ar-foot { font-size: 13px; line-height: 1.5; }
 .ar-assess .ar-said { font-size: 15px; }
 /* the two benefit lists are open, so each one is a section under its plate
    with a rule between it and the figure it belongs to */

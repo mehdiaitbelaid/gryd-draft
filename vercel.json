@@ -1,6 +1,11 @@
 {
   "framework": null,
   "outputDirectory": ".",
+  "functions": {
+    "api/lead.js": {
+      "maxDuration": 30
+    }
+  },
   "cleanUrls": false,
   "trailingSlash": false,
   "redirects": [

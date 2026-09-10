@@ -21,6 +21,7 @@
 
   var ENDPOINT = "https://forms-eu1.hsforms.com/submissions/v3/integration/submit/"
     + "144906745/ff5fca7b-c31f-4fb2-9e65-69b9e058973f";
+  var LEAD_API = "/api/lead";
   var CONSENT_TEXT = "I consent to Gryd storing my details to provide this assessment "
     + "and contact me about their services.";
 
@@ -87,6 +88,29 @@
     };
   }
 
+  /* The same answers in our own endpoint's envelope. The honeypot is empty
+     here because no field on the gate can fill it. */
+  function leadApiBody(inputs, result, contact) {
+    var n = splitName(contact.name);
+    return JSON.stringify({
+      source: "assess",
+      email: contact.email,
+      firstname: n.first,
+      lastname: n.last,
+      website: "",
+      notes: notes(inputs, result),
+      payload: {
+        totalHomes: parseInt(inputs.homes, 10) || 0,
+        postcode: String(inputs.postcode || "").toUpperCase().trim(),
+        orientation: inputs.orientation || "",
+        energyDemand: inputs.energy || "",
+        results: result || null
+      },
+      pageUri: w.location.href,
+      pageName: w.document.title
+    });
+  }
+
   /* inputs is what the engine was given, result is what it returned, and
      contact is the name and the email the gate took. The returned promise
      settles on the send itself: it rejects when there is nothing to send, when
@@ -101,13 +125,22 @@
     } catch (err) {
       return Promise.reject(err);
     }
-    return w.fetch(ENDPOINT, {
+    return w.fetch(LEAD_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: body
+      body: leadApiBody(inputs, result, contact)
     }).then(function (res) {
-      if (!res.ok) { throw new Error("assessment lead not accepted, " + res.status); }
+      if (!res.ok) { throw new Error("lead api " + res.status); }
       return true;
+    }).catch(function () {
+      return w.fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: body
+      }).then(function (res) {
+        if (!res.ok) { throw new Error("assessment lead not accepted, " + res.status); }
+        return true;
+      });
     });
   }
 

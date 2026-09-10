@@ -135,6 +135,7 @@
     if (form && !done) { return; }
     form = window.GrydHsForm.mount(host(), SPEC, {
       name: 'download-gate',
+      source: 'gate',
       onSuccess: release
     });
   }

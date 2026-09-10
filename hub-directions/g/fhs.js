@@ -588,6 +588,7 @@
 
   var HS_ENDPOINT = "https://forms-eu1.hsforms.com/submissions/v3/integration/submit/"
     + "144906745/ff5fca7b-c31f-4fb2-9e65-69b9e058973f";
+  var LEAD_API = "/api/lead";
   var CONSENT_TEXT = "I consent to Gryd storing my details to provide this assessment "
     + "and contact me about their services.";
 
@@ -689,14 +690,40 @@
     };
   }
 
+  /* The same lead in our own endpoint's envelope. The honeypot is empty here
+     because the gate has no field that can fill it. */
+  function leadApiBody(m, r) {
+    var n = splitName(contact.name);
+    return JSON.stringify({
+      source: "fhs",
+      email: contact.email,
+      firstname: n.first,
+      lastname: n.last,
+      company: contact.company || "",
+      website: "",
+      notes: leadNotes(m, r),
+      pageUri: w.location.href,
+      pageName: d.title
+    });
+  }
+
   function sendLead(m, r) {
-    return w.fetch(HS_ENDPOINT, {
+    return w.fetch(LEAD_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(leadPayload(m, r))
+      body: leadApiBody(m, r)
     }).then(function (res) {
-      if (!res.ok) { throw new Error("hubspot " + res.status); }
+      if (!res.ok) { throw new Error("lead api " + res.status); }
       return true;
+    }).catch(function () {
+      return w.fetch(HS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(leadPayload(m, r))
+      }).then(function (res) {
+        if (!res.ok) { throw new Error("hubspot " + res.status); }
+        return true;
+      });
     });
   }
 

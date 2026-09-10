@@ -67,6 +67,7 @@
     var at = 0;
     var pending = false;
     var last = spec.steps.length - 1;
+    var trap = null;            // honeypot input, named as /api/lead expects
 
     spec.steps.forEach(function (step) {
       step.fields.forEach(function (f) {
@@ -174,6 +175,30 @@
       });
     }
 
+    /* Our own endpoint first, the HubSpot form as the fallback. The values are
+       the same either way; only the envelope differs. */
+    function leadBody() {
+      var v = {};
+      spec.steps.forEach(function (step) {
+        step.fields.forEach(function (f) {
+          v[f.name] = String(values[f.name] || "").trim();
+        });
+      });
+      return JSON.stringify({
+        source: opts.source || (spec.formId.slice(0, 8) === "300acd1e" ? "gate" : "contact"),
+        email: v.email,
+        firstname: v.firstname,
+        lastname: v.lastname,
+        phone: v.phone || "",
+        company: v.company || "",
+        message: v.message || "",
+        website: trap ? trap.value : "",
+        pageUri: w.location.href,
+        pageName: d.title,
+        hutk: hutk()
+      });
+    }
+
     function send() {
       if (pending) { return; }        // one send at a time, whatever is clicked
       pending = true;
@@ -182,10 +207,20 @@
       var body;
       try { body = JSON.stringify(payload()); }
       catch (err) { pending = false; retry(); return; }
-      w.fetch(spec.endpoint, {
+      w.fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: body
+        body: leadBody()
+      }).then(function (res) {
+        if (!res.ok) { throw new Error("lead api " + res.status); }
+        return res;
+      }).catch(function () {
+        // Fallback: the form the browser posted to before this route existed.
+        return w.fetch(spec.endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: body
+        });
       }).then(function (res) {
         if (!res.ok) { throw new Error("hubspot " + res.status); }
         pending = false;
@@ -254,6 +289,17 @@
         if (pair.length === 2 && pair.indexOf(f) > -1) { return; }
         rows.appendChild(field(f));
       });
+      /* Honeypot. Off screen rather than display:none so a bot that skips
+         hidden controls still fills it. Never sent to HubSpot. */
+      trap = el("input");
+      trap.type = "text";
+      trap.name = "website";
+      trap.id = "hsf-" + spec.formId.slice(0, 8) + "-website";
+      trap.tabIndex = -1;
+      trap.setAttribute("autocomplete", "off");
+      trap.setAttribute("aria-hidden", "true");
+      trap.style.cssText = "position:absolute;left:-9999px;width:1px;height:1px;opacity:0";
+      rows.appendChild(trap);
       box.appendChild(rows);
       // CONSENT SLOT. The tick and its sentence belong here, on the last step.
       box.appendChild(rail(step));

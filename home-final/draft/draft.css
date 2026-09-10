@@ -547,6 +547,10 @@ a.qlogo:hover img { opacity: .72; }
   transition: opacity .3s ease, filter .3s ease;
 }
 .a-seen .pmark:hover img { filter: grayscale(0); opacity: 1; }
+/* Linked marks, same treatment a.qlogo already gets in the quotes band: the
+   underline off, the hover left to the .pmark rule above, the focus ring the
+   browser's own. */
+a.pmark { text-decoration: none; color: inherit; }
 .a-seen .pmark.word {
   font-family: "DM Sans", sans-serif;
   font-weight: 500;
