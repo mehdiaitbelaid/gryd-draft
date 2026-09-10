@@ -16,7 +16,7 @@
 
 const crypto = require("crypto");
 const { createCompanyAndAssociateContact } = require("./lib/hubspot");
-const { sendEmail } = require("./lib/smtp2go");
+const { sendEmail, formatCurrency, formatPercent } = require("./lib/smtp2go");
 const { storePayload } = require("./lib/dynamo");
 
 const ALLOWED_ORIGINS = [
@@ -130,7 +130,7 @@ function taskSubject(input) {
 
 /* The admin template's own variables, from the old /hubspot route. Anything the
    source does not know is left as an empty string rather than invented. */
-function adminTemplateData(input, hubspotInfo) {
+function adminTemplateData(input, hubspotInfo, origin) {
   const p = input.payload || {};
   const beds = p.bedrooms || {};
   const loc = p.location || {};
@@ -153,37 +153,63 @@ function adminTemplateData(input, hubspotInfo) {
     location_latitude: loc.lat == null ? "" : loc.lat,
     location_longitude: loc.lng == null ? "" : loc.lng,
     map_link: loc.lat == null ? "" : "https://maps.google.com/?q=" + loc.lat + "," + loc.lng,
-    results_link: p.shareLink || "",
+    results_link: p.shareLink || resultsLink(input, origin),
     source: SOURCE_LABEL[input.source],
     notes: input.notes || input.message || ""
   };
 }
 
+/* Where "View your results" points. The old email linked to a stored result in
+   DynamoDB; DynamoDB was dropped, so the link goes to the assessment page on the
+   origin the submission came from, which is the page the reader can run again.
+   The reader's own page path is used when the browser sent one on our origin. */
+const ASSESS_PATH = "/site-assessment.html";
+const DEFAULT_ORIGIN = "https://gryd.energy";
+
+function resultsLink(input, origin) {
+  const base = origin && ALLOWED_ORIGINS.indexOf(origin) !== -1 ? origin : DEFAULT_ORIGIN;
+  if (input.pageUri) {
+    try {
+      const u = new URL(String(input.pageUri));
+      if (u.origin === base) { return u.origin + u.pathname; }
+    } catch (err) { /* an unparseable pageUri just falls through to the default */ }
+  }
+  return base + ASSESS_PATH;
+}
+
 /* The user template's variables, from the old /send-email route. Only the site
-   assessment can fill the savings half, and only when the browser sends its
-   computed result in payload.results. */
-function userTemplateData(input) {
+   assessment fills the savings half, and only from payload.results, which
+   assess-lead.js builds out of what window.GrydAssess.compute returned. Every
+   currency figure arrives as a plain number and is formatted here, the way the
+   old backend formatted it on the way into the same template.
+
+   A submission with no payload.results still produces every key, empty, so the
+   email sends with blanks rather than failing. */
+function userTemplateData(input, origin) {
   const p = input.payload || {};
   const r = p.results || {};
+  const money = function (v) { return v == null || v === "" ? "" : formatCurrency(v); };
+  const pct = function (v) { return v == null || v === "" ? "" : formatPercent(v); };
+  const plain = function (v) { return v == null || v === "" ? "" : String(v); };
   return {
-    number_homes: p.totalHomes == null ? "" : p.totalHomes,
-    location_postcode: p.postcode || "",
-    average_orientation: p.orientation || "",
-    utility_setup: p.energyDemand || "",
-    developer_build_saving: r.developer_build_saving || "",
-    carbon_emission_saving: r.carbon_emission_saving || "",
-    developer_build_per_unit_saving: r.developer_build_per_unit_saving || "",
-    home_owner_saving: r.home_owner_saving || "",
-    subscription_small: r.subscription_small || "",
-    saving_small: r.saving_small || "",
-    saving_percent_small: r.saving_percent_small || "",
-    subscription_medium: r.subscription_medium || "",
-    saving_medium: r.saving_medium || "",
-    saving_percent_medium: r.saving_percent_medium || "",
-    subscription_large: r.subscription_large || "",
-    saving_large: r.saving_large || "",
-    saving_percent_large: r.saving_percent_large || "",
-    results_link: p.shareLink || ""
+    number_homes: plain(r.number_homes != null ? r.number_homes : p.totalHomes),
+    location_postcode: plain(r.location_postcode || p.postcode),
+    average_orientation: plain(r.average_orientation || p.orientation),
+    utility_setup: plain(r.utility_setup || p.energyDemand),
+    developer_build_saving: money(r.developer_build_saving),
+    carbon_emission_saving: plain(r.carbon_emission_saving),
+    developer_build_per_unit_saving: money(r.developer_build_per_unit_saving),
+    home_owner_saving: money(r.home_owner_saving),
+    subscription_small: plain(r.subscription_small),
+    saving_small: money(r.saving_small),
+    saving_percent_small: pct(r.saving_percent_small),
+    subscription_medium: plain(r.subscription_medium),
+    saving_medium: money(r.saving_medium),
+    saving_percent_medium: pct(r.saving_percent_medium),
+    subscription_large: plain(r.subscription_large),
+    saving_large: money(r.saving_large),
+    saving_percent_large: pct(r.saving_percent_large),
+    results_link: resultsLink(input, origin)
   };
 }
 
@@ -303,7 +329,7 @@ async function handler(req, res) {
     try {
       const out = await sendEmail(
         "enquiries@gryd.energy",
-        adminTemplateData(input, hubspotInfo),
+        adminTemplateData(input, hubspotInfo, req.headers.origin),
         "New " + SOURCE_LABEL[input.source] + " - Assigned to " + hubspotInfo.task_owner,
         process.env.SMTP_2_GO_TEMPLATE_ID_ADMIN
       );
@@ -314,7 +340,7 @@ async function handler(req, res) {
       try {
         const out = await sendEmail(
           input.email,
-          userTemplateData(input),
+          userTemplateData(input, req.headers.origin),
           "Website Followup",
           process.env.SMTP_2_GO_TEMPLATE_ID_USER
         );
@@ -342,6 +368,7 @@ module.exports.taskBody = taskBody;
 module.exports.taskSubject = taskSubject;
 module.exports.adminTemplateData = adminTemplateData;
 module.exports.userTemplateData = userTemplateData;
+module.exports.resultsLink = resultsLink;
 module.exports.forwardToForm = forwardToForm;
 module.exports.ALLOWED_ORIGINS = ALLOWED_ORIGINS;
 module.exports.FORMS = FORMS;

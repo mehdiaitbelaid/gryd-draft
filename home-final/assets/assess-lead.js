@@ -88,6 +88,46 @@
     };
   }
 
+  /* The figures the SMTP2GO user template prints, under the names the old
+     backend's /send-email route used. Currency goes as plain numbers and the
+     server reapplies the old formatting; the percentages go as numbers and the
+     server adds the sign. The three bedroom rows come from result.model.bands,
+     not from result.rows, because the email's table has a line for every house
+     size while the page only draws the sizes the scheme actually contains.
+
+     The engine has no figure for a share link, so none is sent: the server
+     points the "View your results" link back at the assessment page. */
+  function bandOf(result, key) {
+    var bands = (result.model && result.model.bands) || [];
+    for (var i = 0; i < bands.length; i++) {
+      if (bands[i].key === key) { return bands[i]; }
+    }
+    return null;
+  }
+
+  function round2(n) { return Math.round(Number(n) * 100) / 100; }
+
+  function results(inputs, result) {
+    if (!result) { return null; }
+    var out = {
+      number_homes: (result.model && result.model.homes) || parseInt(inputs.homes, 10) || 0,
+      location_postcode: String(inputs.postcode || "").toUpperCase().trim(),
+      average_orientation: inputs.orientation || "",
+      utility_setup: (result.model && result.model.energy) || inputs.energy || "",
+      developer_build_saving: round2(result.developerSaving),
+      carbon_emission_saving: round2(result.co2TonnesPerYear),
+      developer_build_per_unit_saving: round2(result.savingPerUnit),
+      home_owner_saving: round2(result.homeownerLifetimeSaving)
+    };
+    [["small", "small"], ["mid", "medium"], ["large", "large"]].forEach(function (pair) {
+      var b = bandOf(result, pair[0]);
+      out["subscription_" + pair[1]] = b ? b.subscription : "";
+      out["saving_" + pair[1]] = b ? round2(b.lifetimeSaving) : "";
+      out["saving_percent_" + pair[1]] = b ? round2(b.lifetimePct) : "";
+    });
+    return out;
+  }
+
   /* The same answers in our own endpoint's envelope. The honeypot is empty
      here because no field on the gate can fill it. */
   function leadApiBody(inputs, result, contact) {
@@ -104,7 +144,7 @@
         postcode: String(inputs.postcode || "").toUpperCase().trim(),
         orientation: inputs.orientation || "",
         energyDemand: inputs.energy || "",
-        results: result || null
+        results: results(inputs, result)
       },
       pageUri: w.location.href,
       pageName: w.document.title
@@ -144,5 +184,6 @@
     });
   }
 
-  w.GrydAssessLeadApi = { send: send, notes: notes, payload: payload, ENDPOINT: ENDPOINT };
+  w.GrydAssessLeadApi = { send: send, notes: notes, payload: payload,
+                          results: results, ENDPOINT: ENDPOINT };
 })(window);
