@@ -337,10 +337,19 @@ async function handler(req, res) {
     } catch (err) { emails.admin = false; }
 
     if (input.source === "assess") {
+      const userData = userTemplateData(input, req.headers.origin);
+      /* Which template variables would print as nothing. The old backend
+         refused the send outright when a field was missing, so a blank table
+         was impossible there; here the send still goes, and the empty names
+         come back on the response so a live submission says for itself which
+         figures never arrived. */
+      emails.user_empty = Object.keys(userData).filter(function (k) {
+        return String(userData[k]) === "";
+      });
       try {
         const out = await sendEmail(
           input.email,
-          userTemplateData(input, req.headers.origin),
+          userData,
           "Website Followup",
           process.env.SMTP_2_GO_TEMPLATE_ID_USER
         );
