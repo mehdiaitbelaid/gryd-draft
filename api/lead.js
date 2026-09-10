@@ -16,7 +16,7 @@
 
 const crypto = require("crypto");
 const { createCompanyAndAssociateContact } = require("./lib/hubspot");
-const { sendEmail, formatCurrency, formatPercent } = require("./lib/smtp2go");
+const { sendEmail, sendRaw, formatCurrency, formatPercent } = require("./lib/smtp2go");
 const { storePayload } = require("./lib/dynamo");
 
 const ALLOWED_ORIGINS = [
@@ -213,6 +213,90 @@ function userTemplateData(input, origin) {
   };
 }
 
+/* ------------------------------------------------- the download gate's copy
+
+   Mehdi, 10 September: the gate used to open the PDF in the browser the moment
+   the API answered. It emails the document instead, so the reader has it in the
+   inbox they just handed over and the file and the lead travel together.
+
+   The browser says which document it wants. That is a path from an untrusted
+   page, so it is never used as a path: only its pathname is read, it has to
+   match the one shelf the site keeps PDFs on, and the file is then fetched from
+   an origin of ours. Anything else leaves the reader with a link and no
+   attachment rather than letting a caller name a file for us to post out. */
+const GATE_PDF_RE = /^\/hub-directions\/g\/pdf\/[a-z0-9][a-z0-9-]*\.pdf$/;
+const ATTACH_LIMIT = 4 * 1024 * 1024;
+const GATE_FALLBACK_TITLE = "your Gryd download";
+
+function gateDoc(input, origin) {
+  const p = input.payload || {};
+  const base = origin && ALLOWED_ORIGINS.indexOf(origin) !== -1 ? origin : DEFAULT_ORIGIN;
+  let path = "";
+  try { path = new URL(String(p.pdf || ""), base).pathname; }
+  catch (err) { path = ""; }
+  const allowed = GATE_PDF_RE.test(path);
+  const title = String(p.title || "").trim().slice(0, 140) || GATE_FALLBACK_TITLE;
+  return {
+    allowed: allowed,
+    url: allowed ? base + path : "",
+    filename: allowed ? path.slice(path.lastIndexOf("/") + 1) : "",
+    title: title
+  };
+}
+
+/* Never fatal. A file we cannot fetch, or one too big to post, comes back null
+   and the reader gets the link on its own. */
+async function gateAttachment(doc) {
+  if (!doc.allowed) { return null; }
+  try {
+    const res = await fetch(doc.url);
+    if (!res.ok) {
+      console.log("gate pdf " + res.status + " for " + doc.url + ", link only");
+      return null;
+    }
+    const declared = res.headers && res.headers.get
+      ? Number(res.headers.get("content-length")) : 0;
+    if (declared && declared > ATTACH_LIMIT) {
+      console.log("gate pdf over the attachment limit, link only: " + doc.url);
+      return null;
+    }
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.length > ATTACH_LIMIT) {
+      console.log("gate pdf over the attachment limit, link only: " + doc.url);
+      return null;
+    }
+    return {
+      filename: doc.filename,
+      mimetype: "application/pdf",
+      fileblob: buf.toString("base64")
+    };
+  } catch (err) {
+    console.log("gate pdf fetch failed, link only: " + String(err && err.message));
+    return null;
+  }
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* Two lines. The first says where the document is, the second opens the door to
+   a reply, which is the only thing we want back. */
+function gateEmail(input, doc, attached) {
+  const who = String(input.firstname || "").trim();
+  const hello = who ? "Hi " + who + ", " : "";
+  const link = doc.url || DEFAULT_ORIGIN;
+  const one = attached
+    ? hello + "your copy of " + doc.title + " is attached to this email, and it also lives at "
+    : hello + "your copy of " + doc.title + " is ready to read at ";
+  const two = "If anything in it raises a question, reply here and one of us will pick it up.";
+  const html = "<p>" + esc(one) + '<a href="' + esc(link) + '">' + esc(link) + "</a>.</p>"
+    + "<p>" + esc(two) + "</p>";
+  const text = one + link + ".\n\n" + two + "\n";
+  return { subject: "Your copy of " + doc.title, html: html, text: text };
+}
+
 /* The same submission the browser used to post directly, so the form history in
    HubSpot keeps filling. Never fatal. */
 async function forwardToForm(input) {
@@ -336,6 +420,23 @@ async function handler(req, res) {
       emails.admin = Boolean(out && out.sent);
     } catch (err) { emails.admin = false; }
 
+    /* CHANGED 10 September. The gate's reader gets the document by email now
+       rather than in a new tab, so this send is the delivery rather than a
+       receipt. It never fails the request: a send that throws is reported on
+       the response and the lead is still filed. */
+    if (input.source === "gate") {
+      const doc = gateDoc(input, req.headers.origin);
+      const attachment = await gateAttachment(doc);
+      const mail = gateEmail(input, doc, Boolean(attachment));
+      emails.attached = Boolean(attachment);
+      emails.doc = doc.url || "";
+      try {
+        const out = await sendRaw(input.email, mail.subject, mail.html, mail.text,
+                                  attachment ? [attachment] : []);
+        emails.user = Boolean(out && out.sent);
+      } catch (err) { emails.user = false; }
+    }
+
     if (input.source === "assess") {
       const userData = userTemplateData(input, req.headers.origin);
       /* Which template variables would print as nothing. The old backend
@@ -379,6 +480,8 @@ module.exports.adminTemplateData = adminTemplateData;
 module.exports.userTemplateData = userTemplateData;
 module.exports.resultsLink = resultsLink;
 module.exports.forwardToForm = forwardToForm;
+module.exports.gateDoc = gateDoc;
+module.exports.gateEmail = gateEmail;
 module.exports.ALLOWED_ORIGINS = ALLOWED_ORIGINS;
 module.exports.FORMS = FORMS;
 module.exports._resetRateLimit = function () { HITS.clear(); };

@@ -26,8 +26,14 @@
 
    mount(host, spec, options) draws the form into host and returns a small
    handle. options:
-     name      string         what the analytics event calls this form
-     onSuccess fn(values)     run once the API has taken the lead
+     name        string             what the analytics event calls this form
+     leadPayload fn() -> object     extra the form's own page knows, sent to
+                                    /api/lead as payload and to nobody else
+     onSuccess   fn(values, via)    run once the lead has landed. via is "api"
+                                    when our own endpoint took it and "hubspot"
+                                    when it fell through to the form endpoint,
+                                    which is the difference between a backend
+                                    that will follow up and one that will not
 
    window.GrydHsForm */
 (function (w, d) {
@@ -184,7 +190,7 @@
           v[f.name] = String(values[f.name] || "").trim();
         });
       });
-      return JSON.stringify({
+      var body = {
         source: opts.source || (spec.formId.slice(0, 8) === "300acd1e" ? "gate" : "contact"),
         email: v.email,
         firstname: v.firstname,
@@ -196,7 +202,14 @@
         pageUri: w.location.href,
         pageName: d.title,
         hutk: hutk()
-      });
+      };
+      // Whatever the host page knows and the form does not: for the gate, which
+      // document was asked for, so the backend can post it out.
+      if (opts.leadPayload) {
+        var extra = opts.leadPayload();
+        if (extra) { body.payload = extra; }
+      }
+      return JSON.stringify(body);
     }
 
     function send() {
@@ -207,6 +220,9 @@
       var body;
       try { body = JSON.stringify(payload()); }
       catch (err) { pending = false; retry(); return; }
+      // Which door the lead went through, which is what onSuccess needs to know:
+      // only the API route puts a backend behind the submission.
+      var via = "api";
       w.fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -216,6 +232,7 @@
         return res;
       }).catch(function () {
         // Fallback: the form the browser posted to before this route existed.
+        via = "hubspot";
         return w.fetch(spec.endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -226,7 +243,7 @@
         pending = false;
         announce();
         done();
-        if (opts.onSuccess) { opts.onSuccess(values); }
+        if (opts.onSuccess) { opts.onSuccess(values, via); }
       }).catch(function () {
         pending = false;
         if (go) { go.disabled = false; }

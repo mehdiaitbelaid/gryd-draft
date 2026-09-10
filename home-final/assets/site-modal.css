@@ -340,8 +340,20 @@
 .hs-form .hs-retry { margin: 22px 0 0; }
 .hs-form .hs-retry-note { margin: 0 0 12px; font-size: 15px; color: var(--modal-flare); }
 
-/* The released file, under the words the form ends on. */
+/* What follows the send, under the words the form ends on: the confirmation
+   that the document is on its way, or, on the fallback path, the file itself. */
 .dl-done { margin: 4px 0 0; }
+
+/* The confirmation sits on the same hairline the gate divides everything else
+   with, and reads at the panel's floor rather than under it. */
+.dl-done .dl-note {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--modal-line);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.dl-done .dl-note:focus { outline: none; }
 
 .gc-note, .dl-note { margin: 0; font-size: 15px; color: #6B4A3E; }
 .gc-note a { color: var(--modal-flare); }

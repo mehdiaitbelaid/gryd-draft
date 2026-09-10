@@ -13,17 +13,25 @@
    and the lead goes straight to the Forms API. That settles what the gate was
    built around for a week. There is no third party frame to read a signal out
    of, no cross origin message to authenticate and no observer guessing at what
-   a renderer wrote, so the release rule is the only one that was ever wanted:
-   the API took the lead, with a 2xx, and the file is handed over. A failed send
-   offers the send again and releases nothing.
+   a renderer wrote, so the rule is the only one that was ever wanted: the API
+   took the lead, with a 2xx. A failed send offers the send again and hands over
+   nothing.
+
+   Mehdi, 10 September: what a taken lead buys changed. The document no longer
+   opens in the browser. The reader is told it is on the way and /api/lead posts
+   it to the address they just gave, so the file lands where the lead did.
+
+   The one case that still hands the file over on the spot is the fallback: when
+   /api/lead cannot be reached the form posts to HubSpot instead, no backend has
+   seen the submission and nothing will be emailed, so refusing the file there
+   would take the document off a reader who gave us their details for it.
 
    Every word the reader sees is HubSpot's, read out of the v4 render
-   definition at build time. No consent line is drawn, because neither form
-   carries a consent module in the portal and inventing one would put a claim
-   in the reader's mouth the portal cannot back.
-
-   The panel ends on a visible link rather than on a new tab, because a tab
-   opened for the reader can be refused and a link cannot. */
+   definition at build time, apart from the confirmation line, which is ours
+   because it describes what this site does with the lead rather than anything
+   the portal holds. No consent line is drawn, because neither form carries a
+   consent module in the portal and inventing one would put a claim in the
+   reader's mouth the portal cannot back. */
 (function () {
   var SPEC = {
   "formId": "300acd1e-5c44-4728-b375-f51164c018b5",
@@ -113,10 +121,37 @@
   function host() { return document.getElementById('dl-gate-form'); }
   function doneBox() { return document.getElementById('dl-gate-done'); }
 
-  /* The file, under the words HubSpot's form ends on. */
+  /* Which document was asked for, as the backend has to be told it: the path on
+     this site, never a whole address, and the page's own title beside it. */
+  function docPath() {
+    if (!pending) { return ''; }
+    try { return new URL(pending, window.location.href).pathname; }
+    catch (e) { return ''; }
+  }
+
+  /* The confirmation. Ours, not HubSpot's, because it describes what this site
+     just did with the lead. */
+  function confirm(email) {
+    var box = doneBox();
+    if (!box) { return; }
+    box.innerHTML = '';
+    box.hidden = false;
+    var note = document.createElement('p');
+    note.className = 'dl-note';
+    note.setAttribute('role', 'status');
+    note.textContent = email
+      ? 'Check your inbox, the PDF is on its way to ' + email
+      : 'Check your inbox, the PDF is on its way to you';
+    box.appendChild(note);
+    note.setAttribute('tabindex', '-1');
+    note.focus();
+  }
+
+  /* The file itself, under the words HubSpot's form ends on. Only the fallback
+     reaches this: when the lead went to HubSpot alone, no backend saw it and
+     nothing will arrive by email, so the reader is handed the file here. */
   function release() {
-    if (done || !pending) { return; }
-    done = true;
+    if (!pending) { return; }
     var box = doneBox();
     if (!box) { return; }
     box.innerHTML = '';
@@ -131,12 +166,22 @@
     a.focus();
   }
 
+  function finish(values, via) {
+    if (done) { return; }
+    done = true;
+    if (via === 'hubspot') { release(); return; }
+    confirm(values && values.email);
+  }
+
   function build() {
     if (form && !done) { return; }
     form = window.GrydHsForm.mount(host(), SPEC, {
       name: 'download-gate',
       source: 'gate',
-      onSuccess: release
+      leadPayload: function () {
+        return { pdf: docPath(), title: document.title };
+      },
+      onSuccess: finish
     });
   }
 
